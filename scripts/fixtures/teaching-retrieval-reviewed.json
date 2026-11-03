@@ -1,0 +1,150 @@
+{
+  "sampling": "Purposive stratified concept-variant sample; not random and not population accuracy. Labels reviewed from checked-in canonical stems, scoring and options.",
+  "groups": [
+    {
+      "subject": "解剖學",
+      "source": "MOEX-103030-1101-Q025",
+      "positive": [
+        "MOEX-112100-1301-Q031",
+        "MOEX-098140-1101-Q014"
+      ],
+      "negative": [
+        "MOEX-111100-1301-Q006"
+      ],
+      "rationale": "正中神經不同動作與分支；海綿竇外旋神經為負例"
+    },
+    {
+      "subject": "解剖學",
+      "source": "MOEX-111020-1301-Q010",
+      "positive": [
+        "MOEX-100030-1101-Q003",
+        "MOEX-C217-093030-S4001-STAGE1-Q019"
+      ],
+      "negative": [
+        "MOEX-111100-1301-Q006"
+      ],
+      "rationale": "頸動脈鞘內容物；內頸動脈經海綿竇不等同頸動脈鞘"
+    },
+    {
+      "subject": "生理學",
+      "source": "MOEX-111020-1301-Q068",
+      "positive": [
+        "MOEX-109020-1301-Q066",
+        "MOEX-102110-2101-Q019"
+      ],
+      "negative": [
+        "MOEX-C101-095030-S2001-HIGHGENERAL-Q011"
+      ],
+      "rationale": "菊糖清除率計算與GFR用途；肺泡通氣為負例"
+    },
+    {
+      "subject": "生理學",
+      "source": "MOEX-C101-095030-S2001-HIGHGENERAL-Q011",
+      "positive": [
+        "MOEX-C217-091030-S5004-STAGE1-Q014"
+      ],
+      "negative": [
+        "MOEX-111020-1301-Q068",
+        "MOEX-097140-2101-Q010",
+        "MOEX-097140-2101-Q011"
+      ],
+      "rationale": "肺泡通氣與無效腔；不能因同為公式就配腎清除率；單獨ventilation泛詞不能把化學感受器或V/Q比當同一肺泡通氣計算機轉"
+    },
+    {
+      "subject": "生物化學",
+      "source": "MOEX-113020-1301-Q074",
+      "positive": [
+        "MOEX-102030-2101-Q026",
+        "MOEX-104030-2101-Q027"
+      ],
+      "negative": [
+        "MOEX-111020-1301-Q068"
+      ],
+      "rationale": "競爭抑制參數；腎菊糖計算不是同機轉"
+    },
+    {
+      "subject": "生物化學",
+      "source": "MOEX-101030-2101-Q033",
+      "positive": [
+        "MOEX-112100-1301-Q087",
+        "MOEX-102030-2101-Q046"
+      ],
+      "negative": [
+        "MOEX-110020-2301-Q099"
+      ],
+      "rationale": "同一琥珀酸脫氫酶：抑制、內膜、complex II；AD病理為負例"
+    },
+    {
+      "subject": "藥理學",
+      "source": "MOEX-103030-2101-Q059",
+      "positive": [
+        "MOEX-106100-2301-Q066",
+        "MOEX-115020-2301-Q056"
+      ],
+      "negative": [
+        "MOEX-115090-2301-Q065"
+      ],
+      "rationale": "warfarin機轉與交互作用；enalapril為負例"
+    },
+    {
+      "subject": "藥理學",
+      "source": "MOEX-101110-2101-Q063",
+      "positive": [
+        "MOEX-115090-2301-Q065"
+      ],
+      "negative": [
+        "MOEX-103030-2101-Q059"
+      ],
+      "rationale": "enalapril作用與ACE；warfarin非同藥"
+    },
+    {
+      "subject": "微生物免疫學",
+      "source": "MOEX-101030-1101-Q064",
+      "positive": [
+        "MOEX-103030-1101-Q055",
+        "MOEX-108030-2301-Q013"
+      ],
+      "negative": [
+        "MOEX-113020-2301-Q015"
+      ],
+      "rationale": "流感的抗原漂移與蛋白功能；輪狀病毒非同病毒"
+    },
+    {
+      "subject": "微生物免疫學",
+      "source": "MOEX-113020-2301-Q015",
+      "positive": [
+        "MOEX-114090-2301-Q014",
+        "MOEX-097050-1101-Q054"
+      ],
+      "negative": [
+        "MOEX-108030-2301-Q013"
+      ],
+      "rationale": "輪狀病毒的基因體與傳播；流感M2非同病毒"
+    },
+    {
+      "subject": "病理學",
+      "source": "MOEX-108100-2301-Q084",
+      "positive": [
+        "MOEX-114090-2301-Q084",
+        "MOEX-103030-2101-Q086"
+      ],
+      "negative": [
+        "MOEX-109100-2301-Q085"
+      ],
+      "rationale": "何杰金腫瘤細胞比例與表現；非何杰金不可僅憑名稱子字串通過"
+    },
+    {
+      "subject": "病理學",
+      "source": "MOEX-110020-2301-Q099",
+      "positive": [
+        "MOEX-100140-2101-Q079",
+        "MOEX-107100-2301-Q073"
+      ],
+      "negative": [
+        "MOEX-100030-2101-Q076",
+        "MOEX-C002-090180-S4004-STAGE1-Q055"
+      ],
+      "rationale": "AD病理、危險背景與藥理；Alzheimer第二型星狀細胞不是AD；鼠疫原題中的plaque字串不能當作AD斑塊概念"
+    }
+  ]
+}

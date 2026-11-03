@@ -1,0 +1,420 @@
+{
+  "reviewedAt": "2026-11-03",
+  "policy": "Source-bound manual additions only; existing manual tags and official stem/scoring remain unchanged. Uses the existing content-reviewed classification layer.",
+  "questions": {
+    "MOEX-115090-2301-Q001": [
+      "微生物免疫學",
+      "細菌學－分枝桿菌、厭氧菌與非典型菌",
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MOEX-115090-2301-Q002": [
+      "微生物免疫學",
+      "細菌學－分枝桿菌、厭氧菌與非典型菌",
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MOEX-115090-2301-Q003": [
+      "微生物免疫學",
+      "細菌學－細菌結構、遺傳與致病機轉",
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MOEX-115090-2301-Q004": [
+      "微生物免疫學",
+      "病毒學－病毒結構、複製與致病診斷",
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "MOEX-115090-2301-Q005": [
+      "微生物免疫學",
+      "真菌學－醫學真菌與抗真菌治療",
+      "微生物免疫學",
+      "真菌學"
+    ],
+    "MOEX-115090-2301-Q006": [
+      "微生物免疫學",
+      "微生物免疫學－抗菌藥物",
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MOEX-115090-2301-Q007": [
+      "微生物免疫學",
+      "微生物免疫學－抗菌藥物",
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MOEX-115090-2301-Q008": [
+      "微生物免疫學",
+      "細菌學－分枝桿菌、厭氧菌與非典型菌",
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MOEX-115090-2301-Q009": [
+      "微生物免疫學",
+      "細菌學－分枝桿菌、厭氧菌與非典型菌",
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MOEX-115090-2301-Q010": [
+      "微生物免疫學",
+      "細菌學－細菌結構、遺傳與致病機轉",
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MOEX-115090-2301-Q011": [
+      "微生物免疫學",
+      "細菌學－分枝桿菌、厭氧菌與非典型菌",
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MOEX-115090-2301-Q012": [
+      "微生物免疫學",
+      "病毒學－病毒結構、複製與致病診斷",
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "MOEX-115090-2301-Q013": [
+      "微生物免疫學",
+      "病毒學－反轉錄、肝炎病毒與普里昂",
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "MOEX-115090-2301-Q014": [
+      "微生物免疫學",
+      "病毒學－RNA 病毒",
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "MOEX-115090-2301-Q015": [
+      "微生物免疫學",
+      "病毒學－病毒結構、複製與致病診斷",
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "MOEX-115090-2301-Q016": [
+      "微生物免疫學",
+      "病毒學－病毒結構、複製與致病診斷",
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "MOEX-115090-2301-Q017": [
+      "微生物免疫學",
+      "真菌學－醫學真菌與抗真菌治療",
+      "微生物免疫學",
+      "真菌學"
+    ],
+    "MOEX-115090-2301-Q018": [
+      "微生物免疫學",
+      "免疫學－先天免疫",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q019": [
+      "微生物免疫學",
+      "免疫學－抗原辨認與淋巴球發育",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q020": [
+      "微生物免疫學",
+      "免疫學－過敏反應與自體免疫",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q021": [
+      "微生物免疫學",
+      "免疫學－細胞性免疫與免疫調節",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q022": [
+      "微生物免疫學",
+      "免疫學－體液性免疫",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q023": [
+      "微生物免疫學",
+      "微生物免疫學－免疫調節治療",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q024": [
+      "微生物免疫學",
+      "免疫學－體液性免疫",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q025": [
+      "微生物免疫學",
+      "微生物免疫學－免疫器官與造血分化",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q026": [
+      "微生物免疫學",
+      "免疫學－過敏反應與自體免疫",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q027": [
+      "微生物免疫學",
+      "免疫學－抗原辨認與淋巴球發育",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-115090-2301-Q028": [
+      "微生物免疫學",
+      "免疫學－細胞性免疫與免疫調節",
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MOEX-111100-2301-Q028": [
+      "藥理學",
+      "藥理學－抗腫瘤藥",
+      "藥理學",
+      "抗腫瘤藥"
+    ]
+  },
+  "sourceBindings": {
+    "MOEX-115090-2301-Q001": {
+      "primaryTagId": "BACT_MYCOBACTERIA_ANAEROBES_ATYPICAL",
+      "stemSha256": "8cde9074df805fd8067f80fe471eaa84137d17f992894eac0f4573878599f81f",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ]
+    },
+    "MOEX-115090-2301-Q002": {
+      "primaryTagId": "BACT_MYCOBACTERIA_ANAEROBES_ATYPICAL",
+      "stemSha256": "9bf80c78a0007e7097f3b2cec04496de2cea9c7315a8761640f655f7d4c87f8e",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ]
+    },
+    "MOEX-115090-2301-Q003": {
+      "primaryTagId": "BACT_STRUCTURE_GENETICS_PATHOGENESIS",
+      "stemSha256": "c089b1af23cddebf88c78ef4dc9d990d67d44e5127af26bf80c49eae0abc9933",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ]
+    },
+    "MOEX-115090-2301-Q004": {
+      "primaryTagId": "VIRO_REPLICATION_PATHOGENESIS_DIAGNOSIS",
+      "stemSha256": "d3cb4279dfbd5b444340ae236bde314c65b8a39bab6cc67349af776d2aee560e",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ]
+    },
+    "MOEX-115090-2301-Q005": {
+      "primaryTagId": "MYCO_MEDICAL_FUNGI",
+      "stemSha256": "17966dd368b199204661d660999de1c73cdd84bab0b86137291dd104d12a98e9",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ]
+    },
+    "MOEX-115090-2301-Q006": {
+      "primaryTagId": "MIM_ANTIBACTERIAL_DRUGS",
+      "stemSha256": "cb007dd8c37590215c76b8d0184e84fa14621fb81f285a02e331aaacee0cc617",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ]
+    },
+    "MOEX-115090-2301-Q007": {
+      "primaryTagId": "MIM_ANTIBACTERIAL_DRUGS",
+      "stemSha256": "5ca7dfa32dba3fca8df71ab59be564e0a27c1526b7522c90bc1471ac78a736f0",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ]
+    },
+    "MOEX-115090-2301-Q008": {
+      "primaryTagId": "BACT_MYCOBACTERIA_ANAEROBES_ATYPICAL",
+      "stemSha256": "1ea90b4f03e9cebd0513e43face75b9ab7bdaf21748320f37c921751179ec9e6",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ]
+    },
+    "MOEX-115090-2301-Q009": {
+      "primaryTagId": "BACT_MYCOBACTERIA_ANAEROBES_ATYPICAL",
+      "stemSha256": "86c6e30b843ceb8177c0b4f63e01ff58be39e6f97fe6193d3385bc5cf6c6a672",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ]
+    },
+    "MOEX-115090-2301-Q010": {
+      "primaryTagId": "BACT_STRUCTURE_GENETICS_PATHOGENESIS",
+      "stemSha256": "2b853c24e42bcf196ad764baee9a06b71a92aeba55972739ce78eb0f41ebfb81",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ]
+    },
+    "MOEX-115090-2301-Q011": {
+      "primaryTagId": "BACT_MYCOBACTERIA_ANAEROBES_ATYPICAL",
+      "stemSha256": "45584998a669775099f8c699b42539d8b1d7c60b45c26ee3b8f1e9f9b2f78d91",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ]
+    },
+    "MOEX-115090-2301-Q012": {
+      "primaryTagId": "VIRO_REPLICATION_PATHOGENESIS_DIAGNOSIS",
+      "stemSha256": "3dd4a74fd97502acf25254ed0ccd01058cf34f695f43cf996aaef9980b24357b",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ]
+    },
+    "MOEX-115090-2301-Q013": {
+      "primaryTagId": "VIRO_RETRO_HEPATITIS_PRION",
+      "stemSha256": "68af6521108fa5dcf72557fa5bb3bdff00dbb4bb024e53cd5a3d3018afe7e2b3",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ]
+    },
+    "MOEX-115090-2301-Q014": {
+      "primaryTagId": "VIRO_RNA_VIRUSES",
+      "stemSha256": "18fe656a04a4bb0423dfea68950561191046439c85641567b1671ca12f5f1300",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B",
+        "A",
+        "C",
+        "D"
+      ]
+    },
+    "MOEX-115090-2301-Q015": {
+      "primaryTagId": "VIRO_REPLICATION_PATHOGENESIS_DIAGNOSIS",
+      "stemSha256": "46e1e88bbb82c3c6dc82f46847384a60353a28072b7979b6c761299a2a905b57",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ]
+    },
+    "MOEX-115090-2301-Q016": {
+      "primaryTagId": "VIRO_REPLICATION_PATHOGENESIS_DIAGNOSIS",
+      "stemSha256": "8f4f9ebebd01b278bce70ff5c32300fe3c6cfca054c272623986d09a89dce482",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ]
+    },
+    "MOEX-115090-2301-Q017": {
+      "primaryTagId": "MYCO_MEDICAL_FUNGI",
+      "stemSha256": "7ad91b1d87e3e4c50342459ba2288e57e493be1a6820be4cf67727bc126da415",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ]
+    },
+    "MOEX-115090-2301-Q018": {
+      "primaryTagId": "IMMU_INNATE",
+      "stemSha256": "dbf3ad40b2deac58d7d38eb9d6d8316566d3891653477432a7456b32886f963a",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ]
+    },
+    "MOEX-115090-2301-Q019": {
+      "primaryTagId": "IMMU_ANTIGEN_RECOGNITION_LYMPH_DEVELOPMENT",
+      "stemSha256": "ea48d7c04c8ad36c4ca548d713286258f2441fc0ec427096df7ff3123a9a1ae7",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ]
+    },
+    "MOEX-115090-2301-Q020": {
+      "primaryTagId": "IMMU_HYPERSENSITIVITY_AUTOIMMUNITY",
+      "stemSha256": "ee4385a3a9bd431d040e5b48219e0375608df93383f4949e8614bf08c06216ee",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ]
+    },
+    "MOEX-115090-2301-Q021": {
+      "primaryTagId": "IMMU_CELL_MEDIATED_REGULATION",
+      "stemSha256": "b2e0c31dab9c14155c5e929d2ee07e09b3bdece311d9d1009dcb370263219bd4",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ]
+    },
+    "MOEX-115090-2301-Q022": {
+      "primaryTagId": "IMMU_HUMORAL",
+      "stemSha256": "960eacdccea78ff911146724bbb358115419faa69526fe2fbbf3b0485a854592",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ]
+    },
+    "MOEX-115090-2301-Q023": {
+      "primaryTagId": "MIM_IMMUNOMODULATORY_THERAPY",
+      "stemSha256": "f8f680d45792da85ba527ca2a09cf740a201a503b857650035464242a25aebac",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ]
+    },
+    "MOEX-115090-2301-Q024": {
+      "primaryTagId": "IMMU_HUMORAL",
+      "stemSha256": "b3ce06eb9e83a88dc47c02fd270052b16cfc66cd3eb842e40d9f603f0b72e4da",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ]
+    },
+    "MOEX-115090-2301-Q025": {
+      "primaryTagId": "MIM_IMMUNE_ORGANS_HEMATOPOIESIS",
+      "stemSha256": "5971be7b7db9de5a76e7faa413998ad82c8acb7dfe79af747d661396e2fbaba9",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D",
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    "MOEX-115090-2301-Q026": {
+      "primaryTagId": "IMMU_HYPERSENSITIVITY_AUTOIMMUNITY",
+      "stemSha256": "ff46faede4c125f2880dcec98295e4f80dddbe88f7bfb91c701cec734ce35395",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ]
+    },
+    "MOEX-115090-2301-Q027": {
+      "primaryTagId": "IMMU_ANTIGEN_RECOGNITION_LYMPH_DEVELOPMENT",
+      "stemSha256": "7c3c40c4267102332f66ef95fa6d07da36cbbe2d7f50a489f32825970655ae86",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ]
+    },
+    "MOEX-115090-2301-Q028": {
+      "primaryTagId": "IMMU_CELL_MEDIATED_REGULATION",
+      "stemSha256": "9e1b8b9e573000baa8c78285a493dd2bde9990604be2899814bc4572f4b08fab",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ]
+    },
+    "MOEX-111100-2301-Q028": {
+      "primaryTagId": "PHAR_ANTINEOPLASTIC",
+      "stemSha256": "b9a13d63d3cbcc06723a59bacd3aedfed7297c3cf5bf5b92cda21a40118dc329",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ]
+    }
+  }
+}

@@ -1,0 +1,2868 @@
+{
+  "sourceAudit": "data/sources/moex_90_stage1_source_audit.json",
+  "rule": "Only zero-flag, derived-clean, text-only original-question snapshots. No image-dependent or uncertain question admitted.",
+  "entries": [
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q001",
+      "stemSha256": "086ecd16112a6846e91dbfdf9a853894dab2ac5ab727fb2559ee8a9c0c553b42",
+      "optionsSha256": "0402aef553a2be41cbd690038bfe1b4f4c6f7bc461f40ce15cb18ddc49bfb88b",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q001.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q001.webp",
+      "displayImageSha256": "c0614d21d1dde7093c8fead839bbba7d378b5e6e5d9c10f0df6a28ad64ca0c09"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q002",
+      "stemSha256": "910ac8e8c6adf0a1847e5a99fc71396cf4ba082a2a20f0fd5e9fdeb2d6c03fc3",
+      "optionsSha256": "0da81b6f05005e321c9988f3cffd494f8043113d950eb8a53c130ac13e7e1899",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q002.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q002.webp",
+      "displayImageSha256": "9dbf9f9628b81eca4e6d64345eeacf91bc6a13b5599785c6b9d7303cc8ff2a24"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q003",
+      "stemSha256": "254a244b4350880e6f3708a1e1c2ab0f5f42b65745240f057dae3a8bebadef0d",
+      "optionsSha256": "9523b905c43d5e2287e325b22b344c4174879540e63e280295911968b8f37402",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q003.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q003.webp",
+      "displayImageSha256": "c16485e8901ab4b89ee5ac7597ae6250905f75308a8f030049c899f4e2340c72"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q005",
+      "stemSha256": "e35f5675c961ad5cbfa6b789b41ad7ec599d54b39a27f0fc14cb9ddf4099edf6",
+      "optionsSha256": "d1539395418167c2ec7adfbdb115976e19b129f531b1659a3d4a0868a188518b",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q005.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q005.webp",
+      "displayImageSha256": "be954d3e9ee1f0b73273bdabbbf545e8dc0f841baedcd9a0c113ca08d6152762"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q009",
+      "stemSha256": "7260f9a7c71b850f965cf0ddd7a2d8e00a0803300965b04563ca77142d92a56b",
+      "optionsSha256": "7bb09a70ef6a2b05202bd22c14b640926b2b03df7ea6a98ac096b865c7db3983",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q009.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q009.webp",
+      "displayImageSha256": "607fa0c146011b7b4c175fc9243825c14c445adf1d7069410f4beb9fe4221f0b"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q010",
+      "stemSha256": "f1ad2c53f041c2e3a83c3498cf058ed73603d67d76b35ffa6b4826695ebf45aa",
+      "optionsSha256": "9130d79e2211f586dcdb1f104cb025854f8b8b5029106cc8a966c62d3ef91ebe",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q010.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q010.webp",
+      "displayImageSha256": "f973c47f57e0713fac8dcb0df510e05ac983908de947b51530ce9b09d9097519"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q012",
+      "stemSha256": "2b9da598da9484b18d6eb561b226f6b72506886435a453401d786fb0334cc3af",
+      "optionsSha256": "09d223aeec78ad8c66a370e1cdd7a184cca95ad0454c89e9f020b402937d5d6d",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q012.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q012.webp",
+      "displayImageSha256": "bcc1db419011aa301e0882b198e74fc152cf0f31b847c8b8b92a0ea5d948cd6e"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q013",
+      "stemSha256": "f56bf4f9d768dddcb9be4b32bd7c077d85e7aed6fc2d7e6e9d7e76b908cd76fb",
+      "optionsSha256": "1457fb8ac976bd001d5c780b6ce9cb556442c05416264959afa83c94c0955e51",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q013.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q013.webp",
+      "displayImageSha256": "d2390c8128ebbd68f3a8831fffd10c5135397db0792fb538fca7b423095f8653"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q014",
+      "stemSha256": "c3b78bcd2a749ae7aafb98fcb42f69e46ee83a5ab547e3478da68a6109ac84ba",
+      "optionsSha256": "37c3cb0c7c7456cc5f36037e9a22171161db90e9c232dcc3789956ea59602a59",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q014.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q014.webp",
+      "displayImageSha256": "ea80abbe06780f055f8f7cccc392af2b92bf3800dd7d584014f9689554e63750"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q016",
+      "stemSha256": "3349d98f9d442f3d9e15ac9c52f10a4e1fa297cd00c6133dd2cec184451a0f29",
+      "optionsSha256": "c8f9c20d3d811917c449de7f91dcc46a3406049d79ec818141ef27ebf6b23270",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q016.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q016.webp",
+      "displayImageSha256": "8a066905adb43e88b2f286789be05d9028ecf2ce93abeb866313b40c08a55d2a"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q035",
+      "stemSha256": "8323f46a245b7524f749b1baf07d28566d38669b3e5e754a021ed7a14695fd42",
+      "optionsSha256": "6319669706b26bcdb27837156540896f6ffb337b90370f4481596e4b177d47d0",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q035.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q035.webp",
+      "displayImageSha256": "44f33c8496247e9fd7dd1a360fb4ca5736809a1890fb5f164a7bb692749d6683"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q038",
+      "stemSha256": "f60f563cf074535fb013647fbda54b937e8945364790c32af91a282209367358",
+      "optionsSha256": "a9217ab872f47bcb23751ea111e65c75112b526b3d8daa0101f209a8762fd89f",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q038.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q038.webp",
+      "displayImageSha256": "57d0c8b63e937da3f660acb88efd4c0cad38be5c8dc7a61c15c175edf3666601"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q039",
+      "stemSha256": "217c148860c669ed981145660002d3f12ded7a119bac9a497b95ebf239d50afe",
+      "optionsSha256": "2ab5ee2e131dd7f9c10d3aa7d3941c849ff13acf5a1d0a44ec8a23d683208585",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q039.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q039.webp",
+      "displayImageSha256": "51c82168f6a4c6cdb3b3efe1373ea5f140535f942440d9cea328bbbb579df044"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q042",
+      "stemSha256": "e1b1ec3acc01d54a380fa83e45f6bdca89450e9c2fa920101c038d275d3b1e7e",
+      "optionsSha256": "414e4f0112013399a1c156e6c5719bbb005355147fbf88eb11ceb5e1774749c3",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q042.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q042.webp",
+      "displayImageSha256": "f2f2452736646ca6fa2551000cc6500f485f720bce4df0ed4f98b6cef4f96a69"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q043",
+      "stemSha256": "66b8f91783fbe1fc327d35329d5b46d0eb70597aa67b95cee21af1e031932865",
+      "optionsSha256": "27e9894fce19b50519af1500d0fdedb65abe043015f22ad560ecacf01409d005",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q043.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q043.webp",
+      "displayImageSha256": "a5183140713d0083d3dff0fd99eed77ef015b112b0ecbd8dc4f01d7323ef6985"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q045",
+      "stemSha256": "092d3ba955ee8607987e11e052ea96b4d7836358502881c4e8565284bcf6782c",
+      "optionsSha256": "54ae56ac1a2de513093df093b966bcdb45833271f3fe90f560784b6d50bb3089",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q045.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q045.webp",
+      "displayImageSha256": "f3cae9cebb53bb1ecf4c1c34b8016887d104044d44f154099cac29e0b40db17a"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q046",
+      "stemSha256": "2c0b9690bd8291ccfa457465b158eb50e18f47c9ea91cb38cfe138cd0d381b4a",
+      "optionsSha256": "8095f74f4dd42c59de588a991a22105241687e83874f63c7a4c07ff3f0a09d23",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q046.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q046.webp",
+      "displayImageSha256": "7f15b323c25b57733aace2ef9141c9c38a90eda3632dd71c1f6c6e8f06e8d5e3"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q049",
+      "stemSha256": "cbb76ecd5bc1ef7fd7dd887d95a73d1f17cc207484b61240ef3d48c9f29692e3",
+      "optionsSha256": "804e63b2a92398245f7495335088259f1bd4cddc61bc1ee85b45162bcbf74ea9",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q049.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q049.webp",
+      "displayImageSha256": "a8c53a92f5c63f44f7786cf8ac965009d297f165e2835010de1357877abd7f30"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q052",
+      "stemSha256": "72c8153ea4796b309587585be6a1554fc8cbc0fd211713a15f1e0e55eb995fdf",
+      "optionsSha256": "ef8cda39af8f89f34b51990b0fa27e99416431830342fd14b47005c6096d5205",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q052.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q052.webp",
+      "displayImageSha256": "185db72f91109ed61a31afd3289417ab130331458e1822f90740191de6b64504"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q053",
+      "stemSha256": "d993557c18c673a6aa435b598104880967b143248b0658e57ca289e0e8f9e5d6",
+      "optionsSha256": "9882104c8565632fd5691f40f4b68f19fc8471c36de979f0e4d65f9b795dc239",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q053.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q053.webp",
+      "displayImageSha256": "4b2140ff29efedd15f45b36fd114283cc726d9de1429e9ccdae987daa7e06f54"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q056",
+      "stemSha256": "df15d6df7e3f72f74f55c275fef7282b4554834ed629e3394b35c837076563ac",
+      "optionsSha256": "690a33469ad374b24aa9c9bc6746bece45a09639489bd52ffa54f6afaf182aea",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q056.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q056.webp",
+      "displayImageSha256": "e5855272e6155077a13dc482253d1e4a60565331e3680be995ec32b71e80b0a6"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q057",
+      "stemSha256": "46efbd74c21d3e1bd45c69705259f556433a88f723abf8f6aceb44456c166cb2",
+      "optionsSha256": "659f68c902095008b7e80a90d1949dd7a529a8836fe7d77bbde994aa5e4033f9",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q057.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q057.webp",
+      "displayImageSha256": "23059331ec2ba9a656e98034f17e4daedfaf9c1dea30542efc6ca6ed8019de07"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q058",
+      "stemSha256": "1a912318be01cb4355f60c6efe5c3fb5a28932792b11b482142b1568ff682407",
+      "optionsSha256": "5dcb8c0ea2712c94e18356e1cb3438bc7c6d84506c847f4f6d5f185e7eaa9692",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q058.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q058.webp",
+      "displayImageSha256": "c40cc51e84f97a60030c86caafe1d33e5ac0999e9d923851bba103c30fd29b11"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q060",
+      "stemSha256": "e12785f6e23784564d8ea4eaf16f73ea6005c4694d279c373429916ce2b086df",
+      "optionsSha256": "4fc347ba41c7c281f9fec5f613839abe068d371e1e7a9bf89491006830529eb2",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q060.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q060.webp",
+      "displayImageSha256": "5e4f9bb089d15588dcfe4c3760662871d85e55fcf7ef87410ff2c7d31e180213"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q061",
+      "stemSha256": "344a2f31005e9a57d5168e22b8959a63320f4e9c900279af6b7803b30e798bbc",
+      "optionsSha256": "9fc2b85badde7ed21a4acc50f91d2128544828ba219c4ba3112cf8f62431023f",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q061.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q061.webp",
+      "displayImageSha256": "b360d3e892b3c7601e1680c9fc76d982558a7ff75bc9de8a25ae8a2d94f4ce40"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q062",
+      "stemSha256": "c9f7bd1815cc60e5781e3240e30553ba790695064f00cbe08ce413becdb196b6",
+      "optionsSha256": "f23c3a239631eb4c96f27a3ce31480e968186f009402c094690e868e6a7fdbcc",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q062.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q062.webp",
+      "displayImageSha256": "4daad632ddeca9d4fbd356e19d45479fd8d41ad172b19f6d016cea539b25620c"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q063",
+      "stemSha256": "8cda2697d45a0784326d1b5291f4ef4e4f7fbfe27a0c507747bd21601937fb96",
+      "optionsSha256": "49d159abab8643d23ef4f01f537caf94b46355d10148519b390421a8ddc275c7",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q063.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q063.webp",
+      "displayImageSha256": "276b582386e6e1fdeae1bd7fabe3e21856f57b17f0d60f9e4c688479d035ba15"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q064",
+      "stemSha256": "26ba6d3b10f8fb6faa3f5f65caf43e05220d13884f362b6b2693f63ec039cb1a",
+      "optionsSha256": "59450657763939a9e98edb6df0056db8a6d6de0a927299ef385b0ec0e31e72ab",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q064.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q064.webp",
+      "displayImageSha256": "8fcf332d2f9fad4d66600bf8f0859294b4d6a34d7d06dafcfb4321496a705266"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q065",
+      "stemSha256": "d846ab8e357bf43a3faedbc9b3106ada896d01bb84291fff0127f84cc4060fa8",
+      "optionsSha256": "c2f32e7311a9026726869e39648f6407e05768572a9c8c9f048211f0ce0626d0",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q065.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q065.webp",
+      "displayImageSha256": "d6f251c301f4ec373a64c2740dcdc083cf6ada00a9e7551a82148c63132a806e"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q070",
+      "stemSha256": "77c071a659a87957b60ac41e9dc25c32d95bb5415b644af8cd2f281fa661c0bd",
+      "optionsSha256": "828dc4cea3c90626bca8eb93b356b0f71c013662f52c98f795272a25fc882806",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q070.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q070.webp",
+      "displayImageSha256": "8af1ad1723580cc73a4925a6f0811302679ca1164d3e5744dc576403bf9b56f8"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q071",
+      "stemSha256": "f5c442f21427aa13e69c5e854f1c39cbaa6db2cd9ddfcd6ce051fbd39249c667",
+      "optionsSha256": "21feeaf68ae1658d4c279b4fac0b660b2ea029f7eb5113196e7e522b0bc37c25",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q071.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q071.webp",
+      "displayImageSha256": "746a6815ab34b597205cf76973059979136aefd38c419662dea1d5c6f315d9aa"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q072",
+      "stemSha256": "e0b1e619370eb5d297e370cc0ae36de4244f89681b727cb018d22c04fc5bfa76",
+      "optionsSha256": "0324bd08c79177a35b6967ec163871408c4ff9f7da3d9beee62220ab803bb276",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q072.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q072.webp",
+      "displayImageSha256": "3e0be69bbe005826f17a638a94c3b99964990e25deb57be848f4bd8baee22ec0"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q073",
+      "stemSha256": "5f2ee8adf37cb8346dcc74c74409d79bd3f5a410d3f1ec34254512e999352b83",
+      "optionsSha256": "f625943b9f12f7742d8a3f8d58a9cbe10f93f39f78dd6746192118038c45aa42",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q073.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q073.webp",
+      "displayImageSha256": "12d56fcdda6d1a333a852f9618de83942db4d07f6f9c30b7867c74dfa14d638e"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q074",
+      "stemSha256": "3dbaa50888306b8769e3efda48155601f0c2d5f548eb5ce135277827d12a6788",
+      "optionsSha256": "2306f2025dc872969379987068b06cd3dc693126112bf662f348d9a06b163be6",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q074.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q074.webp",
+      "displayImageSha256": "94af482a1c8af40a910d901384d0d917efab6f588a12b24777e8408885778e7e"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q075",
+      "stemSha256": "c6081d0d6bb370e620a8e30cb71b385d09898f10cfb3283f313baeb0b0308806",
+      "optionsSha256": "e0f64364cbde1fc055d37aaf7a6043782ef7070eb153d7c7d379a2c7372db001",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q075.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q075.webp",
+      "displayImageSha256": "b6d9f5c2e1aa157737fb1172e05b3a12dbab8590d6779796ede3568c5402d63c"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q076",
+      "stemSha256": "f8c61be68d4eb130b8fbb58201fa8d4cfbe8c214eb088f8579f94d2fc9c70be1",
+      "optionsSha256": "b2a9f8fc19c262d46b11f757292bb85ff1b5710ccfc7599cba8248a44b3e547a",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q076.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q076.webp",
+      "displayImageSha256": "69232488fb7bf2d5dc427712f21e5db300376d90dbeaca897428dc640a6bce8a"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q077",
+      "stemSha256": "8b30a8a4f2447ada324c3b4e52d6d01de92a269976622e07f6ec850d53f42a4d",
+      "optionsSha256": "723831e2e5f36c688649c4c18630fae40f53e758f4c80e530a17d51b79bd426f",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q077.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q077.webp",
+      "displayImageSha256": "0068a8c233f6a9f1aa2099e32864d6c43a6231c5595ea950f9f36de81598ff1d"
+    },
+    {
+      "id": "MOEX-C002-090040-S4004-STAGE1-Q080",
+      "stemSha256": "2a6a12267283d151d7613cef2aed9df3ddc886d5a141fa190f8134737c207c4f",
+      "optionsSha256": "ce78f08e67adb9d4212f64f1a82826627386b5ceaa2dd86bf74c4a5eb1151f28",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med1-display/Q080.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q080.webp",
+      "displayImageSha256": "8cae7d9a0a22dd336ff649f0b1ff4e8a1150864c86c5593cba7f834ca7d28d2f"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q003",
+      "stemSha256": "4ecdc5b137f2cdda390bea2086fbdce1eb73c514d28e38ea597d5bcbc8953bf0",
+      "optionsSha256": "651f2b47ee601affabae99c4f0697c741279570fc022baf5de01d82b1f44b3d7",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q003.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q003.webp",
+      "displayImageSha256": "87937f6bcb5427705f7ab2d9130cf46afca1c7bd43acf86276cefe35950100a2"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q004",
+      "stemSha256": "ece7c7d620a067d9199c1a3eb354dd99b054e01e6aac9f34b086e6d89f56f136",
+      "optionsSha256": "11f58c037e048f14b5d81d91bebd039b3fcedfbb9ac4f213ae9a563f8c7566c9",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q004.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q004.webp",
+      "displayImageSha256": "efebd2d6d047a84f6cd20feba54794ebc3f11d9215ca6543d805533240295336"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q009",
+      "stemSha256": "495ba99a78a1fc719e64d9f8f7fbe1d21ce828816c7e4274fd11edfc3841a6ad",
+      "optionsSha256": "e5e3744a451827d35cf0f7fb7a36e91bd6b8174136fb2e6a577106637fcf8b37",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q009.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q009.webp",
+      "displayImageSha256": "ca4c3e10e2d63a763d614b73a4a81268db93eda8978bcde959ae50ab1ae763a9"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q012",
+      "stemSha256": "047b5ccfc4931cd62573b554fe022a1e5afe0688c23a3454dc82467f5b957650",
+      "optionsSha256": "79d4cbb0f49c15a7c41a8e4be420064b65e07ca7fc7c61ad8b37d986701a8aae",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q012.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q012.webp",
+      "displayImageSha256": "bf4e3889033a574f0f04b8171d539274083e24f8915a10c009bd92ff0c03931c"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q013",
+      "stemSha256": "c2cd227b53828077cbd66114388a8b82d1d42c61caca7fa71ca0570e866b15d4",
+      "optionsSha256": "977c37d91dece9b003e5ac20020526b30baf9acb121f0d70177072e47165d0ea",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q013.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q013.webp",
+      "displayImageSha256": "92003d081fc5168f4582a95a59093b09b8fd563baa4f6a1d3c47dffb3f462d40"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q014",
+      "stemSha256": "e374c45607902b2f9190f0ba09f93a623ec83e295150cc7c5d30d2e1fdca6423",
+      "optionsSha256": "a56101e022160ee1bdd6b5068b262e4b718a18cf41bbc134a6a0ccad8398b9d1",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q014.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q014.webp",
+      "displayImageSha256": "95396fc66156c9716b29f9d047da4164fb2fc6dd6186e366ce90803ece794738"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q015",
+      "stemSha256": "50451798df208f358bdd383e78cdcbe26d95f7b475a624921fffdf0735a3d001",
+      "optionsSha256": "6e571db352e908f85873fcb400131795ed7b518f1817181323f6a44fafa5c7e9",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q015.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q015.webp",
+      "displayImageSha256": "e307a534cdb61ca5248f346d3fb903860d9fed4a7bea80c867d7b603cb33d046"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q016",
+      "stemSha256": "4e9046e73a1e9c904ac56d5ba637904f78063e63ae46872692303c3643c02533",
+      "optionsSha256": "4bd9d5093c1960475a6eff4ff5555d13882b96e4fb3d3977a93d93011c1e4bfa",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q016.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q016.webp",
+      "displayImageSha256": "79f47bb6958e46760c22a663539e30572eca58aa03f3d8f1ee74affca34c64d5"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q024",
+      "stemSha256": "d8a3c091143a899c8eea090d3082a919aface5b39eeb3b23b6b4b6133ff7052b",
+      "optionsSha256": "0a783627fb8be2e700afd4b71aacff79eeb82dbb02cb5c950de1ee3ffa24756e",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q024.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q024.webp",
+      "displayImageSha256": "c4bc0606cbce2efc278f95f4fc44a0c67fbc6fa19457096e3da9a11d6ac5e4b1"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q028",
+      "stemSha256": "062dc57ce4a40b0656fb92945d48eacb8d5f8c92e48300df4f1a732ff0a77907",
+      "optionsSha256": "134781dc903312b5978f749e6c569a1bd5e47ea2cea8aae61e6789f9aee9708e",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q028.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q028.webp",
+      "displayImageSha256": "9d571ccb034e5a87aad176d2b767b5a841051476b6ee0fc72785563188b2c4da"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q039",
+      "stemSha256": "49c88a52efc2c592792de1e657179ae044bfadceeadef8ad78dffe805226bfab",
+      "optionsSha256": "a7fd67cd679d7a652165b759ed12f45491b06486760cca1b2a99d4fa478f5358",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q039.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q039.webp",
+      "displayImageSha256": "2f36f4f376b5e35a3e77a50e0bceb899002788226ca7a93b4772bf998b3fdf1d"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q040",
+      "stemSha256": "79eb65e8a5bc28ee73ffd78e76789bb7d0f9f060688730cf6ed320c3d2d5d253",
+      "optionsSha256": "3aa1e818b90e521f0643dc387d5fe549e325a0abdcbf1212ece8f7df173bd324",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q040.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q040.webp",
+      "displayImageSha256": "44c53dbaae7e36170aba178b96a3d09611793c5fd61b82e54fcb6af1bf00f24e"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q061",
+      "stemSha256": "49cf586196a63eddea5cb90cb61f2afcecab67edf6fa3d9b1c7a9b49edb0861c",
+      "optionsSha256": "ab853df30fba3ea46dcc20f81df79775918782f0a592e2a7c559f125aa273d0e",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q061.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q061.webp",
+      "displayImageSha256": "59a7dcba8344857794b9767731667336206d38c81e3d7525e4063ca92167fdfb"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q062",
+      "stemSha256": "b50322457eb632cd8366ae87cb3cfa38c9cd6f418340c82aec06aaab186ac0cb",
+      "optionsSha256": "fc72f4a7d6c2dc22bafdf0c59a174d465313384d9c4261ee13e43f780ac9ae2c",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q062.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q062.webp",
+      "displayImageSha256": "c67d021163ab7e9e2214ef55c31a64f45cf1821bd9ad4cc30a31d16a65b0cfdd"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q063",
+      "stemSha256": "314a472901c72ae4d6e90deea545cf2e86038b21a0f82745ef9c1d1da5d8b81f",
+      "optionsSha256": "9ee53e67db23b665964160f5d4f8ded9e3b356f276899fbc514de0de7d2b042c",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q063.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q063.webp",
+      "displayImageSha256": "93615d1a3765ded3c64b2cd4bb7ceb71cb3e06d7263ffd7d0e05a233ec229658"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q064",
+      "stemSha256": "1a387ec9bbccb04c3206f76ae4d0c357d383524bcfb80453538533b23f4b88a6",
+      "optionsSha256": "3cdaf94ea55c5bdbcc6df1fc19ac4c3362e19e8af42b6d8bf76016e0335dddba",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q064.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q064.webp",
+      "displayImageSha256": "1904756eadbc8e12a9966cd8a4cce70bf9938ff611ebdb30cbef70d9faeb8d82"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q066",
+      "stemSha256": "8d57c23b72622ec53833ed7b494f4d5843595db33eff2dc367f07e03fd31683c",
+      "optionsSha256": "9ba3b74f5f17ee11c8267677f2afe0358777003ffadb40d4331fc4d69d5bf8c3",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q066.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q066.webp",
+      "displayImageSha256": "5f6cb154f4026cfe8a97ae9138eee7a5349f2341dba770b1b0f0a3af73c3da7d"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q067",
+      "stemSha256": "097837857798110f3a81ad08789cf6bcaae05aef4c4b99566c39a444e5cc275a",
+      "optionsSha256": "c33c7b36e6799e21f8d90ff040ca6a6b58008f5377572c4b69791306580fa859",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q067.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q067.webp",
+      "displayImageSha256": "40ba031c06c910c57f417f33a5821a52c05cb4e297247a94d4176944a3dffa12"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q068",
+      "stemSha256": "1fe9cfff0cd0628ed82b027aa800b61fec16632a929b83c4f0419fb6255bdcac",
+      "optionsSha256": "80c41bcdb1f0df3043e9b1ba493f00c2429f705ca05677ce0945e759f15c4616",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q068.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q068.webp",
+      "displayImageSha256": "e45a2db1b5669bf802fdd8e8905c49f68c3cfd5d39af74192cb65182a14571be"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q069",
+      "stemSha256": "5f59d55c5e84dcd939c30caa6459790a0848041b64d611906c87ce2aa4a8e049",
+      "optionsSha256": "c292f616af95e377e540832e408c6489bcddfbf3c17caaa0ec58bfa5a398ac80",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q069.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q069.webp",
+      "displayImageSha256": "b9b7b4c99fd8831ff91d20c7ce92cf0f39856047d02bd6f646315d9687c15482"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q071",
+      "stemSha256": "7ac1509e8b6086c1e7d6908827d96170a758c3754df37f7f853e7a08a9b0838f",
+      "optionsSha256": "b1c3db47be9c06cd2c71d1feaf81d7a814d200a5b334fad974c111d85796e033",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q071.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q071.webp",
+      "displayImageSha256": "1d67a0a97ee225d443db90b7a29a0ec06a70d83e9569cd6ec1d02f1342a17b16"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q072",
+      "stemSha256": "a49b540f6b6d4d883b6e35ab7fef119e9e517d6e3756fe5f439c5b8d22d96888",
+      "optionsSha256": "9d6ffd2ee9404c6fd410ffec41daa55fb1edc44c0c0c8fae84d3a16613d27803",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q072.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q072.webp",
+      "displayImageSha256": "2c538da75630e49c3b3ef4de8cc6b7adf7aa3ce93ffabac661e88f58a6d22b21"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q073",
+      "stemSha256": "2fc0307da454b2d63045217a8b8d7e2c1be553a68efcd66947c3eaf4934ebf96",
+      "optionsSha256": "2a87732ae37424eb7904d032e9fdf62616bb13b78f04c472be673b39b11908f9",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q073.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q073.webp",
+      "displayImageSha256": "602fc17fdf1c1ebc2f84c8a0cf14487101e5aadbde52a0ebb42188c11417fa6a"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q074",
+      "stemSha256": "1a314502cbfc22722ccb0ee0adfc6c6b30d53e30d250272b5e848c25b9f15f98",
+      "optionsSha256": "790f35344d49b96528596c7f5090b1dfd3b3c7418a87001bc63a4c290e2fce6c",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q074.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q074.webp",
+      "displayImageSha256": "9dac89feff0606ba75f5970f13526d98671145030111bdf03f98f0dd83018340"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q075",
+      "stemSha256": "5ccb9f4033ad7df80f9c37859d35da427c042d610a5075f3638a55d81c0c571f",
+      "optionsSha256": "620d0e7ad35f762334c16b2866da2917c46dde1550122acaf23a853bbec1cf4f",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q075.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q075.webp",
+      "displayImageSha256": "a3e65d706fff7f18ba7b6e4ac01c8d797ae27f495596e0eddd192f25b5d49590"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q076",
+      "stemSha256": "1c8e1e54e576dfd0f62dc0e61f41091a23bac1bb889ad76e11e8267a4ff2be45",
+      "optionsSha256": "8e3eb66cb9a206675c4b7544939cdd93769303e9c74351dda4476b81f0e2eeea",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q076.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q076.webp",
+      "displayImageSha256": "5cbc21484ed2494a5fae4b30f12004bf9f92410ad43caf2b1a4cabca564a259c"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q077",
+      "stemSha256": "8673eaddf656b907a11ca2809c446ca0293b1513c6259b7e3888e0c543ad15bb",
+      "optionsSha256": "4ee4d161c196762182c37a3dd872a6c90507383d9829d7cca5803c557a89343e",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q077.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q077.webp",
+      "displayImageSha256": "99932b72ab5451e76840e13608a316a33037589ab0efbed65b3db7c5093b8e39"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q078",
+      "stemSha256": "010e30fc50b7ab8aaa54bcd2e4f9e6bb16943a69aadcc987c0fa118ebc92d7a7",
+      "optionsSha256": "6c46af1f7c042bf9e29b2ed8cb4e8860b24f599f69c6bc96ff3b37c3833877a7",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q078.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q078.webp",
+      "displayImageSha256": "5122176302a6f170157fc72698321c8b1aa7d6ae2ec9f7302a82eda4e92f4840"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q079",
+      "stemSha256": "72d06615381df769cc0ec9dd3a08193246fab72df1d2f31e5cef0bddfd4bd6ad",
+      "optionsSha256": "c639b274f43e4f50c91d3fd35e7d8590ef898bb82efae309c776d4dedb67b230",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q079.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q079.webp",
+      "displayImageSha256": "df9c276e0a9e9b668eccedb1dab001b52809a88bdb0f2fe8ea9ef7d6782a8914"
+    },
+    {
+      "id": "MOEX-C002-090040-S5004-STAGE1-Q080",
+      "stemSha256": "6dd70cc3b12c9527c2f042c00ef3afc71be22d1774c391dce8558e8bfdbd3219",
+      "optionsSha256": "8c1ac2b053234f53b8cddaec76b3635f689863c82028d4fbbd7c24b62dc83290",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-1-stage1-med2-display/Q080.png",
+      "originalImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q080.webp",
+      "displayImageSha256": "7d9b1755fbcab1af8dec40d706cd84b849015b8b487f892c8c98466102f58182"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q001",
+      "stemSha256": "5b00a20a40b48361926f7ae785b4d075420b2092d57b7520f69ed6285ae78e6e",
+      "optionsSha256": "227dc081c32013b2b88b10f8798766191454faef16abc3bb0830b99978c35de9",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q001.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q001.webp",
+      "displayImageSha256": "2027b6cb675df38e300541fe1c9fd7b37d57f142d5cc94b4d85a2d7a6c8a44ce"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q002",
+      "stemSha256": "97a27247a67d1914476df1652839f883d5db4284bc8ce6111a75ac6c67f5b2aa",
+      "optionsSha256": "73dbbcbb46e480a2969b5e9bda8c919568093c91d570eac64c5753df15f08b50",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q002.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q002.webp",
+      "displayImageSha256": "250320eeb99aac0f20482aef88ea7aa27308fa00b7716a16aa4208cde1d318f7"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q003",
+      "stemSha256": "c4f0665f10d88c299974d81dddbb17c33a35bf5391cbe8f0259b3d0de61d2975",
+      "optionsSha256": "2c0c0d983daa531ddc8fd1c46dcc6eb7a3f96add6c16e1652e01168870127b5a",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q003.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q003.webp",
+      "displayImageSha256": "262d77e63e8e9d2084702286ed6da30f1320cf12dd7101af88420e26c6fbe6dd"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q004",
+      "stemSha256": "b1d5d4ff85e1d6c4e6c008ff84dd9c9a55f2a2ce63cea083c9823ac388a36d2b",
+      "optionsSha256": "6cf6f81f5179ed645f00d7580f34baacc2d6986de86d0591cc5407b1e9fea242",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q004.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q004.webp",
+      "displayImageSha256": "8403cdafc921b7f5cf5cbee2042f754fb1c318504c566e82a6ad79f470e320c1"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q005",
+      "stemSha256": "0c59f3aa0f7e0926d5059797e7992c3b1b73a787e0898a238ee9a83d766baca3",
+      "optionsSha256": "d09e9a447fc1c5b887d6293381604843e4b877efa3af46db99e591ea15d895a8",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q005.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q005.webp",
+      "displayImageSha256": "7f3be807858aff852ae039c031e9e1246f36101c8e95af548a750e12c86b6857"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q006",
+      "stemSha256": "91f11ebcaad1080dc722a7f4c406ca999e455a5661a3ba872d35e2b69add7d36",
+      "optionsSha256": "1f9b0007d1f98fe09aa295ee652628bfe3e23a6d2ccde1adce477c5206ab5a1f",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q006.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q006.webp",
+      "displayImageSha256": "297b40c6668c216bf3a45b33fc536ae46c162f1ec971e279bf0c93615d9bf31f"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q007",
+      "stemSha256": "b5e3ff4e0c4018a4b76182f6813f587e3633836039fef9d4bc5d838259a75217",
+      "optionsSha256": "40199b68034040adc3efc2dac6b0e0929125ebcdfc92f9253b31e3574d2dae36",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q007.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q007.webp",
+      "displayImageSha256": "afabc96664a91aa8a3d29f4002e31f5f3a5437899a426eae91e345dd85f8e117"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q008",
+      "stemSha256": "a98992f87901913c8fb3e230ccd9fc725541e92e07d624a038adec8bc7dbcf13",
+      "optionsSha256": "5adcf94e6756e7ab11fc14f8cfbe65a9e356c49a588d5f7aaab4f68b7d7d9147",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q008.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q008.webp",
+      "displayImageSha256": "1fae0ca4dd535de2e27cb10f68b1c434e81f51b4c6ec7378b4638bd686fbc52e"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q009",
+      "stemSha256": "f264b7e720985b489ffc0c2e24a1cf0f6ccf7805a2c51212fe1c4d7f352b6039",
+      "optionsSha256": "7c50253680238b3e4520c6edfb984126a71ae28ed7f950fe217fcd44c1cdeb88",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q009.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q009.webp",
+      "displayImageSha256": "0861ac90179d5bd710d35faabbfa55b985ed3d48c6bda3df32f410b91236e762"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q010",
+      "stemSha256": "5ca44c2141c486c419a9457879191d3703b81615654a81f06046ccc10129ce5a",
+      "optionsSha256": "b2dbf7948d320e74ee79b76104c2fef116d14b41618144a997902dbf9b08c925",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q010.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q010.webp",
+      "displayImageSha256": "b0954b99f225488272fe4959ad4c42edf4fb9b580e3bf4bce55daf0c022b3d4c"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q011",
+      "stemSha256": "659d59fd5effac0ebbeb984cc767ca891792179bc4b18ebd46ce16638eafc14b",
+      "optionsSha256": "c5ec9a9cc4b67c7ca618279bdaa01f77fabfd1e665b541909ba60785ca284098",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q011.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q011.webp",
+      "displayImageSha256": "ac5f8da8e19acf930724b2cda6a4f1c99ad6f4f76a0a2c55eab73136f784d215"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q012",
+      "stemSha256": "cd982b4cd387ea7c55bfad4dc61b3b61889a06a17d6e4e42f516df8f2cb0a72f",
+      "optionsSha256": "177e8e0015c09555a8e3f477b476f6f6653913f67a9232cdc29500cd5ca94d7f",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q012.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q012.webp",
+      "displayImageSha256": "a1227b056c94c75f33cc1255a4172d8217e35554e10623e58be67a14c572dbab"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q013",
+      "stemSha256": "7e7ea9e98e591b9047e0d826b688478a792b590fcbb987f70909d33f3bd08828",
+      "optionsSha256": "ef57575acc0f09cd348e040daa50bc2236d290efc8e130acf3898207f64bf291",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q013.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q013.webp",
+      "displayImageSha256": "9510a234bce16b124a18cd32f13e61d679ba37721d3080eb4ea90bf7db13ea7b"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q014",
+      "stemSha256": "722441d0e3bd61feafd85e1c5d449f4491d4c22d6bcc70ea4563ca0e4ec85fcb",
+      "optionsSha256": "52a107c157347c175e0015d3e8dfd03ffe40053ce37d730d99485bc63d20afdb",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q014.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q014.webp",
+      "displayImageSha256": "aed38fa46d9b1784cbc84c18a8bd6d526c2dd7be49e9adb18d3be3246a5f6a52"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q015",
+      "stemSha256": "892a52e975f55134fa44ff0cd6661cec09066b0a4bdfcc8b98bcbcf45aa7df37",
+      "optionsSha256": "63be760284cff0bcf5febd981443084147aa46371eb9818e4a590e8280fd601b",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q015.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q015.webp",
+      "displayImageSha256": "fb1662438fdee5946327468c57ee0ea0ad1d02f1455462f1d65dfa714c3d8163"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q016",
+      "stemSha256": "646ed7b26653d5c63f0d72365db2d3410839a7d292b90ce4969d8427842c7cb0",
+      "optionsSha256": "989d27acea299bef1b47805c971a2c2de8f111f80a7403482dc3c06b0442ebcf",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q016.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q016.webp",
+      "displayImageSha256": "9e06041963763d2145d3c85c38d670c87153cd93a677cef6b5df1aebce961d55"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q017",
+      "stemSha256": "9e235c4ae75935846d0e439a496817e2301acd72f2c2543eb6c9b6dd0ad27ce3",
+      "optionsSha256": "a4e817439aafd75980d3da25ad85a09a2bd3cb0697a998215721455e299fc26b",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q017.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q017.webp",
+      "displayImageSha256": "d92958cc190d0aa93954ed0adbec77f743b6fe13bdf0edf8dd42fe9e9ec44f9d"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q018",
+      "stemSha256": "3a15d38e07676bb00785a1411b2ea4eaff425cf713a7068f369aec66fd70e44d",
+      "optionsSha256": "080dbcaa710493a92129f60b0818998da6d64c9b0b878b5665e30949eee5c166",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q018.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q018.webp",
+      "displayImageSha256": "6fa0a500660d21eeebf2ebc90486a50f15b0981f7f7829b9912538c15ec0af5c"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q019",
+      "stemSha256": "c245266324de8813e2f4a4771c3161c5710016ba78281288519b612743c61556",
+      "optionsSha256": "2bbeb7e0d3d8b37a25f5956b416a593ad027a0414f7b539b709ea8f0162613c0",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q019.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q019.webp",
+      "displayImageSha256": "b7018b2c3673563bbf25c35ceee7b0f0e6ab3a3cc483e272655e153d5a1ed58c"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q020",
+      "stemSha256": "6defa2d466d56c6fff747ccc939e7b8aa0535e514964b3f36bd55b7ce53ce19d",
+      "optionsSha256": "af2983a77c5a0305cb903c70a23ab3ec05bbceb2bc001eeeb193ed21432a25f3",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q020.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q020.webp",
+      "displayImageSha256": "fd02e7b5726cdc5d6b48be9d989148f07ebddacaf6d0712abbfae098b911dee4"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q021",
+      "stemSha256": "e3f76557ab135b4927072c1827f59519fabe0af4fddcf7428f1eff32f58530fa",
+      "optionsSha256": "080dbcaa710493a92129f60b0818998da6d64c9b0b878b5665e30949eee5c166",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q021.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q021.webp",
+      "displayImageSha256": "ae777120e1b0f96e02e590965ffd34d00c8078aaa4ac0a971636863c4c1229dd"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q022",
+      "stemSha256": "64e6b1d510884fe43beb9bcbab25b1bc62d4c6929d84cd0d0477242730d9c5ce",
+      "optionsSha256": "b56b8057d97723cc85957a1fdc9f5f8adabfc44feff8b65739d0b82bbeb8a132",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q022.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q022.webp",
+      "displayImageSha256": "7904ab06e56ed658331a53f3a14f2729003c3c3bcc852ae7f9031849f6d2c1e3"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q023",
+      "stemSha256": "3155c87260110b349fe506bab57962ef67887d7f25ac505c78674e383f9d996f",
+      "optionsSha256": "46bedffb9a18533ee2b47fefca192c26de8ed160765035ec2ab26752bd51f6e7",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q023.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q023.webp",
+      "displayImageSha256": "4d11b057dcc77a8d098ff29f9bae5f32f2328fc46c6c4a539ec257803649b23b"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q024",
+      "stemSha256": "7f3bacb4e38be84556ed8bef82f173cd0f4db326b7fe1507eb8f5b94e61e3717",
+      "optionsSha256": "e26be9e57ef05ea06dfa3bfa8f50b3c74c15a93e34d9dfdb02ece3ec706be48f",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q024.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q024.webp",
+      "displayImageSha256": "61653136cd6541235b0b0eaf746939b904b07fd5fe2546c67c94314a899200ee"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q025",
+      "stemSha256": "206d3ee4e0efa83e1a0cc87f38b80dba4d60b2616c292443f9dd009e8b968944",
+      "optionsSha256": "db21ac03f76f6e540111b7675fe56279117a629fd09d427998c1e0f6a67ba5dd",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q025.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q025.webp",
+      "displayImageSha256": "58126b68c0c8d83fbf3952f47fd27c1452cf095b15d656db44661b440a7dafa4"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q026",
+      "stemSha256": "169e8f5de4370ac75facda4f59ace741c698e9b82fe4def04b4244d34c4e1d49",
+      "optionsSha256": "d73471a47c799ec30b42b4348a6d95e9769a4c5d3c8845075a00af46a2858b23",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q026.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q026.webp",
+      "displayImageSha256": "833f321d517a3675bac5b68506d16c70458bbd68ef949e7847d51a6bcf9b9513"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q027",
+      "stemSha256": "be4d5a313d9f94a89fb7b476af29ef25ad2ae64e2657818b6d293b5979a82102",
+      "optionsSha256": "6dc6128d42d2fdbd3ac59eb08409bfba346c66da9a9efcc67968f998f2f9d468",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q027.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q027.webp",
+      "displayImageSha256": "2999bcf4b637673b04c6ea766ef80a3d15fd70f546feb44c4bd461776a4f70e0"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q028",
+      "stemSha256": "e3bb0fc85f15136e1c5da422586c8a8f1847e3fd5e590cb56a5e916648235d38",
+      "optionsSha256": "febda5f8920de76220bbd4e06ecb831947cc787b2b88f3b1ec3706becd8961a4",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q028.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q028.webp",
+      "displayImageSha256": "7cf6c2e140f734cde3e942308f90a680e82aad7830bece4a913a966439d0d179"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q029",
+      "stemSha256": "f13d87dce7d37588702fc17a504e30c2cfaf9ce626381a4e6b01146c412696c5",
+      "optionsSha256": "0c12561f07e2ba6d48dfeb3ef5a3bc82c92c86da60f806b95111247337dd7ba6",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q029.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q029.webp",
+      "displayImageSha256": "6a9c87f0fb04b339f0eba3bb14b78ba775c919e2760522ee5f77989155783463"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q030",
+      "stemSha256": "240cd852d492386c48d6e52fdbabce05e0344f563133e86fee2c450dc027a0dd",
+      "optionsSha256": "4f7e4d2704c59b70dc1ce8787f5c02831bd6aa6f1a9ebe2d11b1f8895331c98c",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q030.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q030.webp",
+      "displayImageSha256": "88b2edc7d37bb534b0cf7652fe18fbdfec4e54d6a0359714405addec659ce34b"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q031",
+      "stemSha256": "923f402c66018096c679c04ddfa25c46f34428c4ff607a7acf0e024c0908122a",
+      "optionsSha256": "838db28291b2f84d505df835d123b7b8d3a71a66b414c8cfc132cf94161eee51",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q031.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q031.webp",
+      "displayImageSha256": "78eba4aebe42bdc28859fb141f43df0bc0628762772f9f398c41f4f8b9c01331"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q032",
+      "stemSha256": "16f21ab02b38b832ea6e04bbb55fc188b7dddff4b573f15586f48e42ae6b6d32",
+      "optionsSha256": "e3bbcc3c9239ed4e9a4cb28560c38343d61afffef61911129718834babd42a82",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q032.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q032.webp",
+      "displayImageSha256": "d5a5203412925f9e2d5fa231444b580d231989dc2c5cc43bf6afc030210a0adb"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q033",
+      "stemSha256": "34a0a3d0f0e5828504bfd99900ffac4b55c3d54235f54f7d47f9836ec064324c",
+      "optionsSha256": "00a61ab92d8c35b36c23c2f1f6860ae0becb64aed78f6abebed0f2a178af5efb",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q033.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q033.webp",
+      "displayImageSha256": "be39ba6c2ec0169454f2a82e3102397e8723680b8285ffc125fa9b0c23284068"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q034",
+      "stemSha256": "dfebcc7b7da87999ee3a0c6982241f0d48b542f393281e9473aca760984ba92f",
+      "optionsSha256": "9db01beb9ac656063a3664ddd839784f58a0b654358d4efddf56458202d3aa71",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q034.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q034.webp",
+      "displayImageSha256": "db4a5097c0b70fd5f95f0ac8108ba60ceef45fa5735b9676725a915d9676726f"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q035",
+      "stemSha256": "20e2eb4472fa2e4da0cacd81bace36d2a4579169f5f34f9bdb5660503fd72081",
+      "optionsSha256": "9dfd6b6a40260a80d3b6274e37dc103d465c6a4bcf11099fc11c5d606942d620",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q035.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q035.webp",
+      "displayImageSha256": "6a4f967416fac53e2986d24983e88fef1fb245dbb5ab29d43def0bd82f2ed535"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q036",
+      "stemSha256": "3ae295f6fb8cd1d1db980d2b2a6e5e3839570d8930807de5e5bbaadcba0d6d0b",
+      "optionsSha256": "c40098468731207f120004490cf1f4783bbef515e1eddd2af545a4507ea79cbb",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q036.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q036.webp",
+      "displayImageSha256": "25c4b0d398136f09e8c377b9d8d2a14a0365b3ef5eb1250e3556f0790c93b4a2"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q037",
+      "stemSha256": "2ed1e418cb8a8e0d33171cb98c35f406b26b7a34926869065fc0884d64baaf8c",
+      "optionsSha256": "70043ab12202e0e9ed74f09cf6963bfe0381aaf9cae2df991b550b42940cb8dc",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q037.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q037.webp",
+      "displayImageSha256": "1512dc39e48072971d91e04c3da107187a4bd242816149a5a3a79928d3adc267"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q038",
+      "stemSha256": "f97e51d99a7dba74aebf0fc61da6caad65cf6202685a53e65079637f84eea2b6",
+      "optionsSha256": "1ca0cd67cd860070a44bf0d5caf799fa6cade53a109c272abc3a2d0b33330cd3",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q038.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q038.webp",
+      "displayImageSha256": "dc25ebb97baf3e59b1993881560938dec80b9b114bc31730b8d47ce4e6108bec"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q039",
+      "stemSha256": "4982f95c6c84ca85c38080d99af37c0143654ec009dc513dcc01d64dc894efe2",
+      "optionsSha256": "61d8630c2c6dde3d2bc8ce98431425969dc4f25aa199af45871ba76a9eb474ce",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q039.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q039.webp",
+      "displayImageSha256": "6f38f52cbae7036de8fb773a1d6baf90cf7fda20d288177025510c22316a1003"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q040",
+      "stemSha256": "3a1002d15c20c814a4af00e6bd0c04bc46aa4b0453373e723b8ee2427b3390ec",
+      "optionsSha256": "d104be824de2f30ff60caaf2b665ea3a4575f8cee00f9f0692d4c81eee08cb98",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q040.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q040.webp",
+      "displayImageSha256": "7baee776614930071e9d86ef5c01164a83ca822ba3daee9fd5e5d0e53d797218"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q041",
+      "stemSha256": "17b05ec989ef943455ce7b77d411db3eea8715748c0fc66f16d7e4b725641ef5",
+      "optionsSha256": "3be2559c240b61c5edcc5542acb91c68e205e10ae0390154c8555b68cd2b1115",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q041.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q041.webp",
+      "displayImageSha256": "acf625dccda542b983eb556e115abca0195fe6b666a7a91dae7f92d3df43763e"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q042",
+      "stemSha256": "cf221340a708837894edd023c22004292e310ac30d169a0731bb07e1c4220989",
+      "optionsSha256": "dfd6057701c18332136a2881ce2740e54997f62006ffc9a86f91e19d93e6ec99",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q042.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q042.webp",
+      "displayImageSha256": "a413eb032e93c4ae71a913630cee48d3cd4f262f796726f0a1d92ee82b20a5af"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q043",
+      "stemSha256": "8799066b50c3d8406d0903572e72b9b9157de9413817dc236c72cd3cb96ed358",
+      "optionsSha256": "8ff9bae7c1cea61833954f2f3d17d15259069f8f02e225348904a990350ec965",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q043.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q043.webp",
+      "displayImageSha256": "8c9e3d6abe77490395593730a6717a65db17f4db2bd0c42b8a25bd752eb8d2a3"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q044",
+      "stemSha256": "3f61989dc44718d4fa6265a7679cb3fabe27c0faf0a73eae711cc8ad2be80cf7",
+      "optionsSha256": "2e27c9d9963e12052667b9b2a3b6fd2768bccbffc1b3ef005aebd44d111e29e0",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q044.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q044.webp",
+      "displayImageSha256": "474c10ae2b59d172962db2c8562ecb30f8fb39cfd0e0e50496e6e0267d935531"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q045",
+      "stemSha256": "af2827f0286df5b7f7f1c29b06173565369a6c65f151fc58342e7bf46d466e0a",
+      "optionsSha256": "13d0f5e4ce16a56de5b6d489d8e1d6192db411b9253987cd11571092cb92e05a",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q045.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q045.webp",
+      "displayImageSha256": "b74084e63ffdd6954334871d6e7af27efe9bde5f0a11b1301fcbdfdffbaef862"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q046",
+      "stemSha256": "34e1c1c93dea5d6140467e9ef7230f172d28afdf73c4715fd624bdcc6a6c7a15",
+      "optionsSha256": "78b0508712e60181ec39900874bdc7b69ac459a205bcd44f2ce4b982a8febd8a",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q046.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q046.webp",
+      "displayImageSha256": "b226c357a90a498a1a925703c1975334221d3e68e3e85760b34cda31673debb6"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q047",
+      "stemSha256": "9dee297d1662c37019fa61a6256fbadfd58e21a94999607b111c1c1800a86235",
+      "optionsSha256": "b636255f0fa65d14d848086dcadda33ccb2d24dc8abe1d967f86d2af675a89f8",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q047.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q047.webp",
+      "displayImageSha256": "ccbcc595ab8120f61a87a73b8aa9f6b3e9c3a41835325d5addcf621716fbfa6c"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q048",
+      "stemSha256": "518ebb0344405372ae659af2bea6be3b5d5216906078a43bdc595fe4155d481a",
+      "optionsSha256": "a2b518df228567923fd766beba6eded958c63d75d83bc014c28fd7bdb6f8f2d6",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q048.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q048.webp",
+      "displayImageSha256": "f1406690e59370f2c9ee1f3dd85977fbda03782a58491db06c8aafb16d88b182"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q050",
+      "stemSha256": "574ec811c5fa96978439a149398dfc5c2b1fb94fc856ba3f0d5b7659f9394cdb",
+      "optionsSha256": "bd45a52792adb8f77fcf78dc4ee4a8ab5651f29d4a694c55513b4782bcd6a393",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q050.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q050.webp",
+      "displayImageSha256": "80cd5e80d2e2dd4a3eb2c08d59c2f4058164d7e97b0778af9db3f1cf99172d75"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q051",
+      "stemSha256": "9686bd1c11ea241032d5befba351bfa099bd568759ed234240d049b0710adb6b",
+      "optionsSha256": "0e261fb28d7fce2aec9501a903da3ec5653781b737f138ada908a1cf6bb8903b",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q051.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q051.webp",
+      "displayImageSha256": "b83ca8a97812324d5ba14ff713274325f2f3e44b8a33ba4e1fb865da0928ccc8"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q052",
+      "stemSha256": "e767319829590febf1380c406c316a24f20c5d568fc9ef24bc1ae69f54e3ef1a",
+      "optionsSha256": "44be649b6926a996c55a624ecdd658f7b688449d79edb955e6fc7bcb6ecfc72e",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q052.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q052.webp",
+      "displayImageSha256": "a33b66f41edf3c966f1d30c3b1cf95c4433bdc41e8c26620abb2409fb216d0a2"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q053",
+      "stemSha256": "7be191ba561b66c5284a02978ab8d32476e0273f4294cd03dad84e09659f190d",
+      "optionsSha256": "5656d6c9915097942555b3081ffcf42ca51c48d877b20e29a7ceb129bf42bd9b",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q053.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q053.webp",
+      "displayImageSha256": "5c82dc7384eb778c06f83ef6933b771f7a67edd10e178c5a34ed7b75b96c9954"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q054",
+      "stemSha256": "e75fcae9896b99b8014f999721089cc62991eb588fc549d1a631e3b9a43ec2de",
+      "optionsSha256": "d6e73d7a6be85f4898758957ba11d504316be1b05feee2bd66d333cd71412532",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q054.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q054.webp",
+      "displayImageSha256": "babc266f81ed9d065e20a61dad5da0c89e04be59b54d33f0ed6da3727927af1f"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q055",
+      "stemSha256": "4b4799f76ef0956ee6ee82b7b73066cebad1d49b3dddda21d84e9e773be60856",
+      "optionsSha256": "1ad9f4db6af1a2fc1a1ab8e92efe1c7e8d2903819b6c433a8a966f880945c0bd",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q055.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q055.webp",
+      "displayImageSha256": "7420f60fdc63f59e622ab98f802a02b4eb21fb25a7be257abcd4cf9ccfe22453"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q056",
+      "stemSha256": "4f6bac9883e2989254cbe7dbf110c5fcd78d6fa0b1d5eca4d28b75a9857020cd",
+      "optionsSha256": "7a5292fce467439ad8ef9ae021ba222639ff04591ad0d88ba112e61c73757308",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q056.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q056.webp",
+      "displayImageSha256": "5a06be6a1eed0cd000b5c168ae3ce7bd49baec161f8e496665e8963271b42583"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q057",
+      "stemSha256": "cd817c642ce6cbc8e7281a381ef086ed9326000d4ad23f70a8282680ed3e3945",
+      "optionsSha256": "c3a240d15237e1d0f6e20cc546ebce1fb4d12825fb49125ce330ddadd155f706",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q057.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q057.webp",
+      "displayImageSha256": "652cf60e3b0405c941d72821461560582ee33591dfc59e30fb73fb99844a35f3"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q058",
+      "stemSha256": "43586ec39db04ed31faa79586eb0ae224f9fafad3625713e347adcc4b922951e",
+      "optionsSha256": "a1dd57271f5cecd5de81062db67ce11f61eaefeb5e349a0931035b11d9876803",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q058.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q058.webp",
+      "displayImageSha256": "bd198cc0cd1a2b04bd2cc0c6ecadb11bef61d1a3a156820656a5350c7c756b36"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q059",
+      "stemSha256": "0ff1f6f4a5d97454b426e2dd827e55a02d5b2c9301b7ce62094e3dc1322f9513",
+      "optionsSha256": "f7bfffcd6654f7d79fddd5bc32b656720ca544787c8b38c6f788b52ab19133a4",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q059.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q059.webp",
+      "displayImageSha256": "7d74728ac1cd09677fdf3dbfe3c773b19590acddb43b4a1d4addccd1804b7a9e"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q060",
+      "stemSha256": "f115c2ee3017fdc5be93c619524fb94c7d0e26d21696d7cfc2af4c5ae20c472b",
+      "optionsSha256": "4a7cf84fc1d014a582046b44bf77a4d5119bad0932665b6d5f158415b573e529",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q060.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q060.webp",
+      "displayImageSha256": "51534e641947c39bab53ec9ad23b50e50e3cc9cb94d4fa43217a9d66bd7527c7"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q062",
+      "stemSha256": "3ba428e91febff6f1ba7d68057abdc662b5f466db2540e0a968a67f138e4528c",
+      "optionsSha256": "6282e314a95e7b273f3d41e6727bb486529699d70ca4f3949ad5cd7f83c43d78",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q062.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q062.webp",
+      "displayImageSha256": "05f116d4897ed6539f2ff139ec0e5e9f1a444541bca3a447d3f69bdbe99018b9"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q063",
+      "stemSha256": "4bc365800e1a7c2da8765a8706493a7f9d376604879ad0cb0648b369dc1a4977",
+      "optionsSha256": "4647ce8cb24df5936b2705ad811590394013cb114b80de76521f24224c8d67b8",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q063.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q063.webp",
+      "displayImageSha256": "ddc9a9358398ea5d7d4d93f57392c15c3a1fa938384deea39d48ff50221f261c"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q064",
+      "stemSha256": "8762505a8b8971b57655eddc6b548c35d919d443e4028f432eda730ef52e52e2",
+      "optionsSha256": "e00032ef17323b97a9a5659357c0b571bf95c94e8d40c46f7eaf23f7b14d6bf7",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q064.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q064.webp",
+      "displayImageSha256": "506944cd9f0d4d5dda1b8bf662c24c20f7885170a28689b7986d4fca5cd8005a"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q065",
+      "stemSha256": "53b756f3abe406eb057c5f82c089210824456961309b338e62ae9565afb185dd",
+      "optionsSha256": "c9303e30bad67c82b9977c3a9e6be0b1c2876a7337eac77d67422a6a85fd2329",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q065.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q065.webp",
+      "displayImageSha256": "fb9b0b11b0e4029c21437a93671af0dd36c4baeacef7b6f16195c89d6f0e8be2"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q066",
+      "stemSha256": "80cfabe87eb6b80028ee38b717f71769f26e570035a3061ad9cdffdb29a7b124",
+      "optionsSha256": "357837b693ec3de81ceba33edac11869650b4ef4c8b4a7409b1425c661fc7efc",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q066.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q066.webp",
+      "displayImageSha256": "ff9f625e742ba5f6d6f15e9e64e5da5d456a47ce57ca71e681261e3a1446b365"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q069",
+      "stemSha256": "4f0776bde406d56ac6d5f59178c99dde7f0f014a9ad14510b7b626f2842d39f3",
+      "optionsSha256": "540bd404b75d5246e68d4aaa3f56039d460a238671dc5e84808fc5996ea59abd",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q069.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q069.webp",
+      "displayImageSha256": "faf01d190090a17978b2a25f5603c577bfa93055fa94a968e943aeaaf1ec878d"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q070",
+      "stemSha256": "bc99939409057ed31cd34f9b3141eb4cdd972cdc4f636b5b15c59ee6ae458034",
+      "optionsSha256": "cc9f2ccc26bc65871ee610246a891d14297ef38b2b6ec7d60f2424f70959e620",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q070.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q070.webp",
+      "displayImageSha256": "b05a1467a6491aace9c1852c854e317df7e25991352d6d4c50fb138eab6136b8"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q071",
+      "stemSha256": "b75c9f8467b5342cc83f59c02145e8b41728a2fdbae63e3b0aaaae2233ce760b",
+      "optionsSha256": "e0e41bc44c16c3324b25acf04169c3092e03cfc38da3ee73408a96e37b1e8d1e",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q071.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q071.webp",
+      "displayImageSha256": "8a3265775962130b4c3c8e64dcb2ea8aa91746340c51a66fda1050e60387bd9b"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q073",
+      "stemSha256": "17bc48f19121d35f5c573fa5ffaf6ae8735430420cbf114546586fe79ad99ec1",
+      "optionsSha256": "7d518ae378c4882763c01aadc113945f9a599115d5e78f456af3bbbca3523802",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q073.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q073.webp",
+      "displayImageSha256": "d99cfb2d64a8ee2ad18985759334eadacb2f24bdfed71a2e3bfc5a56129fe077"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q075",
+      "stemSha256": "5519146054a5684e1a2294b765f31e90ca8773c231eb7b538f203276f9997e10",
+      "optionsSha256": "ae93fd25389e59ce38498a62796ec625aae9606c03a4b95915b7ef05db7ce1ed",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q075.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q075.webp",
+      "displayImageSha256": "fbd7ccf5e4eafafd5c17faee1e2ea857c7e0b0318dbd9efb3ca646cae866147b"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q077",
+      "stemSha256": "08b143bd4be019bfea11b2e223c3ee20e432eec3c4003bc5ba20fb7a3f9bd10a",
+      "optionsSha256": "d2d3d79dea8b60b5e7d397b67e5addb8408e3e730f0814646f292f87bf6298b2",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q077.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q077.webp",
+      "displayImageSha256": "fcdf2229a98c65d99671094ba7c9830e9a61de0db79f7e407032ef8781251e91"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q078",
+      "stemSha256": "abdc163b074804416b0c6c643cfeac7fce55740e55e85c2808d948d1484f50cf",
+      "optionsSha256": "910810b65625d2c35dae532fa502fc087250b49a0ff202bf0d1d912803af93fe",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q078.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q078.webp",
+      "displayImageSha256": "b186c980dc64567b3ca8d64989eb45edcdcae725923c6a94b28eacbeb176e7c7"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q079",
+      "stemSha256": "74bfc5421e640c7914b11d99e735da6949aed7e60e6e6c390d2f17d696005653",
+      "optionsSha256": "64ce995e03c0d6a6bb09d04a7a7774880cc3d60c384169b938c6c71850522a34",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q079.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q079.webp",
+      "displayImageSha256": "ab76aa8d1533cf972b4986b3c46228e6362a55beabd2cdd61601dc7d25efb38d"
+    },
+    {
+      "id": "MOEX-C002-090180-S4004-STAGE1-Q080",
+      "stemSha256": "a82c35056c410014376af24b86fb40f4e7d5e603c3a32693cd702b1826f13899",
+      "optionsSha256": "9ca41ea15246eec3c0b901c841441a9858744eb8ade8da448b220fbf813bcb30",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med1-display/Q080.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med1/MOEX-C002-090180-S4004-STAGE1-Q080.webp",
+      "displayImageSha256": "5120d59a7a90c8f10771e41bef162909ab12d10c61032f461e01a5ae0ab48faf"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q001",
+      "stemSha256": "37c1b5c516c80550da2502b2984d34c34dbae8ebb2ec2d472e1a9b031a02782b",
+      "optionsSha256": "911a6e9acb33337340d1ea0aef568c94865bf1b944342e93cd09c48bf97f5de9",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q001.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q001.webp",
+      "displayImageSha256": "e31ac60ede160c0a1b429ef4689a1d15021057f223b039cd4247d28fcde8026a"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q002",
+      "stemSha256": "457dc997fc47d09d93cffd77855aee4c7be53229855535968d94ed192e25d7c4",
+      "optionsSha256": "ca9d9e3017c6753c75493b906908ab0a81e703f2468b9c781dc67013762d49e2",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q002.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q002.webp",
+      "displayImageSha256": "f71df4c71daf30f0a47bd8b6db36fce36f19b9843244da8fef7432a653e76538"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q003",
+      "stemSha256": "9c2631f4353109c6d34cfd86aff71690ab0434cf1eb3471cd0b4ad3807681cad",
+      "optionsSha256": "d37e369a73333e7ea17c9f29322879a564085ed618e575c2bc3408ab64f2053e",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q003.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q003.webp",
+      "displayImageSha256": "d42d223e57e1e747a2d929f931fd6bfa9d7ad91b65bfb2d62c3b39b4ec53afe8"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q004",
+      "stemSha256": "be787cdecac0c4790e559411b6ccb3335c5526cb515a0e4bc4ead9b4fda338c4",
+      "optionsSha256": "15fe9e522a440c0719e69f5e65f8582d3dce47931e962bdde2f7067ac8dc8bb9",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q004.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q004.webp",
+      "displayImageSha256": "bef53eeb086035b56627e6262350f5de244e66a2fc23e6b58e86ffdb87703765"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q005",
+      "stemSha256": "3b5eb26fb245ff706ed5d42913a9a0f0dd9057a6ddba5251715121e50afd96f9",
+      "optionsSha256": "6f84eabe30acd926f8f8f9dd9e27bae966356c1d753e1577832d676b9abb2f2b",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q005.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q005.webp",
+      "displayImageSha256": "2e1753aa78ec3acb2ddc930065b7ed197483c4989ea3edad37870773d18ba1e9"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q006",
+      "stemSha256": "f7dc203e1f148d54c8d091fbd0c14426e63712be37cfd2a53519bc9d188f095a",
+      "optionsSha256": "fe3129ca7ba89368bfe8bf985b31c30f656b175aafa2734a8e801ea3dd2e209f",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q006.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q006.webp",
+      "displayImageSha256": "17ef1e94321178a25f6d47ebe5c619efed0517830adb1a6177b376421493dd93"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q007",
+      "stemSha256": "e39bba87e2299c47352686982a78638eb1c9c3a923155811b059b5cfe857ec98",
+      "optionsSha256": "8bf0ff566f7608228bd0afed60502208f98948ccb5ece40c3341c197ac1ef8e9",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q007.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q007.webp",
+      "displayImageSha256": "1e78929c4e8efd95c1380e6bd6b615f244debee421e252bb48018156ef4dd39e"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q008",
+      "stemSha256": "9e41bfc1b5bdf0290769168b5bb7ea9ad7a50d507f591726c3e49353de84bc95",
+      "optionsSha256": "67df7cd33ef09e03632116ced777ba1db162ffefca565b7057c7dfae0b119a3a",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q008.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q008.webp",
+      "displayImageSha256": "8acd5242bf9848d3e526a917110d0cb557bf50c4fecde823711a0ce21eecc4d8"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q009",
+      "stemSha256": "595734b008f83e34fff006658231f9c8fcbf519954000be75b6399c557eb45d1",
+      "optionsSha256": "3e76e8145116782062285519312e98b4f7e9af60eeb5a5a8b11de8a9a3e40a89",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q009.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q009.webp",
+      "displayImageSha256": "53beab23a475aaa41d7878224c4d57cac5c6be3154de2163c18601bc1d402332"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q010",
+      "stemSha256": "31975fd62f1cf6fa74de5ef9f8dc21a4f6429aee27c86301a56219433b25d43e",
+      "optionsSha256": "c21b8fa162194d665c36978ae46db4c2a84d8e9dd65d79659a07d92eaafe3052",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q010.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q010.webp",
+      "displayImageSha256": "7bbfa4695e48fd1f8c37c2ee84fa3ed4d53fd07d266283cfdd6544c0969164b8"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q011",
+      "stemSha256": "1f1c4d261db7e7c08c50b5fee7acf9a93ba822206fe9f1c544651efd601f3acb",
+      "optionsSha256": "95c36e454e7dd949c24bb5031c497b4f8435f92af7e1d37ae008fbe6513440b6",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q011.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q011.webp",
+      "displayImageSha256": "7033ff58373595c64b883fa0fb85d9cccacbd670278a667cb559c30b50c65a71"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q012",
+      "stemSha256": "e020bff205e07cab93dd7e8c7a39b3db3ec0f7b55206ba98a25d5cc2ff432f91",
+      "optionsSha256": "9c0aa1a4d6d4291a692314211408b1b30b2bf45a3d6bde23ee09060d8c58e9a6",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q012.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q012.webp",
+      "displayImageSha256": "b8a5923070e67a92e2f089055de38fb87c5e7566061a59725aaabc6689846d77"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q013",
+      "stemSha256": "bdeb8477118912a6a8b8bc3b444ea8d8607012f59f3b796f882527a364751b6c",
+      "optionsSha256": "6fff0db425e9ac98009f8a65e4a39866754ed085f7d33a469eec50890a079e9d",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q013.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q013.webp",
+      "displayImageSha256": "be4d67ad9b80792d0e7ff6048c29429bffbf1d74c541f70b85e0d447b6568c1f"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q014",
+      "stemSha256": "15f1ef574828dc7263d25d2d08dc8ec81b5b9c605105f7ca6b8df5a15e87806f",
+      "optionsSha256": "9890ded477316b6472f3c45ef8bcf738d5029d3de1f94b2383c22f82743d48cb",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q014.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q014.webp",
+      "displayImageSha256": "7e40e9a8930c1fe8968f9efb1edc54266d28fe29920a891da52d36e30b7dd110"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q015",
+      "stemSha256": "50e69141efaee70a7125a4e7b822aa9fbb7f4b0887866a1fb9fa9e6458b6e240",
+      "optionsSha256": "57c3f49f8f4b04387624584f168fbef7e85b3adce4bcd33856a5bc05f6bf78d5",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q015.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q015.webp",
+      "displayImageSha256": "b7b6f99b12d81dda19719623a4596d9c6cde60c186f3972567cdbeba21fdc7f8"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q016",
+      "stemSha256": "f4517c2f00eaf6ce6892eda940c2a25e864d40f60bd0db1dbba93a5d291f3e30",
+      "optionsSha256": "e6704bf3755799e5cc3dcb0e571ee567b8bb9454ce90800196495f8ac29a5f5a",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q016.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q016.webp",
+      "displayImageSha256": "4f978f143643514614e6c8870838fc6dc26d404cec81839c7920ef564b6a8b7f"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q017",
+      "stemSha256": "6c9f54b70255bdb286b5572d6fbec2b4828cf8fe46d98572b70d46b2bf75b0d7",
+      "optionsSha256": "da55100e87a65267d704d9d418a6ac8191a366b51b3ae8d0463b2bef89741d20",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q017.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q017.webp",
+      "displayImageSha256": "dbc5d314cd473582108688d54e9882d11c7cabd00e7bad98dcec1cd7547d94df"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q018",
+      "stemSha256": "b9ba862eda63f4bffa256f13524e776d331b40a666aaaa33297c4d08b2645bd8",
+      "optionsSha256": "b5a9fc5871729af6ed060a55560827bed88bb78cc93f20b429ca8ef9dbb478ab",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q018.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q018.webp",
+      "displayImageSha256": "6e6f8bc92a20341177bfb25335cd9410eaad347ae6183a3701f6449f95c254d2"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q019",
+      "stemSha256": "5c5619f2b495955045cefff5568496eba3a1d70ee5c46f311e336f7656e7e777",
+      "optionsSha256": "5ea21c26eccc72f47bfe8211909f233672d8737a9bc7210dd04cdcf87f44caf2",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q019.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q019.webp",
+      "displayImageSha256": "72b0853510032a0b9b7c5f97e506a53ccbcecf82b15fefd607d93e25956bffaf"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q020",
+      "stemSha256": "50dde3a782e302ab949e6451cdce0c7f8a8d6a7e55b59678566d58de02422afb",
+      "optionsSha256": "f428e96f75f638b0b22bcabea0aee133eeb4441f9a5ae5b755a5f9ef6f13faa3",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q020.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q020.webp",
+      "displayImageSha256": "f462c7f9af0f9cc987f4c0a8d12bed1a884617dc28281c447d543b4e84b74ee0"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q021",
+      "stemSha256": "aea0ef27e1481695daa015143a6fecca43777662b2e7c75794f750ad9c199005",
+      "optionsSha256": "7968183537176701714a9987d94a5c390c2d21258bc85d687c83fd46c3ced00e",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q021.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q021.webp",
+      "displayImageSha256": "fa62b2ec127489b0c57447001c5b0f25788fdf3bcdf19cc63d865c9657dfaef2"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q022",
+      "stemSha256": "94f84890920b1a7b52b4ae008e899bfdfde7a187d82d5af38843ba211998fc45",
+      "optionsSha256": "9cbadf39fd5e40ab8fecff8bef6b98aace950f0db3df4a2a22ba631dc5722f63",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q022.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q022.webp",
+      "displayImageSha256": "929ccd3814018964285fb370325a9d376b3d424fd72e2ebf6a069b3abdb19ed7"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q023",
+      "stemSha256": "b428b8d60b0e8fdd18b23e230b9dee742d0439e74d939e6ca509a0269eede414",
+      "optionsSha256": "d8d248e725279ae36e968f75f20e559c5bdb86a24259db9af8e6f180be3f611c",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q023.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q023.webp",
+      "displayImageSha256": "02b7f48c9730baa757ad14412dbd4b4dd597d7530d1530c2c7f0454921897958"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q024",
+      "stemSha256": "d7f5d7d35b80b56b5ea8ec6e3a853b3221765a846a9518a3870dbcc8f1c992b8",
+      "optionsSha256": "00f6a483afdc53b239a883051d3df033ca7fb2413e920263854f2abb575b5f4f",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q024.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q024.webp",
+      "displayImageSha256": "4b45f43aae840a29e5cf582b48a25f5fa21074ceccdd2da5feac1b1087490e29"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q025",
+      "stemSha256": "87e3fc4faba97237faa10e3f0d5ae3fc226718e3b3d1c1d2b5452083f620e4d2",
+      "optionsSha256": "4e1183eb1bff89a647145f229393e5eb2118ed2129080b3129fe095ab0ba6b0d",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q025.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q025.webp",
+      "displayImageSha256": "b4c7cebae22f90b851ab4227de4eab7a91f5ae373fc6e2cdbd0a12ffdd171f1b"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q026",
+      "stemSha256": "3e00f9f74770fed139a7eb69580df36206398a3e0fe7fb2a35753fe2b6354660",
+      "optionsSha256": "a327e337da2747ae4c1cac13c7f618390eda88e3d5ee7472245b1f3f27fa149b",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q026.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q026.webp",
+      "displayImageSha256": "0d5c13761e76537161ff214b5dbeceb664332299e65a88380f915b2e839d37bc"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q027",
+      "stemSha256": "36b9bfa22549ef72354691841adf51ad41b45c68e291015805636d8895d733e2",
+      "optionsSha256": "090507bbaedf090516549a4943b5dcc57c7b5224351789c4ef87d174a27c3859",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q027.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q027.webp",
+      "displayImageSha256": "f9008934eb44d290c54af0e97c700ea6b038788f1659ba54f21cf0c7459c7c02"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q028",
+      "stemSha256": "a8e052492f867394b3d2d174e3047a87bd5f7995e29bc3ba7349df775b60ef89",
+      "optionsSha256": "ffc948fd44d8165d217d56b487483d338b3206a3e259e72020bb4fd6f2bfeedd",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q028.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q028.webp",
+      "displayImageSha256": "a920aeeea0cdf1335709b10e3c7cc26711036ef465e6cae9ca32753a4cec9c7f"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q029",
+      "stemSha256": "3a6d3b8066b7ac2989d90e232303a0d76f3e21b9c38ec637d4a4f01851e7d613",
+      "optionsSha256": "373c32b211e971aa9b9802fe5f2e530a179b9c3b671ed131a45e100a8ac13efd",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q029.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q029.webp",
+      "displayImageSha256": "22949a23ca739d30cded8abe1c53ec81bed043623b7832891995302fc5f8d09c"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q030",
+      "stemSha256": "ba0d43eda534f6536d5f8302bf28888b566b9d2630c0a00d486a616366566bf0",
+      "optionsSha256": "ca31179cda3d66f33845fade8f1c7c91260aa06b72cd77efadabd28202ba64c8",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q030.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q030.webp",
+      "displayImageSha256": "86ea5077e447bd8ff6a0768b363a665d02919ec728a3016a9d5926e81bc8875f"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q031",
+      "stemSha256": "4be666b8f659398bf746b5cfd6fc8b4a6f6f5887afda983764d5b58ad9faf42c",
+      "optionsSha256": "d0681ca566576658a4c6df118f9264a4195f4fe8868e6c5d367f33364744d6e5",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q031.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q031.webp",
+      "displayImageSha256": "1a57cb010a7441a1d9a5089f6cfe1ae209e18760d1d63942ae9c9f1b17326417"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q032",
+      "stemSha256": "62633e234f18f524ab24f36db19b857fdee4331f4b98f4fea93cdb96bf3d554a",
+      "optionsSha256": "1682ba172abeaca4da53e3ea25cce72bef7cf7bd989b832a9098f0cf173f0178",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q032.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q032.webp",
+      "displayImageSha256": "18b1adb7cfacdf1278bc592d44b09b70f2b6462137cb9003bf0a2e17af58bb08"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q033",
+      "stemSha256": "b4cf937128419c95885cb53d3ba9581f330db69f8f5cd77a91eff0fba4f7f7cd",
+      "optionsSha256": "2fb58de783c3b3ec1d24eb55a592df19ffb02d3671a90948e7ef3aa13bcd6f5e",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q033.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q033.webp",
+      "displayImageSha256": "015ba247e529d702d8f9c59efe842f924a5bfc8381ee8ebdc700c42f1fe7c866"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q034",
+      "stemSha256": "5404a4bb6ecda8fdefc1a8f62a4fe3db99f83813fef2febd22d4ca396a0e7e8e",
+      "optionsSha256": "1b8c56467d9516548fb21397977a81c4e769f472bda3730ec0cf654d6712bc95",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q034.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q034.webp",
+      "displayImageSha256": "3dc49f0b93b09d8f599a1662cb22b06dec28ef54852848a9d90dd3713c1fd3d2"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q035",
+      "stemSha256": "1e449b8b823b1056932cf42f329ed4b45b4d4c596f2a2a116cffd768d7460cc9",
+      "optionsSha256": "5ca0220667752dcdd5f4f26202772a81acbaecaf992619f9dc93d1b3f2e491d2",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q035.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q035.webp",
+      "displayImageSha256": "c8b8df43b9d592fbdc2608e1a77a8b0b281aaed28aa6c08276ec0df7958674cf"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q036",
+      "stemSha256": "7fa93560c4a63cc28bee4ac290d0a83c46450f8ea9fbd2837a56e5e3cbd99d58",
+      "optionsSha256": "5bd0a368f81b9e3de97c0575d9bf57db20622e9306c40319a439fa13e0e962ac",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q036.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q036.webp",
+      "displayImageSha256": "0d237e9c894cc762b87250a9ad1caa90dbe0f476be47154ab458dc2864d7670b"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q038",
+      "stemSha256": "0dccf2cf413478db8232b15ab631f3dc00d90c2fa09db132c2b77dd845db2bcf",
+      "optionsSha256": "55fef3db4375f8ac36cf38d48cc81d9a34e35f3283e77840b225fba365b89d08",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q038.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q038.webp",
+      "displayImageSha256": "20d7da2cb8ed18f0473f2af38c49910fad3615153d47a33a628be6e1aa705280"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q039",
+      "stemSha256": "40435d79e60580c2de66db929d00174cb9d1f8f4d6054b10dae5c3c54a668a0a",
+      "optionsSha256": "a644906e978508acebe9d93919d4b093b27d3aee353a9cbafdd42db8dfc4a6e4",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q039.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q039.webp",
+      "displayImageSha256": "4b09eca2df1f62e89a2dd0379afc1eea9d8186638f6bda9e06ca14dbffa20678"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q040",
+      "stemSha256": "e1c69a2a902d018d5d5b6a532b1303dcf34ddb3bf925220891fc4140c6b472bd",
+      "optionsSha256": "dc43a31a78f9f835d14a3c21adf728f8c3da33ee43c0fab54b8a5081801017e6",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q040.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q040.webp",
+      "displayImageSha256": "9acd7c5ea17cf33efe540e87323e4155650f81583e08e2192deb2189eecfbf26"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q041",
+      "stemSha256": "0e05c9b710f7bc69a794fa457f3f7928fb95b50dbf8192344abfd39f93bed728",
+      "optionsSha256": "4e0d37dba0623eb00343976bdff4c64210d7c874ea4ac5fe999206d294644d44",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q041.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q041.webp",
+      "displayImageSha256": "ccdd7e607d55e721409310b336fc12518c1f39acc5f8068b49884acfff931eb2"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q042",
+      "stemSha256": "1d7d8e51f44d20d0efb1f3099191b1d90552408e0eb6a33d193fee133c5c5f33",
+      "optionsSha256": "6f2e82810cb682218423a2a7bea30c5b873f233ba2a9734d2b1f45c0f78b1f1f",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q042.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q042.webp",
+      "displayImageSha256": "0aa332200dcbd03641af60b65a2c96e8bb3bf95ca18468b8270de8bb791b9363"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q043",
+      "stemSha256": "515bb75d61f201046b32a7c77f705961d53aad411619c8bf3d8d019067f9ac7a",
+      "optionsSha256": "37491941bc9d379b6ca408b793f5c4833841faee3a48f1c0812729a9dbef517c",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q043.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q043.webp",
+      "displayImageSha256": "1ce99f74a837958b9f2b5ee02672d9fccf94e70d7ac910912b11dccbb68cf684"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q044",
+      "stemSha256": "79d50227770b5f132028ace4bb182998b7490b0956e6f659e72c8d04ac9b9863",
+      "optionsSha256": "24c64c54a9a5096f952e7edd35768d89f2e851bd2934228971352d4def999b62",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q044.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q044.webp",
+      "displayImageSha256": "49307b7707786069e7784c54b27a5f4fa8021f2d0c2364c629a64dffe50e16bb"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q045",
+      "stemSha256": "fec8dfbb10cada3deb6065240fd6b32c685d32994a0487e016781c15ec2d541c",
+      "optionsSha256": "54960d18865e8d59ec09b4cbb13ef1ebac5fbbbe6eb046e2cd1699780e9b0512",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q045.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q045.webp",
+      "displayImageSha256": "e8d54172b5eca8c83f79a26030e1097d004e8a1c28c646ea9aa7ddffe1d4528d"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q046",
+      "stemSha256": "b9d98a3f0026039479ca72dc066e75ad76aa7b6a37793065d1f341e3b919b870",
+      "optionsSha256": "ced5878c51977efb7445970e0d8d2418f5661fbcd25e635524dce2400ba48da7",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q046.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q046.webp",
+      "displayImageSha256": "a179a1e017f6e29d651599f7d55a94ff5b9be1bd1af2a9a5b07d5ee793423ce7"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q047",
+      "stemSha256": "b6d2d6f4a98f8c9279096050e81af623cf7ec929603883109f090aa1b196195d",
+      "optionsSha256": "cdcf664904a84029ec3233678d31391eae2581e309f44374420564c23c11f483",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q047.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q047.webp",
+      "displayImageSha256": "f227134cbb93440f194593bf1cf98a2d659acd6cef4a01a92f045104f93a1ded"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q048",
+      "stemSha256": "5d8dfc0bd53a1ee397729e4203160af696709cd4f5283fc1785f1acf804c5a4f",
+      "optionsSha256": "ac83a4ebade1136b4a46d1a30607f0609c688206c692eaeedaca9b928ee8ee71",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q048.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q048.webp",
+      "displayImageSha256": "ab978966818a1e702ac7ff317688943a87f483ed07bbcdb34f88ef696bf7c537"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q049",
+      "stemSha256": "84a03ed1094587508cd3133b3a02b33bd10e972a4bdd02dad7172b7e566042e5",
+      "optionsSha256": "184e0519d12c06410662599ff6a41aad66075741663b6a8557a7f735f2411f20",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q049.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q049.webp",
+      "displayImageSha256": "cdc8bbf7e780f2b3aa2a09de11a1eeca97672eab8c874163b51821556a2f157c"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q050",
+      "stemSha256": "762f96da7680f9f7662cc8e2f0d94d273de6f7de44cced1f95954148ea30816b",
+      "optionsSha256": "6b557040142b416d1e57cb686542e91f7ae5e83e1fc30bc4528189558fa1e6ca",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q050.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q050.webp",
+      "displayImageSha256": "14044a59efdd27eca4cfbca90c99af6fff1e3998ec5f0bd01651094e65f5e557"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q051",
+      "stemSha256": "75df621264529bf75d0f775847a06992e704f35c3993377f529995e9acfa0bfc",
+      "optionsSha256": "5185e48b18876b05bbd1acb1ad7c8057c3b2787164c74c351a5cbab3faad637e",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q051.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q051.webp",
+      "displayImageSha256": "07c8ac20213a451ee402e8ee7b594b695833593be2cdcad354d1bbfe8b0fd2b1"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q052",
+      "stemSha256": "1ff8343646de3a3c11bdc8873d8e395630c839da27153d3be99d8d65ad53510b",
+      "optionsSha256": "65ea55ef760e8beb7098f14f85c9703c69363753e90f0619686f8a5c467cbf19",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q052.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q052.webp",
+      "displayImageSha256": "35b8fddee0579f3e77fc9a45eb1a78fc55daa66a25cee4997f29e9980a5dd414"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q053",
+      "stemSha256": "d48d6b9c2c5c6a9644dcf486b8ce706a215174f98e53631f7253c0d28ba49dfd",
+      "optionsSha256": "ced2b8a235f9664a06dce07b52cd06182c6ffd863d5fe70e715e843ad80bc6ae",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q053.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q053.webp",
+      "displayImageSha256": "ab2646031acbc696104c537640ec3084373912d3773f4c222c06e93c64eddefd"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q054",
+      "stemSha256": "8d67c683a5de9a2225c8f2b8082dbceee4f0776a2a358121a805a058648d1bb5",
+      "optionsSha256": "8241956d01c8b53d8dbe787cc00e726594f276d4e6511bb988a4e770f8743bae",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q054.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q054.webp",
+      "displayImageSha256": "d4cdb1e4a170dabd9ebe21b762f8a61da847be98b2b0263435b3c4159e5df9ee"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q055",
+      "stemSha256": "dd746292ce21d5ce31021379054d4d91244494a4b43340ab469d779060ce25cd",
+      "optionsSha256": "6af8abd0371745e086a41050275f70122f1e180e0cf2f547a216b535705bd0ef",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q055.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q055.webp",
+      "displayImageSha256": "3113878b09b83ca73ad01de75e55c52fe27bc9a25565b905af598176e959b074"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q056",
+      "stemSha256": "cb9d17f4bd41db7db7d782b5d67d96d4978a9148ac8c55294bf9b4c00ce10279",
+      "optionsSha256": "f8cac5d3043d3e067dfc1a2adaaafaf0b1cc8967a5fd40c4f5fb0edbfcee958e",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q056.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q056.webp",
+      "displayImageSha256": "aa2cb8e597f59bf91cf9cd8520da304eb93b29d1e62b333db8c38f8e1e6a5a43"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q057",
+      "stemSha256": "bd0deb0eae85e91e210e2f1d494c37cc8fa5f622551487d8939b918f8b609aef",
+      "optionsSha256": "54818007d90120727eba31f11a95de77cfb4c01281455190d29ad0d3246ea8fd",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q057.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q057.webp",
+      "displayImageSha256": "0f31ad68c416e8ee1b33733a86cf85cba2cb86eecf710475cda87a46bd9755ba"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q058",
+      "stemSha256": "a87c7ab1c83e2d38c091c444ff1423e46ace3bec948230d685ed4ceebe8155d6",
+      "optionsSha256": "0c9652a998e9efae1a868f0c4721a5812cbc4db23944f43b85873acd6818e37b",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q058.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q058.webp",
+      "displayImageSha256": "ec438bf6d7f268d3325cedcdba31c183eb87cafde56dff711128c1858b16e814"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q059",
+      "stemSha256": "ad2a29a83509546b53b6514ca7b59a7c3dea3aef45f105bd48269e433ce31b21",
+      "optionsSha256": "e0792632a3684059749e7c1f429955a065b88f82067b0f91ab252a82749cd522",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q059.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q059.webp",
+      "displayImageSha256": "08d8e22c1d55d1baf5f05903e999a3fd54da6a49d8f9480dd6a64a14f63d3a1c"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q060",
+      "stemSha256": "a3478f4add64b83cb5911f466640bd2fb289070fa8bd1ddf5cb5db55afe9cb94",
+      "optionsSha256": "b04849dbb27b8bff90d08db533015f7baf2f72773840585ed48a1329b05ca6fc",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q060.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q060.webp",
+      "displayImageSha256": "e80a4c00b5303748376d9eaba04967bca4a1a0ff3f5b69752b9526e499912549"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q061",
+      "stemSha256": "a43f7465d446775b8211686aa2eda757883a836ce26a8324e78e882d1f2a54b4",
+      "optionsSha256": "9b3b7fb8642bcdf61056fcc8e48e98f9b60f071ec08d0a029ee53d3c81ff6d71",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q061.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q061.webp",
+      "displayImageSha256": "dc3bd8dba13d549e6265ee03b5978cf51df236af945a9271993c922340371070"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q062",
+      "stemSha256": "dc8523ac8db28bc75a868628e2b471a9528ab013c51e1704e04c25861e3575d4",
+      "optionsSha256": "4e296f5fe9ee7928c4f77ad7746b031553454c001284a419bbe7d7de68d0e530",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q062.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q062.webp",
+      "displayImageSha256": "a75351eacc3ac683d92107691a0b025e73b63a4eefe21c579aff520e771ab0f4"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q063",
+      "stemSha256": "3091968080d4445c1f5853d82565cf7febb36ebde6c9c0f82581bdc510698140",
+      "optionsSha256": "15b87b26fe8ddb5ed82dffeb8c8355b03f256f3fda1997eb6e9f10a347618533",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q063.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q063.webp",
+      "displayImageSha256": "e7b22a9b2b17db821e3658151827178f9fafe2e9ee1033a319e40a99f9bfd84c"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q064",
+      "stemSha256": "481b7d590a849d9aef162281868b1ed7974800a93d2b8fe10543ef6e3bf75f0b",
+      "optionsSha256": "2171ab7998e52600a7e25ee1904b40cfbd57c12c001ab5c16e633ed2db0099e2",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q064.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q064.webp",
+      "displayImageSha256": "b053c906ed4d6ae4c07e4f735177987f35b4186fdd8b708873b9b5e90e4172ee"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q065",
+      "stemSha256": "04b86392f74fbea2b9327de1f0c883d434f444e360eefe762571b8f28a8420f0",
+      "optionsSha256": "a2ee138cb6d70249ba2e4a900cb380ad69657324a053d9df06f5e2aae5b25ff2",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q065.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q065.webp",
+      "displayImageSha256": "c6c5f0a7b30ae3f60b29de5a6f29dfe94eabffda57499b14072568edca81ea8c"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q066",
+      "stemSha256": "6b4ead78f380fbf749b8ee5f6afccf10fa3a811a3e41ff9f1e7d2a95add77109",
+      "optionsSha256": "f3e1c99cc61c2698774e6eb5824c234130f8f1fc150f5535583f7b3aea5ad0f5",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q066.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q066.webp",
+      "displayImageSha256": "a54915aa74309c607c5f973c61cfa43438802d7350e09026be2e507b1cd071cb"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q067",
+      "stemSha256": "20c916980198ac994059998e5abb6a57a63002207ee04fc091a351c001b23a15",
+      "optionsSha256": "357ad34f7270c0d747645f312da6b8d870b41374e6f633226c5c6b3b9e786f4e",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q067.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q067.webp",
+      "displayImageSha256": "6eee4372f7b903f68eb0b3988eb57a5616bb30a275e774943286f9845f64e54e"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q068",
+      "stemSha256": "9dbe95b20c9c13aa35bad2b902a9b04dd5afe86e07af1a06ae7d1c2fa971d6b0",
+      "optionsSha256": "fd9acd62dec494104747d46b559a2deb9794003b67c11d8d4365aed18a42cb19",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q068.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q068.webp",
+      "displayImageSha256": "233e92e51367f2ee87909a47a4975793c113d8691e5200961e027091b79dbcf0"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q069",
+      "stemSha256": "a203296253c9faef986a95435bd9561c8e5d1546efbc8054c09baf114cdac0c3",
+      "optionsSha256": "2b7035031aeacd7a723f1a431a02a9bf68f024c1f4dfdd3132bfd8055346fb66",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q069.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q069.webp",
+      "displayImageSha256": "15f63d6f4cd2f794b489168de0fd35e7a5dcd9067eef0bf21b17726f8d6c12f3"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q070",
+      "stemSha256": "416cb93847d2e29e663b59373b92324945017a9ea0f02de4c7b8c3779cd5165a",
+      "optionsSha256": "370f7435a5e29617e8f87161cceb457cf299eee915cb194e02c5dd0926c3326b",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q070.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q070.webp",
+      "displayImageSha256": "60f1dd7a5c77d23af7319e288f0043b71f51f01056f6087adbc157051ae1735b"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q071",
+      "stemSha256": "39ea32acd6953773f5797b3f0b496ac6fa30bc6f7ab59c17f1c9029a654be50e",
+      "optionsSha256": "e012dd1cfe6a4b12fd538bb87e83f32e18efe9cd8b89de9ca7a116754d096c1a",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q071.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q071.webp",
+      "displayImageSha256": "9e87086b7475fbcada0df3cb5f85847668b956c7c2af7b97d45af71e4c9d95e5"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q072",
+      "stemSha256": "54fc539d9f51fef7bb21906dc385e136dea921c6a0bc5fd2ce77e4d9eb7d0286",
+      "optionsSha256": "022ab26b68622969902b74ce9ee98cf99fc5a0140f9a5b194cbc6c611375bb0d",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q072.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q072.webp",
+      "displayImageSha256": "0dab5bcc7a2a27cda49f444fdcb4c824d0bb33d6b632735b3b439cc0e7631eed"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q073",
+      "stemSha256": "9430a096d006153543f0d9c98191a73c831c9f9a8a09e93e4816e8105444031a",
+      "optionsSha256": "3d75ee8fccb776618c3f6f614dacab81d7af552add7c455c09997d7d20a92ff0",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q073.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q073.webp",
+      "displayImageSha256": "7b639415404bffb0afb32d7907cc6988d1cebe63554c8890959f5245aeec0e1c"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q074",
+      "stemSha256": "357010db986b124d1586a901fb05a89845a5b7dc734aed6c42e3ef98ff36cbea",
+      "optionsSha256": "645c511abaf348abc16fd9f908b60f1b56bbff7e4a23b6423a512b1cb5fdbda2",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q074.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q074.webp",
+      "displayImageSha256": "a860b28d6c36e92dd4052f197288d0d4e4c3ffaf9036dc7597b332660139aaa3"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q075",
+      "stemSha256": "0b95d65f9f10aef0f0ae9460c90f7f5a4f3bd24918c4cecb2bf17554f0115a79",
+      "optionsSha256": "ebe0e5b61ec7a8b8c9e2fd081b3c88a2a054f7bcb359855df8889998906bb735",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q075.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q075.webp",
+      "displayImageSha256": "19948f50579b815a54eb748ceec44389a0f947e37b941609eadf0fd11da7064a"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q076",
+      "stemSha256": "5eb35cc5aead1f95dabddf848d8eca509a503a43052f599647bfabf6c4d0877f",
+      "optionsSha256": "9d921e93d3a80c877965432e7998eb6d1f2c53f4cc3cad530144ae4e4b5ba774",
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q076.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q076.webp",
+      "displayImageSha256": "21d81557fb0cc72bcd0ce25cc94e5e2ee273d855f23a2127d55051deb116c7f2"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q077",
+      "stemSha256": "c17c2c47f78182fc3daaecf65bb6664d5f01532bc283601a9728dbd064ba2d32",
+      "optionsSha256": "e63e3fd0958612168a4370105f2d343bdb8bc8e138377605af6fef25f6daa2f9",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q077.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q077.webp",
+      "displayImageSha256": "7772240446fd1dabc07d432d61b18ec4777747d630df26f36a0070583d4bc260"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q078",
+      "stemSha256": "f3c4c23d7cba0358dc365de51703f095351c2f991b09fe824ac7a4366a826d10",
+      "optionsSha256": "26d24a1b0809ecd73fca54c7076bad29778b72ca8ed2e25a661da083b92fb991",
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q078.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q078.webp",
+      "displayImageSha256": "849ed9f431bea84964a22a50ee974ae5577166a2e9416772544e0f121e54be10"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q079",
+      "stemSha256": "15dd1773aa76d8d2728319cf3f8abc42ed9a7e60df915af2e119200a7b16a956",
+      "optionsSha256": "a7fb8f5446bbb8e8418be307b7f089a2c5c4f817489ea727d9b7fb8285468302",
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q079.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q079.webp",
+      "displayImageSha256": "2685c2cb0054b9787d02a27c2e28fea31c8a7c04d318e86d184d889fbd9eff6e"
+    },
+    {
+      "id": "MOEX-C002-090180-S5004-STAGE1-Q080",
+      "stemSha256": "291ba0fce89f6fcaeab3db882a0369e979aece26a42be9ba6a8f6153d8d7af59",
+      "optionsSha256": "99fb642ded92d09df47b8ed908dc38d493619a053d742a3a77c2500d82d02542",
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "displayImage": "/question-media/moex-90-2-stage1-med2-display/Q080.png",
+      "originalImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q080.webp",
+      "displayImageSha256": "1e892a5a9550a4a2de624261834c097de95405694e743fa0acb7299818b8b039"
+    }
+  ]
+}

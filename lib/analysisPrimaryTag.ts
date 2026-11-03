@@ -10,6 +10,7 @@ import legacy96SecondContentClassificationCandidate from "../data/sources/moex_9
 import legacy95ContentClassificationCandidate from "../data/sources/moex_95_content_classification_candidate.json";
 import legacy91Stage1ClassificationCandidate from "../data/sources/moex_91_stage1_classification_candidate.json";
 import legacy90Stage1ClassificationCandidate from "../data/sources/moex_90_stage1_classification_candidate.json";
+import reviewedPrimaryTagAdditions from "../data/reviewedPrimaryTagAdditions.json";
 import legacyLearningPlacementJson from "../data/sources/moex_98_99_learning_placement.json";
 import { getMoexPrimarySubject } from "../scripts/moex-primary-subject";
 import type { Question, QuestionClassificationOverride, SubjectName } from "../types/quiz";
@@ -33,7 +34,7 @@ type RuntimePrimaryTagMap = {
 const runtimePrimaryTagMap = primaryTagRuntimeMapJson as unknown as RuntimePrimaryTagMap;
 const runtimeAssignments = runtimePrimaryTagMap.questions;
 // 96-1 content-reviewed candidates are keyed per question; no historical band inference.
-const legacy96ContentAssignments = { ...legacy96ContentClassificationCandidate.questions, ...legacy96SecondContentClassificationCandidate.questions, ...legacy95ContentClassificationCandidate.questions, ...legacy91Stage1ClassificationCandidate.questions, ...legacy90Stage1ClassificationCandidate.questions, ...legacy92to94Stage1ClassificationCandidate.questions } as unknown as Record<string, [SubjectName, string | null, string | null, string | null]>;
+const legacy96ContentAssignments = { ...legacy96ContentClassificationCandidate.questions, ...legacy96SecondContentClassificationCandidate.questions, ...legacy95ContentClassificationCandidate.questions, ...legacy91Stage1ClassificationCandidate.questions, ...legacy90Stage1ClassificationCandidate.questions, ...legacy92to94Stage1ClassificationCandidate.questions, ...reviewedPrimaryTagAdditions.questions } as unknown as Record<string, [SubjectName, string | null, string | null, string | null]>;
 const legacy96QuarantinedIds = new Set<string>([...legacy96ContentClassificationCandidate.quarantined, ...legacy96SecondContentClassificationCandidate.quarantined, ...legacy95ContentClassificationCandidate.quarantined, ...legacy91Stage1ClassificationCandidate.quarantined, ...legacy90Stage1ClassificationCandidate.quarantined]);
 // The source-bound contract test validates every subject, tag and tuple length.
 const legacyAssignments = { ...legacyClassificationJson.questions, ...legacy97ClassificationJson.questions, ...legacy97Med2ClassificationJson.questions, ...legacy97SecondMed1ClassificationJson.questions, ...legacy97SecondMed2ClassificationJson.questions } as unknown as Record<string, [SubjectName, string | null]>;
@@ -118,6 +119,19 @@ export function applyAnalysisPrimaryTagClassification(question: Question): Quest
   if (!assignment) return question;
 
   const contentPlacement = legacy96ContentAssignments[question.id];
+  // Old nominal 1–28 bands left bacterial/viral/fungal questions in 免疫學.
+  // Use their already-reviewed tag for both learning placement and the index;
+  // never override an explicit content-reviewed placement or a legacy lock.
+  let correctedSection: string | null = null;
+  if (!contentPlacement?.[3] && !legacyLearningPlacements[question.id] &&
+      assignment.subject === '微生物免疫學' && question.section === '免疫學' &&
+      (question.sourceYear ?? 0) >= 2021 && (question.sourceYear ?? 0) <= 2026) {
+    const tag = assignment.primaryTag || '';
+    if (tag.startsWith('細菌學－') || tag === '微生物免疫學－抗菌藥物') correctedSection = '細菌學';
+    else if (tag.startsWith('病毒學－')) correctedSection = '病毒學';
+    else if (tag.startsWith('真菌學－')) correctedSection = '真菌學';
+    else if (tag === '微生物免疫學－正常菌相與宿主互動') correctedSection = '正常菌相與宿主互動';
+  }
   return {
     ...question,
     subject: assignment.subject,
@@ -127,6 +141,7 @@ export function applyAnalysisPrimaryTagClassification(question: Question): Quest
       chapter: legacyLearningPlacements[question.id][0],
       section: legacyLearningPlacements[question.id][1]
     } : {}),
+    ...(correctedSection ? { section: correctedSection } : {}),
     primaryTag: assignment.primaryTag ?? undefined
   };
 }

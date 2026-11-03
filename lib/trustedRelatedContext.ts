@@ -1,6 +1,10 @@
 import type { Question, OptionKey } from '@/types/quiz';
 import { buildRelatedQuestionIndex, getRelatedQuestions } from '@/lib/relatedQuestions';
 import { CURATED } from '@/lib/reviewedRelatedLinks';
+import {getTeachingEntityCandidates,teachingEntityQualifierConflict} from '@/lib/teachingEntityEvidence';
+import {createHash} from 'node:crypto';
+import auditedSnapshots from '@/data/auditedTeachingSnapshots.json';
+import contextExclusions from '@/data/teachingContextExclusions.json';
 
 // Internal teaching context only: these links do not feed public recommendation UI.
 const TEACHING_LINKS: typeof CURATED = {
@@ -36,6 +40,7 @@ const CONCEPTS: readonly (readonly string[])[] = [
   ['腫瘤','tumor','tumour'], ['血管','blood vessel'], ['心肌','myocard'], ['肺泡','alveol'],
   ['神經傳導物','neurotransmitter'], ['血壓','blood pressure'], ['肌肉','muscle'], ['骨骼','skeletal'],
 ];
+const BROAD_ANCHORS=new Set(['病毒','細菌','受體','腫瘤','肌肉','骨骼','抗原','抗體','細胞膜','細胞凋亡']);
 function normalize(value: string) { return value.normalize('NFKC').toLowerCase(); }
 function matchedConcepts(text: string): Set<number> {
   const value=normalize(text); const out=new Set<number>();
@@ -76,11 +81,35 @@ function conflictingContent(corpus:readonly Question[]) {
  for(const q of corpus){if(q.sourceType!=='MOEX_PAST_EXAM')continue;const id=identity(q),keys=acceptedKeys(q).map(k=>normalize(q.options[k]||'').replace(/\s+/g,'')).sort().join('|');if(!keys)continue;const previous=answers.get(id);if(previous&&previous!==keys)bad.add(id);else answers.set(id,keys)}
  conflictsCache.set(corpus,bad);return bad;
 }
-function isUsableOfficial(q: Question, conflictingIds: ReadonlySet<string>): boolean {
-  return q.needsHumanReview!==true && q.answerConfidence!=='low' && !conflictingIds.has(q.id) && !/待核|無法辨識|缺漏/.test((q.officialSource?.transcriptionNotice||'')+' '+(q.officialSource?.displayNotice||'')) && q.sourceType==='MOEX_PAST_EXAM' && Boolean(q.stem?.trim()) &&
-    !/^\s*[（(【\[]?\s*承上題/.test(q.stem) && !q.stemImage && !Object.values(q.optionImages??{}).some(Boolean) && acceptedKeys(q).length>0;
+const snapshotAudit=new Map(auditedSnapshots.entries.map(row=>[row.id,row]));
+const snapshotCache=new WeakMap<Question,boolean>();
+function verifiedTextSnapshot(q:Question){
+ const cached=snapshotCache.get(q);if(cached!==undefined)return cached;
+ const row=snapshotAudit.get(q.id);
+ if(!row||q.officialSource?.image!==row.originalImage||q.stemImage!==row.displayImage)return false;
+ if(/如圖|附圖|圖中|圖示|下圖|箭頭|影像|圖所|結構式|圖形|難以辨識/.test(q.stem+' '+Object.values(q.options).join(' ')))return false;
+ const result=createHash('sha256').update(q.stem).digest('hex')===row.stemSha256&&createHash('sha256').update(JSON.stringify(q.options)).digest('hex')===row.optionsSha256&&q.answer===row.answer&&q.answerCreditType===row.answerCreditType&&JSON.stringify(acceptedKeys(q))===JSON.stringify(row.acceptedAnswers);snapshotCache.set(q,result);return result;
 }
-export function findTrustedRelatedQuestions(current: Question, corpus: readonly Question[], conflictingIds: ReadonlySet<string>, limit=3): Question[] {
+function baseExclusion(q:Question,conflictingIds:ReadonlySet<string>):string|null {
+ if(q.sourceType!=='MOEX_PAST_EXAM')return 'not_official';
+ if(conflictingIds.has(q.id))return 'conflicting_id';
+ if(q.needsHumanReview||q.answerConfidence==='low'||/待核|無法辨識|難以辨識|缺漏/.test((q.officialSource?.transcriptionNotice||'')+' '+(q.officialSource?.displayNotice||'')))return 'uncertain_source';
+ if(q.answerCreditType==='all_credit')return 'all_credit';
+ if(q.answerCreditType==='multiple_accepted'&&acceptedKeys(q).length>1)return 'ambiguous_multiple_accepted';
+ if(contextExclusions.some(row=>row.id===q.id&&createHash('sha256').update(q.stem).digest('hex')===row.stemSha256))return 'reviewed_content_uncertainty';
+ if(!q.stem?.trim()||!acceptedKeys(q).length)return 'missing_text_or_scoring';
+ if(/^\s*[（(【\[]?\s*承上題/.test(q.stem))return 'continuation';
+ if(Object.values(q.optionImages??{}).some(Boolean))return 'option_image';
+ if(q.stemImage&&!verifiedTextSnapshot(q))return 'image_required_or_unverified';
+ return null;
+}
+export function trustedBackgroundExclusion(q:Question,corpus:readonly Question[],conflictingIds:ReadonlySet<string>=new Set()):string|null {
+ return baseExclusion(q,conflictingIds)||(conflictingContent(corpus).has(identity(q))?'conflicting_content':null);
+}
+function isUsableOfficial(q: Question, conflictingIds: ReadonlySet<string>): boolean {
+ return baseExclusion(q,conflictingIds)===null;
+}
+function selectTrustedRelatedQuestions(current: Question, corpus: readonly Question[], conflictingIds: ReadonlySet<string>, limit=3,audit=false): Question[] {
   const currentKeys=acceptedKeys(current); const contentConflicts=conflictingContent(corpus); if (!currentKeys.length||conflictingIds.has(current.id)||contentConflicts.has(identity(current))) return [];
   const curated=TEACHING_LINKS[current.id]??CURATED[current.id];
   let reviewed: Question[] = [];
@@ -88,35 +117,46 @@ export function findTrustedRelatedQuestions(current: Question, corpus: readonly 
     if(currentKeys.length!==1 || currentKeys[0]!==curated.sourceAnswer || !normalize(current.stem).includes(normalize(curated.sourceFragment))) return [];
     const byId = new Map(corpus.map(q=>[q.id,q]));
     reviewed = curated.links.flatMap(link=>{
-      const q=byId.get(link.id); if(!q || (!isUsableOfficial(q,conflictingIds)||contentConflicts.has(identity(q)))) return [];
+      const q=byId.get(link.id); if(!q || identity(q)===identity(current) || (!isUsableOfficial(q,conflictingIds)||contentConflicts.has(identity(q)))) return [];
       const keys=acceptedKeys(q);
       if(keys.length!==1 || keys[0]!==link.expectedAnswer || !link.stemFragments.every(fragment=>normalize(q.stem).includes(normalize(fragment)))) return [];
       return [q];
     });
   }
-  const max = Math.max(0, Math.min(limit, 3));
+  const max = Math.max(0, Math.min(limit, audit?corpus.length:3));
   if (reviewed.length >= max) return reviewed.slice(0,max);
   const stemConcepts=matchedConcepts(current.stem);
   const answerConcepts=matchedConcepts(currentKeys.map(k=>current.options[k]).join(' '));
   const focus=matchedConcepts(focusedText(current,currentKeys)); 
-  const seen=new Set<string>(reviewed.map(identity)), candidates:{q:Question;score:number}[]=[];
+  const seen=new Set<string>([identity(current),...reviewed.map(identity)]), candidates:{q:Question;score:number}[]=[];
   // Reuse the website ranking, then apply the stricter server-side evidence checks.
   const ranked = getRelatedQuestions(current, buildRelatedQuestionIndex(corpus as Question[]), corpus.length);
   const rankedIds = new Set(ranked.map(item => item.id));
   // Preserve existing high-precision concept fallback when the website ranking misses synonyms.
-  const candidatesInOrder = focus.size>=2 ? [...ranked, ...corpus.filter(item => !rankedIds.has(item.id))] : ranked;
+  const entityCandidates=getTeachingEntityCandidates(current,corpus),entityIds=new Set(entityCandidates.map(x=>x.question.id));
+  const lexicalCandidates = focus.size>=2 ? [...ranked, ...corpus.filter(item => !rankedIds.has(item.id))] : ranked;
+  const candidatesInOrder=[...entityCandidates.map(x=>x.question),...lexicalCandidates.filter(x=>!entityIds.has(x.id))];
   for(const q of candidatesInOrder) {
-    if(q.id===current.id || q.subject!==current.subject || reviewed.some(item=>item.id===q.id) || (!isUsableOfficial(q,conflictingIds)||contentConflicts.has(identity(q)))) continue;
+    if(q.id===current.id || (!entityIds.has(q.id)&&q.subject!==current.subject) || reviewed.some(item=>item.id===q.id) || (!isUsableOfficial(q,conflictingIds)||contentConflicts.has(identity(q)))) continue;
+    if(teachingEntityQualifierConflict(current,q,corpus))continue;
     const keys=acceptedKeys(q);
     const concepts=matchedConcepts(focusedText(q,keys)); let score=0; for(const x of focus) if(concepts.has(x)) score++;
     const stemMatch=[...stemConcepts].some(x=>concepts.has(x));
     const answerMatch=!answerConcepts.size || [...answerConcepts].some(x=>concepts.has(x));
-    const reviewedAnchors=score>=2&&stemMatch&&answerMatch;
+    const specificShared=[...focus].some(x=>concepts.has(x)&&!BROAD_ANCHORS.has(CONCEPTS[x][0]));
+    const reviewedAnchors=score>=2&&specificShared&&stemMatch&&answerMatch;
     const genericEvidence=rankedIds.has(q.id)&&textSupported(current,q,currentKeys,keys);
-    if(!reviewedAnchors&&!genericEvidence)continue;
+    if(!entityIds.has(q.id)&&!reviewedAnchors&&!genericEvidence)continue;
     const fingerprint=identity(q);
     if(seen.has(fingerprint)) continue;seen.add(fingerprint); candidates.push({q,score});
     if(reviewed.length+candidates.length>=max)break;
   }
   return [...reviewed, ...candidates.map(x=>x.q)].slice(0,max);
+}
+export function findTrustedRelatedQuestions(current:Question,corpus:readonly Question[],conflictingIds:ReadonlySet<string>,limit=3){
+ return selectTrustedRelatedQuestions(current,corpus,conflictingIds,limit);
+}
+/** Offline audit only; the generation entry point above always caps at three. */
+export function auditTrustedRelatedCandidates(current:Question,corpus:readonly Question[],conflictingIds:ReadonlySet<string>){
+ return selectTrustedRelatedQuestions(current,corpus,conflictingIds,corpus.length,true);
 }

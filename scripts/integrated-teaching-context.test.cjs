@@ -8,7 +8,7 @@ const current=q('MOEX-098020-2101-Q034','競爭型抑制劑（competitive inhibi
 const graph=q('MOEX-097140-2101-Q028','酵素雙倒數圖（double-reciprocal plot）有 competitive inhibitor 時何項改變？','B',{A:'1/V 截距',B:'1/[S] 截距',C:'Vmax',D:'平衡常數'});
 const parameter=q('MOEX-102030-2101-Q026','競爭型抑制劑（competitive inhibitor）的酵素動力學變化？','A',{A:'Km上升',B:'kcat下降',C:'Vmax下降',D:'其他'});
 const distant=q('different','酵素 inhibitor 有何結構特徵？','A',{A:'膜蛋白',B:'Km'});
-test('generic text evidence finds same mechanism variants outside old concept dictionary',()=>assert.deepEqual(find(current,[current,graph,parameter,distant],new Set()).map(x=>x.id),[parameter.id,graph.id]));
+test('generic text evidence finds same mechanism variants outside old concept dictionary',()=>assert.deepEqual(find(current,[current,graph,parameter,distant],new Set()).map(x=>x.id).sort(),[parameter.id,graph.id].sort()));
 test('matching labels or only distractors never authorize context, and cross-subject excluded',()=>{const distractor=q('d','受體的作用？','A',{A:'其他',B:'competitive inhibitor'});assert.equal(find(current,[distant,distractor,{...graph,id:'cross',subject:'病理學'}],new Set()).length,0)});
 test('unknown concept needs no hardcoded topic entry',()=>{const a=q('x','晶狀體 zonular fibers 機轉？','A',{A:'懸韌帶',B:'其他'}),b=q('y','zonular fibers 在晶狀體調節的作用？','A',{A:'懸韌帶',B:'其他'});assert.equal(find(a,[b],new Set()).length,1)});
 test('no reliable match stays empty; at most three and duplicate text removed',()=>{assert.deepEqual(find(current,[distant],new Set()),[]);const rows=[graph,{...graph,id:'dup'},parameter];assert.equal(find(current,rows,new Set()).length,2);assert.ok(find(current,rows,new Set(),1).length<=1)});

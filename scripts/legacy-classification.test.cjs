@@ -77,7 +77,7 @@ test('all original taxonomy definitions/IDs/names/order survive additive approve
  assert.equal(crypto.createHash('sha256').update(JSON.stringify(original,null,2)+'\n').digest('hex'),extension.baseTaxonomySha256);
  assert.equal(new Set(current.primaryTags.map(t=>t.id)).size,current.primaryTags.length);
 });
-test('all 6730 pre-existing canonical questions retain their baseline except two source-reviewed corrections',()=>{
+test('all 6730 pre-existing canonical questions retain their baseline except source-reviewed and classification-only corrections',()=>{
  const added97Ids=new Set([...require('../data/sources/moex_97_1_med1_questions.json').questions,...require('../data/sources/moex_97_1_med2_questions.json').questions,...require('../data/sources/moex_97_2_med1_questions.json').questions,...require('../data/sources/moex_97_2_med2_questions.json').questions,...require('../data/sources/moex_96_1_med1_questions.json').questions,...require('../data/sources/moex_96_1_med2_questions.json').questions,...require('../data/sources/moex_96_2_med1_questions.json').questions,...require('../data/sources/moex_96_2_med2_questions.json').questions].map(q=>q.id));
  const added95Ids=new Set([1,2].flatMap(r=>[1,2].flatMap(p=>require(`../data/sources/moex_95_${r}_med${p}_questions.json`).questions.map(q=>q.id)))); assert.equal(added95Ids.size,400);
  const added91Ids=new Set([1,2].flatMap(r=>[1,2].flatMap(p=>require(`../data/sources/moex_91_${r}_stage1_med${p}_questions.json`).questions.map(q=>q.id)))); assert.equal(added91Ids.size,320);
@@ -94,7 +94,8 @@ test('all 6730 pre-existing canonical questions retain their baseline except two
   const current=matches[0], fields=Object.fromEntries(revision.fields.filter(k=>Object.hasOwn(current,k)).map(k=>[k,current[k]]));
   assert.equal(crypto.createHash('sha256').update(JSON.stringify(fields)).digest('hex'),revision.revisedSha256,revision.id+' reviewed fields');
  }
- const historic=old.map(q=>{const revision=revisions.find(r=>r.id===q.id);if(!revision)return q;const restored={...q};for(const key of revision.fields){if(Object.hasOwn(revision.original,key))restored[key]=revision.original[key];else delete restored[key]}return restored});
+ const classRevisions=require('./fixtures/reviewed-classification-revisions.json');assert.equal(classRevisions.length,125);for(const r of classRevisions){assert.ok(r.fields.every(k=>['subject','chapter','section','primaryTag'].includes(k)));const q=old.find(q=>q.id===r.id);assert.ok(q,r.id);const current=Object.fromEntries(r.fields.filter(k=>Object.hasOwn(q,k)).map(k=>[k,q[k]]));assert.equal(crypto.createHash('sha256').update(JSON.stringify(current)).digest('hex'),r.revisedSha256,r.id+' reviewed classification')}
+ const historic=old.map(q=>{const classRevision=classRevisions.find(r=>r.id===q.id);if(classRevision){q={...q};for(const key of classRevision.fields){if(Object.hasOwn(classRevision.original,key))q[key]=classRevision.original[key];else delete q[key]}}const revision=revisions.find(r=>r.id===q.id);if(!revision)return q;const restored={...q};for(const key of revision.fields){if(Object.hasOwn(revision.original,key))restored[key]=revision.original[key];else delete restored[key]}return restored});
  assert.equal(crypto.createHash('sha256').update(JSON.stringify(historic)).digest('hex'),placementRules.baselineOldCanonicalSha256);
 });
 test('all 800 learning placements are exposed through their locked subject outline without source placeholders',()=>{
