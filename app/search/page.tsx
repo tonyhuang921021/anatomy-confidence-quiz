@@ -1,4 +1,5 @@
 "use client";
+import { ExplanationMathText } from "@/components/ExplanationMathText";
 import {requestExplanation} from "@/lib/explanationRequestClient";
 
 import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
@@ -1275,7 +1276,7 @@ function SearchPageContent() {
                               {key}
                             </span>
                             <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
-                              {text}
+                              <ExplanationMathText text={text} />
                             </p>
                           </div>
                         </div>

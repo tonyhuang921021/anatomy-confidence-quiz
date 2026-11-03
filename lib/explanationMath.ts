@@ -1,5 +1,5 @@
 export type MathNode={tag:'mrow'|'mfrac'|'msub'|'msup'|'msubsup'|'msqrt'|'mover'|'mi'|'mn'|'mo'|'mtext';text?:string;children?:MathNode[]};
-const commands:Record<string,string>={alpha:'α',beta:'β',gamma:'γ',delta:'δ',Delta:'Δ',mu:'μ',sigma:'σ',theta:'θ',pi:'π',times:'×',cdot:'⋅',pm:'±',le:'≤',leq:'≤',ge:'≥',geq:'≥',approx:'≈',neq:'≠',to:'→',rightarrow:'→',infty:'∞'};
+const commands:Record<string,string>={alpha:'α',beta:'β',gamma:'γ',delta:'δ',Delta:'Δ',mu:'μ',sigma:'σ',theta:'θ',pi:'π',times:'×',div:'÷',cdot:'⋅',pm:'±',le:'≤',leq:'≤',ge:'≥',geq:'≥',approx:'≈',neq:'≠',to:'→',rightarrow:'→',infty:'∞'};
 /** A small bounded grammar, never HTML/MathML supplied by the model. */
 export function parseSafeMath(source:string):MathNode|null {
  if(!source.trim()||source.length>512||/[<>]|\\(?:html|href|url|include|begin|end|style|class|def|newcommand)\b/i.test(source))return null;
