@@ -15,5 +15,12 @@
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "app/api/question-explanation/route.ts": {
+      "regions": [
+        "bom1"
+      ]
+    }
+  }
 }

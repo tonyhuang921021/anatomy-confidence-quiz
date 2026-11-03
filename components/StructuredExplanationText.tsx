@@ -1,4 +1,5 @@
 "use client";
+import { ExplanationMathText } from "@/components/ExplanationMathText";
 import { SectionFiguresProvider, SectionFigures } from "@/components/SectionExplanationFigures";
 
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
@@ -9,7 +10,7 @@ import { splitInlineExplanationEmphasis } from "@/lib/inlineExplanationEmphasis"
 
 function InlineEmphasis({ text }: { text: string }) {
   return <>{splitInlineExplanationEmphasis(text).map((part, index) =>
-    part.strong ? <strong key={index}>{part.text}</strong> : part.text
+    part.strong ? <strong key={index}><ExplanationMathText text={part.text}/></strong> : <ExplanationMathText key={index} text={part.text}/>
   )}</>;
 }
 
