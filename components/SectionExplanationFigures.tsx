@@ -24,8 +24,8 @@ export function SectionFiguresProvider({questionId,text,children}:{questionId?:s
    if(loop&&figures.length===0&&data.imageStatus&&++reads<60)timer=setTimeout(()=>void read(),reads<12?5000:15000);
   }catch{if(!cancelled)setDelivery({sectionFigures:[],sections:[],imageStatus:'unavailable',refresh:()=>void read(false)})}};
   const focus=()=>{if(document.visibilityState==='visible')void read(false)};
-  void read();window.addEventListener('focus',focus);
-  return()=>{cancelled=true;clearTimeout(timer);window.removeEventListener('focus',focus)};
+  void read();window.addEventListener('focus',focus);document.addEventListener('visibilitychange',focus);
+  return()=>{cancelled=true;clearTimeout(timer);window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',focus)};
  },[questionId,text]);
  return <Context.Provider value={preview || delivery}>{children}</Context.Provider>;
 }
