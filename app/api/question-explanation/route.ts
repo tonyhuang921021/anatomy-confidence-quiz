@@ -1,3 +1,4 @@
+import {createReservedReads} from "@/lib/explanationReservedReads";
 import { explanationPrefix } from "@/lib/explanationStream";
 import {waitUntil} from '@vercel/functions';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
@@ -762,6 +763,16 @@ export async function POST(request: NextRequest) {
   const reviewedManifestSha = createHash("sha256").update(JSON.stringify(Object.keys(reviewedIndex).sort()),"utf8").digest("hex");
   let canonicalPrompt = "";
   const requestStarted=Date.now();let delivery:any=null;
+  const stages:Record<string,number>={};
+  const measured=async<T,>(name:string,work:()=>Promise<T>):Promise<T>=>{const started=Date.now();try{return await work()}finally{stages[name]=(stages[name]||0)+Date.now()-started}};
+  let sharedReads=0;
+  const reservedReads=createReservedReads(async(id:string)=>measured(++sharedReads===1?"initialSharedMs":"postReserveSharedMs",async()=>{
+    const {data,error}=await withServerTimeout(db.from("question_explanation_overrides")
+      .select("question_id,explanation,option_analysis,memory_tip,model,updated_at")
+      .eq("question_id",id).maybeSingle(),1600,"共享詳解讀取逾時");
+    if(error)throw error;
+    return data?{explanation:data.explanation,optionAnalysis:data.option_analysis??{},memoryTip:data.memory_tip??"",model:data.model}:null;
+  }));
   const wantsStream=request.headers.get("accept")?.includes("text/event-stream");
   let emit: (event:any)=>void = ()=>{};
   const run=async()=>{
@@ -770,14 +781,14 @@ export async function POST(request: NextRequest) {
       isReviewed: async (id: string) => hasReviewedExplanation(id),
       auth: async (token: string | undefined) => {
         if (!token) return null;
-        const {data,error} = await withServerTimeout(db.auth.getUser(token),1600,"登入驗證逾時");
+        const {data,error} = await measured("authMs",()=>withServerTimeout(db.auth.getUser(token),1600,"登入驗證逾時"));
         if (error || !data.user?.id || !data.user.email) return null;
         actorId = data.user.id;
         verifiedEmail = data.user.email.trim().toLowerCase();
         return {id:actorId};
       },
       resolveTrusted: async (id: string) => {
-        const found = resolveTrustedExplanationQuestion(id);
+        const resolveStart=Date.now();const found = resolveTrustedExplanationQuestion(id);stages.trustedQuestionMs=Date.now()-resolveStart;
         if (!found.ok) return null;
         const q = found.question;
         // Mark restrictions without blocking access to an existing shared row.
@@ -785,7 +796,7 @@ export async function POST(request: NextRequest) {
           hasUnresolvedImage:Boolean(q.stemImage || (q.optionImages && Object.values(q.optionImages).some(Boolean)))};
       },
       prepare: async (q:any) => {
-        const trustedContext = q.trustedContext;
+        const prepareStart=Date.now();const trustedContext = q.trustedContext;
         canonicalPrompt = buildQuestionExplanationPrompt({question:{...q,stem:trustedContext ? `${trustedContext}\n\n${q.stem}` : q.stem}});
         if (newFigures) canonicalPrompt += "\n" + IMAGE_PROMPT;
         const related = resolveTrustedRelatedQuestions(q.id);
@@ -794,15 +805,9 @@ export async function POST(request: NextRequest) {
           const block = `\n\n經核對的相關題背景（只用以整合共同機制、鑑別與延伸；不要提年份或考題來源）：\n科目：${item.subject}；章節：${item.chapter} / ${item.section}\n題目：${item.stem}\n選項：${Object.entries(item.options).map(([key,value]) => `${key}. ${value ?? ''}`).join('；')}\n題庫登錄的官答：${accepted}；判分方式：${item.answerCreditType ?? 'standard'}；若與題文衝突請註明，不要強行解釋`;
           if (Buffer.byteLength(canonicalPrompt + block, 'utf8') <= 16000) canonicalPrompt += block;
         }
-        return Buffer.byteLength(canonicalPrompt,"utf8") <= 16000;
+        stages.promptPrepareMs=Date.now()-prepareStart;return Buffer.byteLength(canonicalPrompt,"utf8") <= 16000;
       },
-      readShared: async (id: string) => {
-        const {data,error} = await withServerTimeout(db.from("question_explanation_overrides")
-          .select("question_id,explanation,option_analysis,memory_tip,model,updated_at")
-          .eq("question_id",id).maybeSingle(),1600,"共享詳解讀取逾時");
-        if (error) throw error;
-        return data ? {explanation:data.explanation,optionAnalysis:data.option_analysis ?? {},memoryTip:data.memory_tip ?? "",model:data.model} : null;
-      },
+      readShared: reservedReads.read,
       reserve: async ({actorId: actor, questionId}: {actorId:string;questionId:string}) => {
         const runUntil=Date.parse(process.env.QUESTION_EXPLANATION_RUN_UNTIL || "");
         if(!Number.isFinite(runUntil)||Date.now()>=runUntil)return {ok:false,code:"budget"};
@@ -810,8 +815,8 @@ export async function POST(request: NextRequest) {
             !["low","default"].includes(mode) || !pricingRevision || !Number.isSafeInteger(inRate) || inRate <= 0 ||
             !Number.isSafeInteger(outRate) || outRate <= 0) return {ok:false,code:"safe_configuration_missing"};
         // Do not use the legacy helper's missing-table fail-open behaviour.
-        const banQuery = await withServerTimeout(db.from("ai_account_bans").select("banned_until")
-          .eq("user_email",verifiedEmail).maybeSingle(),1600,"帳號限制查詢逾時");
+        const banQuery = await measured("accountCheckMs",()=>withServerTimeout(db.from("ai_account_bans").select("banned_until")
+          .eq("user_email",verifiedEmail).maybeSingle(),1600,"帳號限制查詢逾時"));
         if (banQuery.error) return {ok:false,code:"guard_unavailable"};
         if (banQuery.data?.banned_until) {
           const until = Date.parse(banQuery.data.banned_until);
@@ -819,9 +824,11 @@ export async function POST(request: NextRequest) {
           if (until > Date.now() && !isBypassEmail(verifiedEmail)) return {ok:false,code:"account_banned"};
         }
         const id = crypto.randomUUID();
-        const {data,error} = await withServerTimeout(db.rpc(figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit}),1600,"預算預留逾時");
+        const {data,error} = await measured("reserveMs",()=>withServerTimeout(db.rpc(figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit}),1600,"預算預留逾時"));
         if (error || data !== "reserved") return {ok:false,code:typeof data === "string" ? data : "reservation_unavailable"};
-        const fetched = await withServerTimeout(db.rpc("ai_guard_read_reservation",{p_id:id,p_actor:actor}),1600,"預留驗證逾時");
+        // Reservation is committed. These independent reads run together;
+        // neither is skipped, and start_call still follows full grant validation.
+        const fetched = await reservedReads.confirmAndRead(questionId,()=>measured("grantReadMs",()=>withServerTimeout(db.rpc("ai_guard_read_reservation",{p_id:id,p_actor:actor}),1600,"預留驗證逾時")));
         const row = Array.isArray(fetched.data) ? fetched.data[0] : fetched.data;
         if (fetched.error || !row || row.model !== model || row.pricing_revision !== pricingRevision) return {ok:false,code:"reservation_unconfirmed_held"};
         // Token count cannot exceed UTF-8 bytes for normal encoded text. The
@@ -839,7 +846,7 @@ export async function POST(request: NextRequest) {
         return !error && data === "cancelled";
       },
       start: async (g:any, seq:number) => {
-        const {data,error} = await withServerTimeout(db.rpc("ai_guard_start_call",{p_id:g.leaseId,p_seq:seq}),1600,"預算啟動逾時");
+        const {data,error} = await measured("startMs",()=>withServerTimeout(db.rpc("ai_guard_start_call",{p_id:g.leaseId,p_seq:seq}),1600,"預算啟動逾時"));
         return !error && data === "started";
       },
       markUnknown: async (g:any, seq:number) => {
@@ -855,7 +862,8 @@ export async function POST(request: NextRequest) {
           if(text && text!==last){last=text;firstTextMs ??= Date.now()-requestStarted;emit({type:"draft",text,firstTextMs});}
         } : undefined);
         delivery={firstTextMs,providerMs:Date.now()-providerStart,model:result.servedModel,inputTokens:result.usage.inputTokens,outputTokens:result.usage.outputTokens};
-        return {usage:result.usageKnown && result.servedModel === args.model ? result.usage : null,value:parseExplanationPayload(result.text)};
+        const parseStart=Date.now();const value=parseExplanationPayload(result.text);stages.payloadParseMs=Date.now()-parseStart;
+        return {usage:result.usageKnown && result.servedModel === args.model ? result.usage : null,value};
       },
       settle: async (g:any, seq:number, usage:any) => {
         // A provider-side bound violation makes the estimate unsafe for every
@@ -866,11 +874,11 @@ export async function POST(request: NextRequest) {
           return false;
         }
         // Reserve and account full per-call ceiling, not a speculative discount.
-        const {data,error} = await withServerTimeout(db.rpc("ai_guard_settle_call",{p_id:g.leaseId,p_seq:seq,p_cost:g.ceiling,p_input:usage.inputTokens,p_output:usage.outputTokens}),1600,"用量結算逾時");
+        const {data,error} = await measured("settleMs",()=>withServerTimeout(db.rpc("ai_guard_settle_call",{p_id:g.leaseId,p_seq:seq,p_cost:g.ceiling,p_input:usage.inputTokens,p_output:usage.outputTokens}),1600,"用量結算逾時"));
         return !error && data === "settled";
       },
       insertIfAbsentFenced: async (g:any, id:string, result:any) => {
-        const {data,error} = await withServerTimeout(db.rpc(newFigures ? "figure_guard_commit_new_images" : figureQueue ? "figure_guard_commit" : "ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? "",...(newFigures ? {p_needs:buildNeedsWithFallback(result.explanation,result.figureNeeds,resolveTrustedExplanationQuestion(id).ok ? (resolveTrustedExplanationQuestion(id) as any).question : null)} : {})}),1600,"共享詳解寫入逾時");
+        const {data,error} = await measured("commitMs",()=>withServerTimeout(db.rpc(newFigures ? "figure_guard_commit_new_images" : figureQueue ? "figure_guard_commit" : "ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? "",...(newFigures ? {p_needs:buildNeedsWithFallback(result.explanation,result.figureNeeds,resolveTrustedExplanationQuestion(id).ok ? (resolveTrustedExplanationQuestion(id) as any).question : null)} : {})}),1600,"共享詳解寫入逾時"));
         const row = Array.isArray(data) ? data[0] : data;
         if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
         // Text is already durably saved. Image failure never retries paid generation.
@@ -878,7 +886,7 @@ export async function POST(request: NextRequest) {
         return {inserted:row.status === "inserted",winner:{explanation:row.explanation,optionAnalysis:row.option_analysis ?? {},memoryTip:row.memory_tip ?? "",model:row.model}};
       },
       close: async (g:any) => {
-        const {data,error} = await withServerTimeout(db.rpc(figureQueue ? "figure_guard_close" : "ai_guard_close",{p_id:g.leaseId}),1600,"預留結束逾時");
+        const {data,error} = await measured("closeMs",()=>withServerTimeout(db.rpc(figureQueue ? "figure_guard_close" : "ai_guard_close",{p_id:g.leaseId}),1600,"預留結束逾時"));
         if (error || data !== "closed") throw new Error("預留結束未確認，請稍後由管理員對帳。");
       }
     });
@@ -893,7 +901,7 @@ export async function POST(request: NextRequest) {
     if (outcome.status === 200 && outcome.value) {
       // Final success is emitted only after usage settlement and durable text commit.
       // Images continue independently via waitUntil above.
-      return NextResponse.json({ok:true,configured:true,sharedSaved:true,...outcome.value,delivery:{...delivery,responseMs:Date.now()-requestStarted,source:outcome.code}});
+      return NextResponse.json({ok:true,configured:true,sharedSaved:true,...outcome.value,delivery:{...delivery,stages,responseMs:Date.now()-requestStarted,source:outcome.code}});
     }
     return NextResponse.json({ok:false,code:outcome.code,recoverable:true,message:messages[outcome.code] || "暫時無法產生詳解，既有詳解不受影響。"},{status:outcome.status});
   } catch (error) {

@@ -1258,7 +1258,7 @@ function SearchPageContent() {
 
                 <ExplanationGenerationStatus key={renderedQuestion.id} questionId={renderedQuestion.id} loading={loading} error={error} resultVersion={override?.updatedAt} />
                 {shouldShowAnswer ? (
-                  <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact questionId={renderedQuestion.id} />
+                  <StructuredExplanationText text={renderedQuestion.explanation} label={!override&&!hasReviewedExplanation(renderedQuestion.id)?"題庫既有說明":"詳解"} compact questionId={renderedQuestion.id} />
                 ) : null}
                 {shouldShowAnswer && !hasReviewedExplanation(renderedQuestion.id) && renderedQuestion.optionAnalysis ? (
                   <div className="space-y-2.5">
