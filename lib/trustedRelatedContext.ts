@@ -2,6 +2,23 @@ import type { Question, OptionKey } from '@/types/quiz';
 import { buildRelatedQuestionIndex, getRelatedQuestions } from '@/lib/relatedQuestions';
 import { CURATED } from '@/lib/reviewedRelatedLinks';
 
+// Internal teaching context only: these links do not feed public recommendation UI.
+const TEACHING_LINKS: typeof CURATED = {
+  // Exact drug/target, virus and cell-type matches reviewed in the canonical
+  // corpus. Keep source stems and official scoring (including negation) intact;
+  // a same-subject label or a shared distractor is not sufficient evidence.
+  'MOEX-100030-2101-Q059': {sourceFragment:'治療乳癌藥物',sourceAnswer:'B',links:[
+    {id:'MOEX-109020-2301-Q026',expectedAnswer:'A',stemFragments:['trastuzumab','breast cancer']}
+  ]},
+  'MOEX-105100-5301-Q055': {sourceFragment:'不屬於腸病毒屬',sourceAnswer:'B',links:[
+    {id:'MOEX-113020-2301-Q015',expectedAnswer:'A',stemFragments:['托育中心','水瀉並嘔吐']},
+    {id:'MOEX-097050-1101-Q054',expectedAnswer:'A',stemFragments:['Rotavirus','Norwalk']}
+  ]},
+  'MOEX-100030-2101-Q076': {sourceFragment:'Alzheimer 第二型星狀細胞',sourceAnswer:'C',links:[
+    {id:'MOEX-C101-095140-S2001-HIGHGENERAL-Q099',expectedAnswer:'A',stemFragments:['Alzheimer typeⅡ','何者無關']}
+  ]},
+};
+
 // High-precision anchors, not subject names or neighboring question numbers.
 // Extend only with independently reviewed clinical concept/synonym groups.
 const CONCEPTS: readonly (readonly string[])[] = [
@@ -65,7 +82,7 @@ function isUsableOfficial(q: Question, conflictingIds: ReadonlySet<string>): boo
 }
 export function findTrustedRelatedQuestions(current: Question, corpus: readonly Question[], conflictingIds: ReadonlySet<string>, limit=3): Question[] {
   const currentKeys=acceptedKeys(current); const contentConflicts=conflictingContent(corpus); if (!currentKeys.length||conflictingIds.has(current.id)||contentConflicts.has(identity(current))) return [];
-  const curated=CURATED[current.id];
+  const curated=TEACHING_LINKS[current.id]??CURATED[current.id];
   let reviewed: Question[] = [];
   if(curated) {
     if(currentKeys.length!==1 || currentKeys[0]!==curated.sourceAnswer || !normalize(current.stem).includes(normalize(curated.sourceFragment))) return [];

@@ -25,3 +25,25 @@ test('negated source answers remain scoring data rather than asserted facts',()=
 test('grammatical CJK fragments cannot stand in for a specific biochemical answer',()=>{const a=q('urea','下列有關尿素循環（urea cycle）的敘述何者錯誤？','B',{A:'肝臟',B:'尿素循環的產物之一為草醯乙酸（oxaloacetate）'}),b=q('cps','胺甲醯磷酸與尿素循環（urea cycle）的作用？','A',{A:'活化酵素，增進尿素循環的效率',B:'其他'});assert.deepEqual(find(a,[b],new Set()),[])});
 
 test('known source-label failure settles one mock call, saves nothing and never retries',async()=>{const {handleExplanation}=require('../lib/explanation-orchestrator.cjs');let calls=0,settled=0,writes=0,closed=0;const leaked={explanation:'類似題也出現相同概念',optionAnalysis:{A:'甲',B:'乙',C:'丙',D:'丁'}};const deps={isReviewed:async()=>false,auth:async()=>({id:'u'}),resolveTrusted:async()=>current,readShared:async()=>null,prepare:async()=>true,reserve:async()=>({ok:true,leaseId:'fixture',fence:'fixture',maxCalls:1,model:'gpt-6.1-terra',mode:'default'}),start:async()=>true,callProvider:async()=>{calls++;return {usage:{inputTokens:1,outputTokens:1},value:validPublicTeaching(leaked)?leaked:null}},settle:async()=>{settled++;return true},insertIfAbsentFenced:async()=>{writes++},close:async()=>{closed++}};const r=await handleExplanation({question:{id:current.id}},deps);assert.equal(r.status,502);assert.equal(calls,1);assert.equal(settled,1);assert.equal(writes,0);assert.equal(closed,1)});
+
+test('reviewed real-corpus drug, virus and astrocyte variants recover missed background without lowering generic thresholds',()=>{
+ const {getCanonicalQuestionBank}=require('../data/med1QuestionBank.ts');
+ const corpus=getCanonicalQuestionBank(),byId=new Map(corpus.map(q=>[q.id,q]));
+ const groups=[['MOEX-100030-2101-Q059',['MOEX-109020-2301-Q026']],['MOEX-105100-5301-Q055',['MOEX-113020-2301-Q015','MOEX-097050-1101-Q054']],['MOEX-100030-2101-Q076',['MOEX-C101-095140-S2001-HIGHGENERAL-Q099']]];
+ for(const [id,targets] of groups){
+  const source=byId.get(id);assert.ok(source,id);assert.equal(require('../lib/reviewedRelatedLinks.ts').CURATED[id],undefined,'private teaching context must not add public recommendation links');
+  const candidates=targets.map(x=>{const q=byId.get(x);assert.ok(q,x);return q});
+  assert.deepEqual(find(source,candidates,new Set()).map(x=>x.id),targets);
+  for(const target of candidates){
+   assert.equal(find(source,[{...target,answer:'E',acceptedAnswers:['E']}],new Set()).length,0);
+   assert.equal(find(source,[{...target,needsHumanReview:true}],new Set()).length,0);
+   assert.equal(find(source,[target],new Set([target.id])).length,0);
+   assert.equal(find({...source,answer:'E',acceptedAnswers:['E']},[target],new Set()).length,0);
+  }
+ }
+ const source=byId.get(groups[2][0]),target=byId.get(groups[2][1][0]);
+ const prompt=appendTeachingContext('BASE',[target]);
+ assert.ok(prompt.includes('何者無關'));assert.ok(prompt.includes('Alzheimer’s disease'));
+ assert.ok(!prompt.includes(target.id));assert.ok(!prompt.includes('095140'));
+ assert.equal(find(source,[{...target,stem:'阿茲海默症一般介紹'}],new Set()).length,0);
+});

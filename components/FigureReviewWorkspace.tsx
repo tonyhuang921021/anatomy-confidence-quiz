@@ -7,9 +7,9 @@ import { useCallback, useEffect, useState } from 'react';
 type Candidate={id:string;question_id:string;section_title:string;status:string};
 type Preview={id:string;status:string;questionId:string;question:{stem:string;options:Record<string,string>;answer:string;sharedContext:string|null}|null;section:string|null;explanation:string|null;mime:string;imageBase64:string;imageSha:string;sourceUrl:string;licenseUrl:string;license:string;attribution:string;sectionTitle:string;reuseSource:{id:string;questionId:string}|null};
 export function FigureReviewWorkspace({accessToken}:{accessToken?:string}){
- const [items,setItems]=useState<Candidate[]>([]),[active,setActive]=useState(''),[previews,setPreviews]=useState<Record<string,Preview>>({}),[confirmed,setConfirmed]=useState<Record<string,boolean>>({}),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[showApproved,setShowApproved]=useState(false);
+ const [items,setItems]=useState<Candidate[]>([]),[active,setActive]=useState(''),[previews,setPreviews]=useState<Record<string,Preview>>({}),[confirmed,setConfirmed]=useState<Record<string,boolean>>({}),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[showApproved,setShowApproved]=useState(false),[previewRevision,setPreviewRevision]=useState(0);
  const request=useCallback(async(body:Record<string,unknown>)=>{if(!accessToken)throw Error('請先登入管理員帳號');const r=await fetch('/api/owner/figure-review',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...body,accessToken})});const x=await r.json();if(!r.ok||!x.ok)throw Error(x.status==='reuse_not_exact'?'內容已變更，不能重用，請重新核對。':'未能完成，請重新整理核對目前狀態。');return x},[accessToken]);
- const load=useCallback(async()=>{setBusy(true);try{const x=await request({action:'list'});setItems(x.candidates);setActive(old=>x.candidates.some((i:Candidate)=>i.question_id===old)?old:x.candidates[0]?.question_id||'');setPreviews({});setConfirmed({});setMessage('')}catch(e){setMessage((e as Error).message)}finally{setBusy(false)}},[request]);
+ const load=useCallback(async()=>{setBusy(true);try{const x=await request({action:'list'});setItems(x.candidates);setActive(old=>x.candidates.some((i:Candidate)=>i.question_id===old)?old:x.candidates[0]?.question_id||'');setPreviewRevision(v=>v+1);setConfirmed({});setMessage('')}catch(e){setMessage((e as Error).message)}finally{setBusy(false)}},[request]);
  useEffect(()=>{if(accessToken)void load()},[accessToken,load]);
  const visible=items.filter(x=>showApproved||x.status==='pending');
  const groups=[...new Set(visible.map(x=>x.question_id))];
@@ -17,7 +17,7 @@ export function FigureReviewWorkspace({accessToken}:{accessToken?:string}){
  useEffect(()=>{let canceled=false;setPreviews({});setConfirmed({});if(!active||!accessToken)return;void(async()=>{for(const item of current){try{const x=await request({action:'preview',id:item.id});if(canceled)return;setPreviews(old=>({...old,[item.id]:x}))}catch(e){if(!canceled)setMessage((e as Error).message)}}})();return()=>{canceled=true};
  // Re-fetch only when selected question or candidate membership changes.
  // eslint-disable-next-line react-hooks/exhaustive-deps
- },[active,accessToken,request,current.map(x=>x.id).join(',')]);
+ },[active,accessToken,request,previewRevision,current.map(x=>x.id).join(',')]);
  const context=current.map(x=>previews[x.id]).find(Boolean);
  async function decide(p:Preview,action:'approve'|'reject'|'revoke'|'reuse'){
   setBusy(true);try{await request(action==='revoke'?{action:'revoke',id:p.id,imageSha:p.imageSha,confirmRevoke:true}:action==='reuse'?{action:'reuse',id:p.id,visualConfirmed:confirmed[p.id]===true}:{action:'review',id:p.id,decision:action==='approve'?'approved':'rejected',visualConfirmed:confirmed[p.id]===true});await load();setMessage(action==='revoke'?'已撤回此圖及依它重用的圖片，紀錄保留。':action==='reject'?'已拒絕，紀錄保留。':'已核准，回到題目即可讀取。')}catch(e){setMessage((e as Error).message)}finally{setBusy(false)}
