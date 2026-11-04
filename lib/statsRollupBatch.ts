@@ -16,7 +16,7 @@ function timestamp(value: unknown): string {
 }
 function micros(value: string) {
   const fraction = /\.(\d{1,6})/.exec(value)?.[1] ?? "";
-  return BigInt(Date.parse(value)) * 1000n + BigInt(fraction.padEnd(6, "0").slice(3));
+  return BigInt(Date.parse(value)) * BigInt(1000) + BigInt(fraction.padEnd(6, "0").slice(3));
 }
 function marker(value: unknown): Marker {
   const v = value as Marker | null;
