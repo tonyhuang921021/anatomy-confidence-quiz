@@ -1,3 +1,4 @@
+import { planRollup, fetchRollupPage, boundRollupDays, nextRollupCursor, type RollupCursor } from "@/lib/statsRollupBatch";
 import {scheduleNewImageContinuation} from "@/lib/newExplanationImageContinuation.cjs";
 import {commonsSearch,readBoundedImage} from "@/lib/commonsFigureSource.cjs";
 import { NextRequest, NextResponse } from "next/server";
@@ -14,17 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-type ChangedAttemptRow = {
-  question_id: string;
-  answered_at: string;
-  created_at: string;
-};
-
 const ROLLUP_SETTING_KEY = "stats_rollup_cursor";
-const INITIAL_LOOKBACK_MS = 24 * 60 * 60 * 1000;
-const CURSOR_OVERLAP_MS = 2 * 60 * 1000;
-const ROLLUP_PAGE_SIZE = 1000;
-const MAX_CHANGED_ATTEMPTS_PER_RUN = 500;
 const ROLLUP_TIMEOUT_MS = 20_000;
 const ROLLUP_LEASE_SECONDS = 180;
 
@@ -63,12 +54,6 @@ function getDateRangeForTaipeiDay(dayKey: string) {
   };
 }
 
-function normalizeIsoTimestamp(value: unknown) {
-  if (typeof value !== "string" || !value.trim()) return null;
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
-}
-
 function getErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error && error.message) return error.message;
   if (error && typeof error === "object" && "message" in error) {
@@ -87,17 +72,16 @@ async function readRollupCursor(supabase: any, signal: AbortSignal) {
     .abortSignal(signal);
 
   if (error) throw error;
-  const value = data?.value as { lastCreatedAt?: unknown } | null | undefined;
-  return normalizeIsoTimestamp(value?.lastCreatedAt);
+  return data?.value ?? null;
 }
 
-async function writeRollupCursor(supabase: any, lastCreatedAt: string, signal: AbortSignal) {
+async function writeRollupCursor(supabase: any, value: RollupCursor, signal: AbortSignal) {
   const { error } = await supabase
     .from("site_settings")
     .upsert(
       {
         setting_key: ROLLUP_SETTING_KEY,
-        value: { lastCreatedAt },
+        value,
         updated_at: new Date().toISOString()
       },
       { onConflict: "setting_key" }
@@ -105,34 +89,6 @@ async function writeRollupCursor(supabase: any, lastCreatedAt: string, signal: A
     .abortSignal(signal);
 
   if (error) throw error;
-}
-
-async function fetchChangedAttemptRows(
-  supabase: any,
-  since: string,
-  until: string,
-  signal: AbortSignal
-) {
-  const rows: ChangedAttemptRow[] = [];
-
-  for (let from = 0; rows.length < MAX_CHANGED_ATTEMPTS_PER_RUN; from += ROLLUP_PAGE_SIZE) {
-    const { data, error } = await supabase
-      .from("question_attempt_logs")
-      .select("question_id, answered_at, created_at")
-      .gte("created_at", since)
-      .lte("created_at", until)
-      .order("created_at", { ascending: true })
-      .range(from, from + ROLLUP_PAGE_SIZE - 1)
-      .abortSignal(signal);
-
-    if (error) throw error;
-
-    const page = (data ?? []) as ChangedAttemptRow[];
-    rows.push(...page);
-    if (page.length < ROLLUP_PAGE_SIZE) break;
-  }
-
-  return rows.slice(0, MAX_CHANGED_ATTEMPTS_PER_RUN);
 }
 
 async function refreshQuestionAccuracyStats(
@@ -287,34 +243,38 @@ export async function GET(request: NextRequest) {
 
     const result = await withAbortableServerTimeout(
       async (signal) => {
-        const previousCursor = await readRollupCursor(supabase, signal);
-        const until = new Date().toISOString();
-        const since = new Date(
-          previousCursor
-            ? new Date(previousCursor).getTime() - CURSOR_OVERLAP_MS
-            : Date.now() - INITIAL_LOOKBACK_MS
-        ).toISOString();
-        const changedRows = await fetchChangedAttemptRows(supabase, since, until, signal);
+        const previousValue = await readRollupCursor(supabase, signal);
+        const plan = planRollup(previousValue, new Date().toISOString());
+        const page = await fetchRollupPage(supabase, plan, signal);
+        const batch = boundRollupDays(page, getTaipeiDayKey(new Date()), value => getTaipeiDayKey(new Date(value)));
+        const changedRows = batch.rows;
         const questionIds = changedRows.map((row) => row.question_id);
         const dayKeys = [
           getTaipeiDayKey(new Date()),
           ...changedRows.map((row) => getTaipeiDayKey(new Date(row.answered_at)))
         ];
 
-        const [questionStatsUpdated, ownerDailyStatsUpdated] = await Promise.all([
+        const updates = await Promise.allSettled([
           refreshQuestionAccuracyStats(supabase, questionIds, signal),
           refreshOwnerDailyStats(supabase, dayKeys, signal)
         ]);
+        // Do not release the lease while the other refresh is still running
+        // after one branch fails. Partial writes are safe to recompute.
+        if (updates[0].status === "rejected") throw updates[0].reason;
+        if (updates[1].status === "rejected") throw updates[1].reason;
+        const questionStatsUpdated = updates[0].value;
+        const ownerDailyStatsUpdated = updates[1].value;
 
-        const nextCursor =
-          changedRows.length >= MAX_CHANGED_ATTEMPTS_PER_RUN
-            ? changedRows.at(-1)?.created_at ?? until
-            : until;
-        await writeRollupCursor(supabase, nextCursor, signal);
+        // Cursor is committed only after both idempotent absolute refreshes.
+        // Failed or uncertain refreshes replay the batch; they never skip it.
+        const cursor = nextRollupCursor(plan, changedRows, batch.hasMore);
+        await writeRollupCursor(supabase, cursor, signal);
 
         return {
-          previousCursor,
-          nextCursor,
+          previousCursor: plan.previousCursor,
+          nextCursor: cursor.lastCreatedAt,
+          scanComplete: !cursor.scan,
+          fetchedAttempts: page.length,
           changedAttempts: changedRows.length,
           questionStatsUpdated,
           ownerDailyStatsUpdated
