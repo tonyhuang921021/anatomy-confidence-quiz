@@ -405,9 +405,23 @@ function getStoredQuestionCount(session: QuizSession) {
   );
 }
 
+function hasSameResultSessionContent(left: QuizSession, right: QuizSession) {
+  // Cloud hydration may return a fresh object with the exact same content.
+  // Ignore object key order and JSON-omitted undefined fields, but preserve
+  // answer order and all real metadata so genuine corrections still save.
+  const canonical = (value: QuizSession) => JSON.stringify(value, (_key, item: unknown) => {
+    if (item && typeof item === "object" && !Array.isArray(item)) {
+      return Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b)));
+    }
+    return item;
+  });
+  return canonical(left) === canonical(right);
+}
+
 function isMoreCompleteResultSession(candidate: QuizSession, current: QuizSession | null) {
   if (!candidate.completedAt || candidate.attempts.length === 0) return false;
   if (!current?.completedAt) return true;
+  if (hasSameResultSessionContent(candidate, current)) return false;
   if (candidate.attempts.length !== current.attempts.length) {
     return candidate.attempts.length > current.attempts.length;
   }
@@ -572,15 +586,6 @@ function getAccuracyTone(correctRate: number) {
 function getQuestionSourceBadgeLabel(question: Question) {
   if (question.sourceType === "AI_GENERATED" || question.source === "ai-generated") {
     return question.originalQuestionNumber ? `AI 題 Q${question.originalQuestionNumber}` : "AI 題";
-  }
-  if (question.sourceYear && question.sourceRound && question.originalQuestionNumber) {
-    return `${formatRocYear(question.sourceYear)} 第${question.sourceRound}次 Q${question.originalQuestionNumber}`;
-  }
-  if (question.sourceYear && question.originalQuestionNumber) {
-    return `${formatRocYear(question.sourceYear)} Q${question.originalQuestionNumber}`;
-  }
-  if (question.originalQuestionNumber) {
-    return `Q${question.originalQuestionNumber}`;
   }
   return "";
 }

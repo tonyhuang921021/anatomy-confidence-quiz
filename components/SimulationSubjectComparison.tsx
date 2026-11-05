@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Question, QuizSession } from "@/types/quiz";
 import { getSessionComparisonPaper } from "@/lib/simulationComparisonCatalog";
-import { isMatchingSubjectStats, scoreOwnCompletePaper,
+import { comparisonPaperSignature, isMatchingSubjectStats, scoreOwnCompletePaper,
   type ComparisonPaper, type SubjectCount, type PaperSubjectStats } from "@/lib/simulationSubjectComparison";
 
 export type ResultsSubjectComparison = {
@@ -21,23 +21,28 @@ export function useSimulationSubjectComparison(session: QuizSession | null, ques
     const current={...known,questions:known.questions.map(q=>map.get(q.id)!)};
     return scoreOwnCompletePaper(current,session) ? current : null;
   },[session,questions]);
-  const [remote,setRemote]=useState<{paper:ComparisonPaper;value:PaperSubjectStats|null;loading:boolean}|null>(null);
+  // Background history/explanation sync may recreate identical objects. Only
+  // actual paper/category/answer changes should restart the aggregate request.
+  const paperKey=paper?.key ?? null;
+  const signature=paper ? comparisonPaperSignature(paper) : null;
+  const [remote,setRemote]=useState<{paperKey:string;signature:string;value:unknown;loading:boolean}|null>(null);
   useEffect(()=>{
-    if(!paper) return;
+    if(!paperKey || !signature) return;
     const controller=new AbortController();
-    setRemote({paper,value:null,loading:true});
+    setRemote({paperKey,signature,value:null,loading:true});
     const timer=setTimeout(()=>controller.abort(),10000);
     let mounted=true;
-    void fetch(`/api/simulation-subject-stats?paperKey=${encodeURIComponent(paper.key)}`,{signal:controller.signal})
-      .then(async r=>{if(!r.ok)throw Error("unavailable");const value:unknown=await r.json();if(!isMatchingSubjectStats(value,paper))throw Error("mismatch");return value;})
-      .then(value=>{if(mounted)setRemote({paper,value,loading:false});})
-      .catch(()=>{if(mounted)setRemote({paper,value:null,loading:false});})
+    void fetch(`/api/simulation-subject-stats?paperKey=${encodeURIComponent(paperKey)}`,{signal:controller.signal})
+      .then(async r=>{if(!r.ok)throw Error("unavailable");return await r.json() as unknown;})
+      .then(value=>{if(mounted)setRemote({paperKey,signature,value,loading:false});})
+      .catch(()=>{if(mounted)setRemote({paperKey,signature,value:null,loading:false});})
       .finally(()=>clearTimeout(timer));
     return()=>{mounted=false;clearTimeout(timer);controller.abort();};
-  },[paper]);
-  const current=remote?.paper===paper ? remote:null;
-  const stats=current?.value ?? null;
-  return {paper,stats,loading:Boolean(paper && (!current || current.loading)),ready:Boolean(paper && stats?.available && isMatchingSubjectStats(stats,paper))};
+  },[paperKey,signature]);
+  const current=remote?.paperKey===paperKey && remote?.signature===signature ? remote:null;
+  const value=current?.value;
+  const stats=paper && isMatchingSubjectStats(value,paper) ? value : null;
+  return {paper,stats,loading:Boolean(paper && (!current || current.loading)),ready:Boolean(stats?.available)};
 }
 
 export function SubjectAverageCaption({row,comparison}:{row:SubjectCount;comparison:ResultsSubjectComparison}) {
