@@ -10,12 +10,13 @@ import { useQuestionOrderMode } from "@/components/QuestionOrderModeControl";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
-  getPracticeQuestionCountPreference,
-  getPracticeYearRangePreference
+  getPracticeQuestionCountPreference
 } from "@/lib/accountPreferences";
 import { buildProgressBlocks } from "@/lib/progressMetrics";
 import {
   buildProgressPracticeSettings,
+  buildProgressPracticeHref,
+  resolveProgressPracticeYearRange,
   getProgressPracticeQuestionIds,
   type ProgressPracticeQuestionCount,
   type ProgressPracticeYearRange
@@ -31,15 +32,15 @@ import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import {
   loadCompletedHistorySessionsForUser,
   loadPracticeQuestionCount,
-  loadPracticeYearRange,
-  savePracticeQuestionCount,
-  savePracticeYearRange
+  savePracticeQuestionCount
 } from "@/lib/storage";
 import type { Attempt, QuizSession, SubjectName } from "@/types/quiz";
 
 type ProgressPracticePageProps = {
   subjectParam?: string;
   primaryTagParam?: string;
+  yearFromParam?: string;
+  yearToParam?: string;
 };
 
 type ProgressPracticeHistorySession = Pick<QuizSession, "id" | "attempts">;
@@ -57,7 +58,9 @@ function resolveSubject(value?: string): SubjectName | null {
 
 export function ProgressPracticePage({
   subjectParam,
-  primaryTagParam
+  primaryTagParam,
+  yearFromParam,
+  yearToParam
 }: ProgressPracticePageProps) {
   const router = useRouter();
   const { user, syncVersion } = useAuth();
@@ -75,7 +78,7 @@ export function ProgressPracticePage({
       ? { yearFrom: Math.min(MIN_PRACTICE_SOURCE_YEAR, ...years), yearTo: Math.max(MAX_PRACTICE_SOURCE_YEAR, ...years) }
       : DEFAULT_YEAR_RANGE;
   }, [subject]);
-  const [yearRange, setYearRange] = useState<ProgressPracticeYearRange>(defaultYearRange);
+  const yearRange = useMemo(() => resolveProgressPracticeYearRange(defaultYearRange, yearFromParam, yearToParam), [defaultYearRange, yearFromParam, yearToParam]);
   const [questionCount, setQuestionCount] = useState<ProgressPracticeQuestionCount>(10);
   const activeHistoryOwnerKey = user?.id ?? "__guest__";
 
@@ -102,14 +105,10 @@ export function ProgressPracticePage({
   }, [activeHistoryOwnerKey, syncVersion, user?.id]);
 
   useEffect(() => {
-    const storedRange = user
-      ? getPracticeYearRangePreference(user.user_metadata)
-      : loadPracticeYearRange(defaultYearRange);
     const storedCount = user
       ? getPracticeQuestionCountPreference(user.user_metadata, 10)
       : loadPracticeQuestionCount(10);
 
-    setYearRange(normalizePracticeYearRange(storedRange ?? defaultYearRange));
     setQuestionCount(storedCount);
   }, [user?.id, user?.user_metadata, defaultYearRange]);
 
@@ -153,22 +152,8 @@ export function ProgressPracticePage({
     !localHistoryReady || Boolean(user?.id && cloudHistoryHydrating && sessions.length === 0);
 
   function handleYearRangeChange(nextRange: ProgressPracticeYearRange) {
-    const normalized = normalizePracticeYearRange(nextRange);
-    setYearRange(normalized);
-    savePracticeYearRange(normalized);
-    if (!user) return;
-
-    void getSupabaseBrowserClient().auth.updateUser({
-      data: {
-        ...user.user_metadata,
-        practice_year_from: normalized.yearFrom,
-        practice_year_to: normalized.yearTo
-      }
-    }).then(({ error }) => {
-      if (error) console.error("Practice year preference sync skipped:", error);
-    }).catch((error) => {
-      console.error("Practice year preference sync skipped:", error);
-    });
+    if (!subject || !block) return;
+    router.replace(buildProgressPracticeHref(subject, block.fullLabel, nextRange), { scroll: false });
   }
 
   function handleQuestionCountChange(nextCount: ProgressPracticeQuestionCount) {
@@ -238,6 +223,8 @@ export function ProgressPracticePage({
               idPrefix={`progress-practice-${block.key}`}
               label={label}
               availableQuestionCount={availableQuestionIds.length}
+              totalQuestionCount={block.totalQuestionsInBank}
+              onResetYearRange={() => { if (subject) router.replace(buildProgressPracticeHref(subject, block.fullLabel), { scroll: false }); }}
               questionCount={questionCount}
               yearRange={normalizedYearRange}
               yearOptions={yearOptions}

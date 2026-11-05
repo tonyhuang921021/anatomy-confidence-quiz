@@ -19,6 +19,8 @@ type ProgressPracticeSetupProps = {
   idPrefix: string;
   label: string;
   availableQuestionCount: number;
+  totalQuestionCount?: number;
+  onResetYearRange?: () => void;
   questionCount: ProgressPracticeQuestionCount;
   yearOptions: number[];
   yearRange: ProgressPracticeYearRange;
@@ -33,6 +35,8 @@ export function ProgressPracticeSetup({
   idPrefix,
   label,
   availableQuestionCount,
+  totalQuestionCount,
+  onResetYearRange,
   questionCount,
   yearRange,
   yearOptions,
@@ -59,6 +63,14 @@ export function ProgressPracticeSetup({
       aria-label={`${label}練習設定`}
       className="rounded-lg border border-brand-200 bg-brand-50/45 p-4 sm:p-5"
     >
+      {totalQuestionCount !== undefined && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-600" aria-live="polite">
+          <p>章節共 <strong>{totalQuestionCount}</strong> 題・目前年份符合 <strong>{availableQuestionCount}</strong> 題</p>
+          {availableQuestionCount < totalQuestionCount && onResetYearRange && (
+            <button type="button" onClick={onResetYearRange} className="min-h-10 rounded-lg px-3 font-semibold text-brand-700 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">恢復全部年份</button>
+          )}
+        </div>
+      )}
       <div className="grid gap-4 lg:grid-cols-[minmax(14rem,0.9fr)_minmax(8rem,0.45fr)_minmax(17rem,1fr)]">
         <fieldset>
           <legend className="text-xs font-semibold text-slate-500">年份</legend>

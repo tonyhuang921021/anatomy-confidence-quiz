@@ -4,6 +4,8 @@ type ProgressPracticeRouteProps = {
   searchParams?: {
     subject?: string | string[];
     tag?: string | string[];
+    yearFrom?: string | string[];
+    yearTo?: string | string[];
   };
 };
 
@@ -16,6 +18,8 @@ export default function ProgressPracticeRoute({ searchParams }: ProgressPractice
     <ProgressPracticePage
       subjectParam={getFirstParam(searchParams?.subject)}
       primaryTagParam={getFirstParam(searchParams?.tag)}
+      yearFromParam={getFirstParam(searchParams?.yearFrom)}
+      yearToParam={getFirstParam(searchParams?.yearTo)}
     />
   );
 }

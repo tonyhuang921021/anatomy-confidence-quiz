@@ -23,9 +23,23 @@ export type ProgressPracticeYearRange = {
 
 export const PROGRESS_PRACTICE_QUESTION_COUNTS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50] as const;
 
-export function buildProgressPracticeHref(subject: SubjectName, primaryTag: string) {
+export function buildProgressPracticeHref(subject: SubjectName, primaryTag: string, yearRange?: ProgressPracticeYearRange) {
   const params = new URLSearchParams({ subject, tag: primaryTag });
+  if (yearRange) {
+    const range = normalizeProgressPracticeYearRange(yearRange);
+    params.set("yearFrom", String(range.yearFrom));
+    params.set("yearTo", String(range.yearTo));
+  }
   return `/progress/practice?${params.toString()}`;
+}
+
+// Overview links cover the whole chapter. Only explicit URL filters narrow it;
+// unrelated account/free-practice preferences must not silently remove questions.
+export function resolveProgressPracticeYearRange(
+  fallback: ProgressPracticeYearRange, yearFrom?: string, yearTo?: string
+): ProgressPracticeYearRange {
+  if (!yearFrom || !yearTo || !/^\d{2,4}$/.test(yearFrom) || !/^\d{2,4}$/.test(yearTo)) return fallback;
+  return normalizeProgressPracticeYearRange({ yearFrom: Number(yearFrom), yearTo: Number(yearTo) });
 }
 
 type ProgressPracticeInput = {
