@@ -25,6 +25,7 @@ import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
 import { WrongQuestionPdfExport } from "@/components/WrongQuestionPdfExport";
 import { useSurfaceTransition } from "@/components/useSurfaceTransition";
 import { ResultSummary } from "@/components/ResultSummary";
+import { useSimulationSubjectComparison, SubjectAverageCaption, SubjectComparisonFootnote } from "@/components/SimulationSubjectComparison";
 import { CURRENT_ANSWER_KEY_REVISION } from "@/lib/answerKeyRevisions";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
@@ -1572,6 +1573,8 @@ function ResultsPageContent() {
         .filter((item): item is { attempt: Attempt; question: Question } => Boolean(item.question)),
     [activeSession?.attempts, questionMap]
   );
+  const simulationComparisonQuestions = useMemo(() => reviewedAttempts.map(item => item.question), [reviewedAttempts]);
+  const simulationSubjectComparison = useSimulationSubjectComparison(activeSession, simulationComparisonQuestions);
   const questionNumberMap = useMemo(() => {
     const orderedQuestionIds =
       activeSession?.questionOrder && activeSession.questionOrder.length > 0
@@ -3137,9 +3140,11 @@ function ResultsPageContent() {
                     {item.correct}
                     <span className="ml-1 text-base font-semibold text-slate-500">/ {item.total}</span>
                   </p>
+                  <SubjectAverageCaption row={item} comparison={simulationSubjectComparison} />
                 </article>
               ))}
             </div>
+            <SubjectComparisonFootnote comparison={simulationSubjectComparison} />
           </section>
         ) : null}
       </div>
