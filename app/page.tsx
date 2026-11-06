@@ -50,6 +50,11 @@ const REVIEW_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "11/6",
+    title: "抓 AI 聊天室限時試玩",
+    body: "新增 /games/undercover 多人文字遊戲：聊天後投票找出 AI，遊戲結束才揭曉身分。測試額度或時間用盡會停止 AI，國考刷題不受影響。"
+  },
+  {
     time: "11/5",
     title: "結果頁平均穩定顯示，回顧標示簡化",
     body: "背景同步相同作答紀錄時，同卷平均不再反覆跳回讀取中。題目回顧移除重複的年份、考次與題號來源標示，保留原題序與題目內容。"
