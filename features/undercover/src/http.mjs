@@ -39,6 +39,8 @@ export function makeApi({game,origin,rate=new RateLimit()}){
   if(['create','join'].includes(action))rate.take('join:'+digest(ip),12);
   if(action==='admission')rate.take('admission:'+digest(ip),30);
   if(!['view','sync','admission'].includes(action))rate.take('mutation:'+device,40);
+  if(game.checkPlayable&&['create','configure','start','restart'].includes(action))await game.checkPlayable();
+  if(game.checkPlayable&&action==='join'&&!(await game.admission(device,code)).returning)await game.checkPlayable();
   if(action==='create'){const result=await game.create(device,args.name,requestId);return json({state:await game.view(device,result.code)});}
   if(action==='admission')return json({admission:await game.admission(device,code)});
   if(action==='view')return json({state:await game.view(device,code)});
