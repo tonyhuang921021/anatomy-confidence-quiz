@@ -145,7 +145,7 @@ function aiContext(r,p,task){const messages=publicMessages(r).slice(-30),self={i
 function chatIntent(r,p,now,durations,random){
  const record=(r.aiCadence||={})[p.id]||={seen:null,pending:true,due:r.nextChatAt[p.id],repliedCount:0};
  const humanIds=new Set(r.players.filter(x=>x.kind==='human').map(x=>x.id));const others=r.messages.filter(m=>m.day===r.day&&humanIds.has(m.sender)),last=others.at(-1),count=Object.entries(r.chatCounts).filter(([key])=>humanIds.has(key)).reduce((n,[,v])=>n+v,0),initial=!(r.aiChatCount[p.id]||0);
- if(last&&last.id!==record.seen){record.seen=last.id;const direct=addressedTo(last.text,p.alias)||isChatQuestion(last.text)||/回我|有人|哈囉|哈啰|你好|嗨|講話|说话|說話|回應|你覺得|在不在|[?？]|[嗎呢]$/.test(last.text.trim());const respond=initial||direct||count-record.repliedCount>=3||random(100)<45;
+ if(last&&last.id!==record.seen){record.seen=last.id;if(!addressedTo(last.text,p.alias)&&r.players.some(x=>x.id!==p.id&&addressedTo(last.text,x.alias))){record.pending=false;record.due=null;return null;}const direct=addressedTo(last.text,p.alias)||isChatQuestion(last.text)||/回我|有人|哈囉|哈啰|你好|嗨|講話|说话|說話|回應|你覺得|在不在|[?？]|[嗎呢]$/.test(last.text.trim());const respond=initial||direct||count-record.repliedCount>=3||random(100)<45;
   if(respond){const delay=durations.aiDelayMs*3+random(Math.max(1,durations.aiDelayMs===0?1:durations.aiJitterMs*3))+Math.min(4000,[...last.text].length*(durations.aiDelayMs===0?0:60));record.pending=true;record.due=Math.min(record.due??Infinity,now+delay);}
  }
  if(!record.pending)return null;const due=Math.max(record.due||0,(r.lastPost[p.id]||0)+Math.max(1500,durations.aiDelayMs*6));return now>=due?{due,count}:null;
