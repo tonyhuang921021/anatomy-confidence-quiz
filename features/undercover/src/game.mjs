@@ -138,11 +138,14 @@ function recover(db,now,durations,random){for(const r of Object.values(db.rooms)
  if(job.at+15_000<now){job.status='unknown';job.reason='lease_expired';db.aiUnknown++;db.aiPaused=true;}
 }}
 function localHold(r,db){return db.aiPaused||Object.values(r.jobs).some(job=>job.game===r.game&&job.day===r.day&&['unknown','invalid','blocked'].includes(job.status));}
-function aiContext(r,p,task){const opening=task==='chat'&&r.day===1&&!(r.aiChatCount[p.id]||0)&&r.messages.filter(m=>m.day===r.day).length<=r.players.length+2;const remaining=LIMITS.messagesPerDay-(r.chatCounts[p.id]||0);return {task,self:{id:p.publicId,name:p.alias},...(p.persona?{roleplay:structuredClone(p.persona)}:{}),day:r.day,players:roster(r),messages:publicMessages(r).slice(-30),allowedVotes:task==='vote'?candidates(r).filter(x=>x.id!==p.id).map(x=>x.publicId):[],maxChars:opening?24:task==='chat'?96:LIMITS.textChars,...(task==='chat'?{opening,maxParts:opening?Math.min(2,remaining):Math.min(4,remaining)}:{}),goal:'blend_in_and_win'};}
+export function addressedTo(text,name){return new RegExp('(?:^|[\\s@，,])'+name+'(?:號|[\\s，,:：]|$)','u').test(text);}
+export function isChatQuestion(text){return /[?？]|[嗎呢]$|什麼|甚麼|啥|怎麼|為何|為什麼|哪個|哪裡|幾點|多少|吃啥|你覺得|回我|在不在/u.test(text.trim());}
+export function replyFocus(messages,self){const lastOwn=messages.findLastIndex(m=>m.sender===self.id),fresh=messages.slice(lastOwn+1).filter(m=>m.sender!==self.id);return fresh.filter(m=>addressedTo(m.text,self.name)).at(-1)||fresh.filter(m=>isChatQuestion(m.text)&&!/^@?\d+(?:號)?[\s，,:：]/u.test(m.text)).at(-1)||fresh.at(-1)||null;}
+function aiContext(r,p,task){const messages=publicMessages(r).slice(-30),self={id:p.publicId,name:p.alias},selectedFocus=task==='chat'?replyFocus(messages.filter(m=>m.day===r.day),self):null,trigger=messages.find(m=>m.id===r.aiCadence?.[p.id]?.seen),focus=task==='chat'&&trigger&&isChatQuestion(trigger.text)&&!addressedTo(selectedFocus?.text||'',p.alias)?trigger:selectedFocus;const opening=task==='chat'&&r.day===1&&!(r.aiChatCount[p.id]||0)&&r.messages.filter(m=>m.day===r.day).length<=r.players.length+2&&!messages.some(m=>m.sender!==p.publicId&&!/^(嗨|哈囉|哈啰|你好|大家好|來了|嗯|欸|晚安|早安|喔|[，,。.!！\s])+$/u.test(m.text));const remaining=LIMITS.messagesPerDay-(r.chatCounts[p.id]||0);return {task,self:{id:p.publicId,name:p.alias},...(p.persona?{roleplay:structuredClone(p.persona)}:{}),day:r.day,players:roster(r),messages,...(focus?{replyTo:focus.id}:{}),allowedVotes:task==='vote'?candidates(r).filter(x=>x.id!==p.id).map(x=>x.publicId):[],maxChars:opening?24:task==='chat'?96:LIMITS.textChars,...(task==='chat'?{opening,maxParts:opening?Math.min(2,remaining):Math.min(4,remaining)}:{}),goal:'blend_in_and_win'};}
 function chatIntent(r,p,now,durations,random){
  const record=(r.aiCadence||={})[p.id]||={seen:null,pending:true,due:r.nextChatAt[p.id],repliedCount:0};
  const humanIds=new Set(r.players.filter(x=>x.kind==='human').map(x=>x.id));const others=r.messages.filter(m=>m.day===r.day&&humanIds.has(m.sender)),last=others.at(-1),count=Object.entries(r.chatCounts).filter(([key])=>humanIds.has(key)).reduce((n,[,v])=>n+v,0),initial=!(r.aiChatCount[p.id]||0);
- if(last&&last.id!==record.seen){record.seen=last.id;const direct=(new RegExp('(?:^|[\\s@，,])'+p.alias+'(?:號|[\\s，,:：]|$)','u')).test(last.text)||/回我|有人|哈囉|哈啰|你好|嗨|講話|说话|說話|回應|你覺得|在不在|[?？]|[嗎呢]$/.test(last.text.trim());const respond=initial||direct||count-record.repliedCount>=3||random(100)<45;
+ if(last&&last.id!==record.seen){record.seen=last.id;const direct=addressedTo(last.text,p.alias)||isChatQuestion(last.text)||/回我|有人|哈囉|哈啰|你好|嗨|講話|说话|說話|回應|你覺得|在不在|[?？]|[嗎呢]$/.test(last.text.trim());const respond=initial||direct||count-record.repliedCount>=3||random(100)<45;
   if(respond){const delay=durations.aiDelayMs*3+random(Math.max(1,durations.aiDelayMs===0?1:durations.aiJitterMs*3))+Math.min(4000,[...last.text].length*(durations.aiDelayMs===0?0:60));record.pending=true;record.due=Math.min(record.due??Infinity,now+delay);}
  }
  if(!record.pending)return null;const due=Math.max(record.due||0,(r.lastPost[p.id]||0)+Math.max(1500,durations.aiDelayMs*6));return now>=due?{due,count}:null;
@@ -150,13 +153,14 @@ function chatIntent(r,p,now,durations,random){
 
 export function validateAiContext(c){
  requireThat(c&&['chat','vote'].includes(c.task)&&c.self&&typeof c.self.id==='string'&&typeof c.self.name==='string','BAD_AI_CONTEXT');
- requireThat(Object.keys(c).every(k=>['task','self','day','players','messages','allowedVotes','maxChars','goal','roleplay','opening','maxParts'].includes(k)),'BAD_AI_CONTEXT');
+ requireThat(Object.keys(c).every(k=>['task','self','day','players','messages','allowedVotes','maxChars','goal','roleplay','opening','maxParts','replyTo'].includes(k)),'BAD_AI_CONTEXT');
  if(c.opening!==undefined)requireThat(typeof c.opening==='boolean','BAD_AI_CONTEXT');if(c.maxParts!==undefined)requireThat(Number.isInteger(c.maxParts)&&c.maxParts>=1&&c.maxParts<=4,'BAD_AI_CONTEXT');requireThat(Number.isInteger(c.maxChars)&&c.maxChars>=1&&c.maxChars<=200,'BAD_AI_CONTEXT');
  requireThat(Object.keys(c.self).every(k=>['id','name'].includes(k)),'BAD_AI_CONTEXT');
  if(c.roleplay!==undefined){const template=ALL_AI_PERSONAS.find(x=>x.id===c.roleplay?.id);requireThat(template&&Object.keys(c.roleplay).length===4&&Object.keys(template).every(k=>c.roleplay[k]===template[k]),'BAD_AI_CONTEXT');}
  requireThat(Array.isArray(c.players)&&Array.isArray(c.messages)&&Array.isArray(c.allowedVotes),'BAD_AI_CONTEXT');
  for(const p of c.players)requireThat(Object.keys(p).every(k=>['id','name','avatarSeed','alive'].includes(k)),'BAD_AI_CONTEXT');
  for(const m of c.messages)requireThat(Object.keys(m).every(k=>['id','day','sender','text'].includes(k)),'BAD_AI_CONTEXT');
+ if(c.replyTo!==undefined)requireThat(c.task==='chat'&&typeof c.replyTo==='string'&&c.messages.some(m=>m.id===c.replyTo&&m.sender!==c.self.id),'BAD_AI_CONTEXT');
  return structuredClone(c);
 }
 export class TestAiAdapter {
