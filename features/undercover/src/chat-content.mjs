@@ -10,3 +10,6 @@ export function containsEmoji(value){
  const chars=[...value];
  return chars.some((char,i)=>presentation.test(char)||(pictograph.test(char)&&(!(punctuation.test(char)||textSymbols.has(char))||chars[i+1]==='\uFE0F')));
 }
+// Bopomofo letters, including the extended block. Tone marks alone and ordinary
+// punctuation/digits are not banned: their meaning is not exclusively Zhuyin.
+export function containsZhuyin(value){return typeof value==='string'&&/[\u3100-\u312F\u31A0-\u31BF]/u.test(value);}
