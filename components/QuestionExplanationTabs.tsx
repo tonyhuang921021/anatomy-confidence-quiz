@@ -1,4 +1,8 @@
 "use client";
+import {usesFullGeneratedReading} from "@/lib/generatedExplanationReading";
+import {loadQuestionExplanationOverride} from "@/lib/storage";
+import {hasReviewedExplanation} from "@/lib/reviewedExplanations";
+import {ExplanationReplacementControls} from "@/components/ExplanationReplacementControls";
 import type { KeyboardEvent, ReactNode } from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BookOpen, CircleOff, Layers3, MessageCircle, MoreHorizontal } from "lucide-react";
@@ -63,6 +67,8 @@ export function QuestionExplanationTabs({question, compact = false, className = 
   const sources=[{source:"yangming" as const,label:"陽明",Icon:BookOpen},
     {source:"supplement" as const,label:"補充",Icon:MessageCircle},
     {source:"related" as const,label:"類似題",Icon:Layers3}];
+  const [fullGenerated,setFullGenerated]=useState(false);
+  useEffect(()=>{const refresh=()=>setFullGenerated(usesFullGeneratedReading(loadQuestionExplanationOverride(question.id),hasReviewedExplanation(question.id)));refresh();for(const name of ['explanation-version-changed','explanation-recovered','storage'])window.addEventListener(name,refresh);return()=>{for(const name of ['explanation-version-changed','explanation-recovered','storage'])window.removeEventListener(name,refresh)};},[question.id]);
   return <section className={`min-w-0 max-w-full ${className}`} onKeyDown={handleKeyDown} aria-label="詳解內容與來源">
     <div className="mb-3 flex min-w-0 items-center gap-1.5 border-b border-slate-200 pb-2.5" role="group" aria-label="切換詳解來源，再點已選來源回到原詳解">
       <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
@@ -88,13 +94,13 @@ export function QuestionExplanationTabs({question, compact = false, className = 
     {reactionError?<p role="alert" className="mb-2 text-sm text-rose-700">{reactionError}</p>:null}
     {moreActionsContent?<div {...morePresence.attributes} id={moreId} role="group" aria-label="更多操作" hidden={!morePresence.present}
       className="mb-3 ml-auto w-full rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:w-64">
-      <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg">{moreActionsContent}</div>
+      <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg"><ExplanationReplacementControls questionId={question.id}/>{moreActionsContent}</div>
     </div>:null}
     <div id={panelId} className="min-w-0 max-w-full">
       {/* Keep the original reader mounted: preserve 簡解／詳解 and image state. */}
       <div hidden={activeTab!==null} role="region" aria-label="原詳解" className="min-w-0 space-y-3">
         {mainExplanationContent || <p className="text-sm text-slate-500">此題尚無原詳解。</p>}
-        {aiExplanationContent?<details className="rounded-xl border border-slate-200 p-3"><summary className="cursor-pointer text-sm font-semibold text-brand-800">展開完整詳解</summary><div className="mt-3">{aiExplanationContent}</div></details>:null}
+        {aiExplanationContent&&!fullGenerated?<details className="rounded-xl border border-slate-200 p-3"><summary className="cursor-pointer text-sm font-semibold text-brand-800">展開完整詳解</summary><div className="mt-3">{aiExplanationContent}</div></details>:null}
       </div>
       {activeTab==="yangming"?<div role="region" aria-label="陽明詳解" className="study-disclosure"><YangmingExplanationPanel questionId={question.id} compact={compact} autoLoad hideButton/></div>:null}
       {activeTab==="supplement"?<div role="region" aria-label="同學補充" className="study-disclosure"><QuestionSupplementCardsPanel question={question} compact={compact} onCountChange={handleCountChange} onReactionsChange={handleReactionsChange}/></div>:null}

@@ -93,9 +93,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const cached = statsCache.get(paperKey);
+  const repairEnabled=process.env.QUIZ_STATS_REPAIR_ENABLED === "true";
+  const cacheKey=`${repairEnabled?"repair-v1":"legacy"}:${paperKey}`;
+  const responseHeaders=repairEnabled?{"Cache-Control":"no-store"}:CACHE_HEADERS;
+  const cached = statsCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
-    return NextResponse.json(cached.value, { headers: CACHE_HEADERS });
+    return NextResponse.json(cached.value, { headers: responseHeaders });
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -103,7 +106,7 @@ export async function GET(request: NextRequest) {
   if (!url || !serviceRoleKey) {
     return NextResponse.json(
       buildUnavailableStats(paperKey, "級距暫時無法讀取，不影響開始作答。"),
-      { headers: CACHE_HEADERS }
+      { headers: responseHeaders }
     );
   }
 
@@ -125,21 +128,22 @@ export async function GET(request: NextRequest) {
       ? (data[0] as SimulationPaperStatsRow | undefined)
       : (data as SimulationPaperStatsRow | null);
     const value = mapStatsRow(paperKey, row);
-    statsCache.set(paperKey, {
-      expiresAt: Date.now() + MEMORY_CACHE_MS,
+    if(statsCache.size>=128)statsCache.delete(statsCache.keys().next().value!);
+    statsCache.set(cacheKey, {
+      expiresAt: Date.now() + (repairEnabled?60000:MEMORY_CACHE_MS),
       value
     });
 
-    return NextResponse.json(value, { headers: CACHE_HEADERS });
+    return NextResponse.json(value, { headers: responseHeaders });
   } catch (error) {
     console.warn("[simulation-paper-stats] read failed", error);
-    if (cached) {
-      return NextResponse.json(cached.value, { headers: CACHE_HEADERS });
+    if (cached && !repairEnabled) {
+      return NextResponse.json(cached.value, { headers: responseHeaders });
     }
 
     return NextResponse.json(
       buildUnavailableStats(paperKey, "級距暫時無法讀取，不影響開始作答。"),
-      { headers: CACHE_HEADERS }
+      { headers: responseHeaders }
     );
   }
 }

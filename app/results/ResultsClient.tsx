@@ -1995,6 +1995,7 @@ function ResultsPageContent() {
         explanation?: string;
         optionAnalysis?: Partial<Record<OptionKey, string>>;
         memoryTip?: string;
+        readingFormat?: "full-v1" | null;
         model?: string;
         message?: string;
       };
@@ -2014,6 +2015,7 @@ function ResultsPageContent() {
         explanation: payload.explanation ?? "",
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
+        readingFormat: payload.readingFormat === "full-v1" ? "full-v1" : null,
         model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };

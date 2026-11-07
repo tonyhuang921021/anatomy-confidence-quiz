@@ -1,4 +1,6 @@
 "use client";
+import {getActiveStorageUser} from "@/lib/storage";
+import {editCanonicalAnswer,syncAnswerEditMetadata,isAcceptedCompletion,canonicalCompletionResponse} from "@/lib/quizAnswerEdits";
 import { ExplanationMathText } from "@/components/ExplanationMathText";
 import {requestExplanation} from "@/lib/explanationRequestClient";
 
@@ -13,6 +15,8 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
+import {OriginalSessionExamRenderer} from "@/components/OriginalSessionExamRenderer";
+import {clearRendererAttempt,replaceRendererAttempt} from "@/lib/examRendererProjection";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
@@ -808,6 +812,13 @@ function getExpectedSimulationQuestionCount(
 }
 
 export default function QuizPage() {
+  const {session, loading} = useAuth();
+  // Auth identity owns every local UI state and pending callback in this tree.
+  if (loading) return <main className="shell" aria-busy="true">題目載入中...</main>;
+  return <OwnerQuizPage key={session?.user?.id ?? "guest"} />;
+}
+
+function OwnerQuizPage() {
   const router = useRouter();
   const {
     session: authSession,
@@ -827,13 +838,17 @@ export default function QuizPage() {
   const incrementalPracticePrefetchRef = useRef(false);
   const simulationExamTimerStateRef = useRef<SimulationExamTimerState | null>(null);
   const simulationExamTimerSessionIdRef = useRef<string | null>(null);
+  const [examPresentation,setExamPresentation] = useState(false);
+  const completingIds = useRef(new Set<string>());
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
+  useEffect(()=>{const change=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;setExplanationOverrides(current=>{const next={...current};if(saved)next[id]=saved;else delete next[id];return next;});};window.addEventListener("explanation-version-changed",change);return()=>window.removeEventListener("explanation-version-changed",change);},[]);
   useEffect(()=>{const recover=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;const override={...saved,updatedAt:new Date().toISOString()};saveQuestionExplanationOverride(id,override);setExplanationOverrides(current=>({...current,[id]:override}));setExplanationErrorMap(current=>({...current,[id]:''}));};window.addEventListener('explanation-recovered',recover);return()=>window.removeEventListener('explanation-recovered',recover)},[]);
 
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
+  const [completionNotice,setCompletionNotice]=useState("");
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
@@ -888,7 +903,7 @@ export default function QuizPage() {
   function flushDeferredCurrentSessionSave() {
     const pendingSession = takeDeferredCurrentSessionSave();
     if (pendingSession) {
-      saveCurrentSession(pendingSession);
+      saveCurrentSession(pendingSession, authSession?.user?.id ?? "guest");
     }
   }
 
@@ -901,7 +916,7 @@ export default function QuizPage() {
       const pendingSession = deferredCurrentSessionRef.current;
       deferredCurrentSessionRef.current = null;
       if (pendingSession) {
-        saveCurrentSession(pendingSession);
+        saveCurrentSession(pendingSession, authSession?.user?.id ?? "guest");
       }
     }, 120);
   }
@@ -934,7 +949,7 @@ export default function QuizPage() {
       currentSessionCloudSyncTimerRef.current = null;
       const pendingSession = currentSessionCloudPendingRef.current;
       currentSessionCloudPendingRef.current = null;
-      if (!pendingSession || pendingSession.completedAt) return;
+      if (!pendingSession || pendingSession.completedAt || getActiveStorageUser() !== authSession?.user?.id) return;
 
       currentSessionCloudLastQueuedAtRef.current = Date.now();
       void pushCurrentSessionToSupabase(pendingSession);
@@ -946,7 +961,7 @@ export default function QuizPage() {
     const pendingSession =
       forceSession ?? currentSessionCloudPendingRef.current ?? latestCurrentSessionRef.current;
     currentSessionCloudPendingRef.current = null;
-    if (!authSession?.user?.id || !pendingSession || pendingSession.completedAt) return;
+    if (!authSession?.user?.id || !pendingSession || pendingSession.completedAt || getActiveStorageUser() !== authSession.user.id) return;
 
     currentSessionCloudLastQueuedAtRef.current = Date.now();
     void pushCurrentSessionToSupabase(pendingSession, { force: true });
@@ -1511,6 +1526,7 @@ export default function QuizPage() {
 
   useEffect(() => {
     if (
+      examPresentation ||
       !effectiveKeyboardNavigationEnabled ||
       !session ||
       session.completedAt ||
@@ -1545,6 +1561,7 @@ export default function QuizPage() {
     errorType,
     isSubmittingAnswer,
     effectiveKeyboardNavigationEnabled,
+    examPresentation,
     mounted,
     selectedAnswer,
     session,
@@ -1556,6 +1573,7 @@ export default function QuizPage() {
     nextSession: QuizSession,
     options: { deferLocalSave?: boolean } = {}
   ) {
+    nextSession=syncAnswerEditMetadata(nextSession);
     latestCurrentSessionRef.current = nextSession;
     setSession(nextSession);
     scheduleCurrentSessionCloudSync(nextSession);
@@ -1755,6 +1773,9 @@ export default function QuizPage() {
         : [...nextSession.attempts, normalizedAttempt]
     };
 
+    if(nextSession.answerEdits && JSON.stringify(nextSession.answerEdits.entries[currentQuestion.id]?.value)!==JSON.stringify(normalizedAttempt)) {
+      return editCanonicalAnswer(nextSession,currentQuestion.id,normalizedAttempt);
+    }
     return nextSession;
   }
 
@@ -1953,12 +1974,40 @@ export default function QuizPage() {
     return saved !== false;
   }
 
-  function completeSessionAndNavigate(completedSession: QuizSession) {
-    const completedSessionWithEliminations = getSessionWithHydratedEliminatedOptions(
+  async function completeSessionAndNavigate(completedSession: QuizSession) {
+    const completionKey=JSON.stringify([authSession?.user?.id??"guest",completedSession.id]);
+    if(completingIds.current.has(completionKey))return;
+    completingIds.current.add(completionKey);
+    let completedSessionWithEliminations = syncAnswerEditMetadata(getSessionWithHydratedEliminatedOptions(
       getSessionWithSimulationTiming(completedSession)
-    );
+    ));
+    if(completedSessionWithEliminations.answerEdits&&authSession?.user?.id){
+      const prefix=`user-${authSession.user.id}:`;
+      const pendingId=completedSessionWithEliminations.id.startsWith(prefix)?completedSessionWithEliminations.id:!completedSessionWithEliminations.id.startsWith('user-')?prefix+completedSessionWithEliminations.id:null;
+      if(!pendingId){setCompletionNotice("回合與目前登入帳號不符，未送出交卷。");completingIds.current.delete(completionKey);setIsSubmittingAnswer(false);return;}
+      if(!queuePendingCompletedSessionUploadForUser(authSession.user.id,{...completedSessionWithEliminations,id:pendingId})){setCompletionNotice("本機儲存空間不足，請保留此頁，交卷尚未送出。");completingIds.current.delete(completionKey);setIsSubmittingAnswer(false);return;}
+      setCompletionNotice("正在確認交卷；作答已保留在本機。");
+      try{
+        const accepted=await pushCompletedSessionToSupabase(completedSessionWithEliminations);
+        if(getActiveStorageUser()!==authSession.user.id){completingIds.current.delete(completionKey);return;}
+        if(!accepted)throw Error("交卷尚未確認，作答已保留，恢復連線後可再確認。");
+        completedSessionWithEliminations=accepted;
+      }catch(error){
+        if(getActiveStorageUser()!==authSession.user.id){completingIds.current.delete(completionKey);return;}
+        const canonical=canonicalCompletionResponse(authSession.user.id,getActiveStorageUser(),completedSession.id,(error as {canonicalSessions?:QuizSession[]}).canonicalSessions);
+        if(canonical&&isAcceptedCompletion(canonical)){
+          // Another device's accepted terminal uses the same original result pipeline.
+          completedSessionWithEliminations=canonical;
+        }else{
+          if(canonical&&!canonical.completedAt){const recovered=loadCurrentSession();const draft=recovered&&(recovered.id===canonical.id||`user-${authSession.user.id}:${recovered.id}`===canonical.id)?recovered:canonical;setSession(draft);latestCurrentSessionRef.current=draft;saveCurrentSession(draft);setSubmittedAttempt(null);setSelectedAnswer(undefined);}
+          setCompletionNotice(error instanceof Error?error.message:"交卷尚未確認，作答已保留。");
+          completingIds.current.delete(completionKey);setIsSubmittingAnswer(false);return;
+        }
+      }
+    }
+    setCompletionNotice("");
     const savedLocally = finalizeCompletedSession(completedSessionWithEliminations);
-    void pushCompletedSessionToSupabase(completedSessionWithEliminations).catch((error) => {
+    if(!completedSessionWithEliminations.completionReceipt)void pushCompletedSessionToSupabase(completedSessionWithEliminations).catch((error) => {
       console.error("Completed session cloud handoff skipped; pending queue kept local copy:", error);
     });
     void pushQuestionStatsSnapshotToSupabase(completedSessionWithEliminations).catch((error) => {
@@ -2033,7 +2082,7 @@ export default function QuizPage() {
     setSubmittedAttempt(updatedAttempt);
   }
 
-  function handleSubmit(answerOverride?: OptionKey) {
+  function handleSubmit(answerOverride?: OptionKey, stayOnQuestion = false) {
     const answerToSubmit = answerOverride ?? selectedAnswer;
     if (!session || !currentQuestion || !answerToSubmit || isSubmittingAnswer) return;
     setSelectedAnswer(answerToSubmit);
@@ -2060,7 +2109,7 @@ export default function QuizPage() {
       );
     }
 
-    const nextSessionBase: QuizSession = {
+    let nextSessionBase: QuizSession = {
       ...setQuestionEliminatedOptions(
         session,
         currentQuestion.id,
@@ -2069,6 +2118,12 @@ export default function QuizPage() {
       attempts: [...session.attempts.filter((item) => item.questionId !== currentQuestion.id), attempt],
       isReviewingAnswer: effectiveFeedbackMode === "none" ? false : true
     };
+
+    if(session.answerEdits)nextSessionBase=editCanonicalAnswer(nextSessionBase,currentQuestion.id,attempt);
+    if (stayOnQuestion && session.settings?.mode === "simulation") {
+      persistSession(replaceRendererAttempt(latestCurrentSessionRef.current??session,attempt));
+      setSubmittedAttempt(null);setErrorType(undefined);setIsSubmittingAnswer(false);return;
+    }
 
     if (session.settings?.mode === "simulation" && effectiveFeedbackMode === "none") {
       const isLast = currentIndex >= targetCount - 1;
@@ -2115,6 +2170,21 @@ export default function QuizPage() {
     if (effectiveFastAnswerMode) {
       handleSubmit(value);
     }
+  }
+
+  function switchExamPresentation(next:boolean) {
+    if(!session||session.completedAt)return;
+    persistSession(examPresentation ? (latestCurrentSessionRef.current??session) : getSessionWithCurrentDraft(session));
+    setExamPresentation(next);
+  }
+  function clearExamAnswer() {
+    if(!session||!currentQuestion||session.completedAt)return;
+    persistSession(clearRendererAttempt(latestCurrentSessionRef.current??session,currentQuestion.id));
+    resetQuestionUI();
+  }
+  function finishExamPresentation() {
+    if(!session||session.completedAt)return;
+    completeSessionAndNavigate({...latestCurrentSessionRef.current??session,completedAt:new Date().toISOString(),isReviewingAnswer:false});
   }
 
   function handleToggleEliminatedOption(value: OptionKey) {
@@ -2264,6 +2334,7 @@ export default function QuizPage() {
         explanation?: string;
         optionAnalysis?: Partial<Record<OptionKey, string>>;
         memoryTip?: string;
+        readingFormat?: "full-v1" | null;
         model?: string;
         message?: string;
       };
@@ -2283,6 +2354,7 @@ export default function QuizPage() {
         explanation: payload.explanation ?? "",
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
+        readingFormat: payload.readingFormat === "full-v1" ? "full-v1" : null,
         model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
@@ -2594,9 +2666,15 @@ export default function QuizPage() {
         ? "本題為官方送分題：本輪直接視為答對。"
         : null;
 
+  if(examPresentation&&process.env.NEXT_PUBLIC_EXAM_RENDERER_ENABLED==='true'&&session.settings?.mode==='simulation'&&!session.completedAt&&!session.examSessionSync){
+    return <>{completionNotice?<p role="status" className="mx-auto max-w-5xl p-3">{completionNotice}</p>:null}<OriginalSessionExamRenderer key={`${authSession?.user?.id??'guest'}:${session.id}`} session={session} questions={questionSet} owner={authSession?.user?.id??'guest'} elapsed={simulationTimerElapsedSeconds} paused={simulationTimerPaused} disabled={isSubmittingAnswer} onAnswer={option=>handleSubmit(option,true)} onClear={clearExamAnswer} onNavigate={handleJumpToQuestion} onStandard={()=>switchExamPresentation(false)} onFinish={finishExamPresentation} onPause={handleToggleSimulationTimerPaused}/></>;
+  }
+
   return (
     <main id="main-content" data-answer-actions={submittedAttempt ? "true" : undefined} className={`study-quiz shell ${submittedAttempt ? "pb-28 sm:pb-0" : ""}`}>
       <div ref={questionTopRef} />
+      {completionNotice?<p role="status" className="mb-3 rounded border p-3">{completionNotice}</p>:null}
+      {process.env.NEXT_PUBLIC_EXAM_RENDERER_ENABLED==='true'&&session.settings?.mode==='simulation'&&!session.completedAt&&!session.examSessionSync?<button className="mb-3 inline-block underline" onClick={()=>switchExamPresentation(true)}>切換仿國考介面</button>:null}
       <header className="mb-5 border-b border-slate-200/80 pb-3">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <Link href="/" className="text-sm font-semibold text-slate-600 transition hover:text-brand-700">

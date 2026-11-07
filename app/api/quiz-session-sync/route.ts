@@ -5,6 +5,7 @@ import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { shouldProtectExistingCompletedSession } from "@/lib/quizSessionSyncSafety";
 import { buildSimulationPaperScoreRow } from "@/lib/simulationPaperStats";
 import {
+  mergeQuizSessionProgressPayload,
   buildQuizSessionProgressPayload,
   hasQuizSessionDefinitionChanged,
   omitHeavySessionPayload,
@@ -136,6 +137,8 @@ function buildSessionPayloadForCloud(
     settings: compacted.settings,
     questionOrder: compacted.questionOrder,
     optionEliminationMap: compacted.optionEliminationMap,
+    examSessionSync: compacted.examSessionSync,
+    answerEdits: compacted.answerEdits,
     simulationElapsedSeconds: compacted.simulationElapsedSeconds,
     simulationTimerDurationSeconds: compacted.simulationTimerDurationSeconds,
     scoreRevisions: compacted.scoreRevisions,
@@ -343,7 +346,11 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json().catch(() => null)) as QuizSessionSyncRequestBody | null;
     const inputSessions = Array.isArray(body?.sessions) ? body.sessions.slice(0, MAX_SYNC_SESSIONS) : [];
-    const sessions = canonicalizeSessionsForUser(userId, normalizeSessions(inputSessions as QuizSession[]));
+    let sessions = canonicalizeSessionsForUser(userId, normalizeSessions(inputSessions as QuizSession[]));
+    if(sessions.some(s=>s.answerEdits && (!s.id.startsWith(`user-${userId}:`) || s.id.slice(`user-${userId}:`.length).startsWith("user-"))))return NextResponse.json({ok:false,code:"OWNER_MISMATCH"},{status:403});
+    if (sessions.some(session => session.examSessionSync !== undefined)) {
+      return NextResponse.json({ ok:false, message:"仿真作答需要版本化交易承接；舊同步不會覆寫。", code:"EXAM_CHECKPOINT_REQUIRED" }, {status:409,headers:{"Cache-Control":"no-store"}});
+    }
     const attemptCount = sessions.reduce((sum, session) => sum + session.attempts.length, 0);
 
     if (sessions.length === 0) {
@@ -360,6 +367,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const edited=sessions.filter(s=>s.answerEdits);
+    let editedCount=0;
+    const canonicalSessions:QuizSession[]=[];
+    if(edited.length){
+      if(process.env.QUIZ_ANSWER_EDITS_ENABLED!=="true")return NextResponse.json({ok:false,code:"ANSWER_EDIT_SYNC_DISABLED"},{status:503});
+      for(const s of edited){
+        const {data,error}=await supabase.rpc("sync_quiz_answer_edits",{p_owner:userId,p_row:buildSessionRowForCloud(userId,s,{includeAttemptsInPayload:true}),p_admit:process.env.QUIZ_ANSWER_EDITS_ADMISSION_ENABLED!=="false"});
+        if(error)return NextResponse.json({ok:false,code:"ANSWER_EDIT_CONFLICT",message:formatError(error)},{status:409});
+        if(data?.conflict==="ENROLLMENT_PAUSED")return NextResponse.json({ok:false,code:data.conflict,message:"暫停接入新的仿國考回合；作答仍保留在本機，請稍後同步。",acceptedCanonicalSessions:canonicalSessions},{status:409,headers:{"Cache-Control":"no-store"}});
+        if(data?.conflict)return NextResponse.json({ok:false,code:data.conflict,canonicalSessions:[data.canonical],acceptedCanonicalSessions:canonicalSessions},{status:409,headers:{"Cache-Control":"no-store"}});
+        canonicalSessions.push(data as QuizSession);
+        // Scores come only from the accepted canonical state, never the rejected snapshot.
+        await storeSimulationPaperScores(supabase,normalizeSessions([data as QuizSession]));
+        editedCount++;
+      }
+      sessions=sessions.filter(s=>!s.answerEdits);
+      if(!sessions.length)return NextResponse.json({ok:true,uploadedSessions:editedCount,canonicalSessions},{headers:{"Cache-Control":"no-store"}});
+    }
     const activeCheckpoint = body?.activeCheckpoint === true;
     const rows = dedupeSessionRows(
       sessions.map((session) =>
@@ -377,7 +402,7 @@ export async function POST(request: NextRequest) {
     if (rows.length > 0) {
       const { data, error: existingError } = await supabase
         .from("quiz_sessions")
-        .select("id, mode, completed_at, correct_count, wrong_count, average_confidence, started_at, session_payload, progress_payload, updated_at")
+        .select("id, subject, mode, completed_at, correct_count, wrong_count, average_confidence, started_at, session_payload, progress_payload, updated_at")
         .eq("user_id", userId)
         .in("id", rows.map((row) => row.id));
 
@@ -390,6 +415,11 @@ export async function POST(request: NextRequest) {
           continue;
         }
         const incomingRow = incomingRowsById.get(existingRow.id);
+        if(existingRow.session_payload?.answerEdits){
+          const canonical={...mergeQuizSessionProgressPayload(existingRow.session_payload,existingRow.progress_payload),id:existingRow.id,subject:existingRow.subject,startedAt:existingRow.started_at,completedAt:existingRow.completed_at??undefined};
+          return NextResponse.json({ok:false,code:"ANSWER_EDIT_REVISION_REQUIRED",canonicalSessions:[canonical]},{status:409,headers:{"Cache-Control":"no-store"}});
+        }
+
         if (
           incomingRow &&
           shouldProtectExistingCompletedSession(
@@ -438,7 +468,7 @@ export async function POST(request: NextRequest) {
         !protectedCompletedSessionIds.has(row.id)
     );
     const scoreSummarySessions = sessions.filter(
-      (session) => !discardedSessionIds.has(session.id)
+      (session) => !discardedSessionIds.has(session.id) && !protectedCompletedSessionIds.has(session.id)
     );
 
     if (safeRows.length === 0) {
@@ -514,7 +544,7 @@ export async function POST(request: NextRequest) {
     await storeSimulationPaperScores(supabase, scoreSummarySessions);
 
     return NextResponse.json(
-      { ok: true, uploadedSessions: safeRows.length, uploadedAttempts: attemptRows.length },
+      { ok: true, uploadedSessions: safeRows.length, uploadedAttempts: attemptRows.length, canonicalSessions },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (syncError) {

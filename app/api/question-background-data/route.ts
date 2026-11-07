@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
       const { data, error } = await withServerTimeout(
         supabase
           .from("question_explanation_overrides")
-          .select("question_id, explanation, option_analysis, memory_tip, model, updated_at")
+          .select("question_id, explanation, option_analysis, memory_tip, model, updated_at, replacement_revision, reading_format")
           .in("question_id", questionIds),
         1800,
         "共享詳解讀取逾時"

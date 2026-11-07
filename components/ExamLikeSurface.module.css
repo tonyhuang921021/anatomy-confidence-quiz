@@ -1,0 +1,223 @@
+.root :global(*) { box-sizing: border-box; }
+.root { color-scheme: light; font-family: Arial, "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif; color: #242724; background: #e8eae7; }
+.root { margin: 0; }
+.root :global(button), .root :global(select), .root :global(input) { font: inherit; }
+.root :global(button) { cursor: pointer; }
+.root :global(button:disabled) { cursor: default; opacity: .45; }
+.root :global(button:focus-visible), .root :global(select:focus-visible), .root :global(input:focus-visible) { outline: 3px solid #2667aa; outline-offset: 3px; }
+.root :global(.preview-bar) { max-width: 1336px; margin: 0 auto; padding: 15px 18px 13px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #555c52; font-size: 13px; }
+.root :global(.preview-bar strong) { color: #314131; }
+.root :global(.preview-bar small) { margin-left: 12px; }
+.root :global(.preview-links) { display: flex; gap: 16px; }
+.root :global(.preview-links button) { border: 0; border-bottom: 1px solid #969f92; background: transparent; padding: 3px 0; color: #3e533c; font-size: 12px; }
+.root :global(.exam-shell) { max-width: 1300px; margin: 0 auto 28px; min-height: calc(100vh - 85px); background: #fff; border: 1px solid #bcc1b9; box-shadow: 0 2px 9px #2c36271a; display: flex; flex-direction: column; }
+.root :global(.exam-header) { padding: 0 18px 7px; background: #f8f9f6; border-bottom: 4px ridge #d2d5cf; }
+.root :global(.exam-title) { min-height: 34px; display: flex; align-items: center; gap: 5px; margin: 0 -1px; padding: 5px 12px; font-size: 17px; background: linear-gradient(#c4e9b5 0%, #e9f4df 62%, #f8faf5 100%); border: 1px solid #dde7d5; }
+.root :global(.exam-title strong) { font-weight: 600; }
+.root :global(.preview-tag) { font-size: 12px; font-weight: 400; padding: 2px 7px; color: #4e6844; border: 1px solid #a9b99e; border-radius: 3px; margin-left: auto; }
+.root :global(.candidate-panel) { background: linear-gradient(#f4f4f4,#eceeec); padding: 12px 14px 14px; border: 1px solid #c7cac5; border-top: 0; border-radius: 0 0 10px 10px; box-shadow: inset 2px 0 3px #fff, inset -2px -3px 3px #d8dcd5; }
+.root :global(.candidate-top) { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 14px; border-bottom: 1px dotted #91998d; }
+.root :global(.identity) { display: grid; grid-template-columns: repeat(3,auto); gap: 10px 46px; font-size: 17px; }
+.root :global(.subject) { grid-column: 1 / -1; }
+.root :global(.header-actions) { display: flex; gap: 12px; padding-top: 3px; }
+.root :global(.silver) { border: 1px solid #81877e; border-radius: 7px; color: #31382e; background: linear-gradient(#f4f5f2,#d9dcd6 47%,#bdc3b8 51%,#ebede8); padding: 8px 13px; min-height: 36px; white-space: nowrap; box-shadow: inset 1px 1px 1px white, inset -1px -1px 2px #9da496, 0 1px 3px #0002; font-size: 14px; text-shadow: 0 1px white; }
+.root :global(.silver:not(:disabled):hover) { filter: brightness(1.04); border-color: #4c5e44; }
+.root :global(.silver:not(:disabled):active) { background: #c9cec5; box-shadow: inset 1px 1px 3px #0003; transform: translateY(1px); }
+.root :global(.exam-stats) { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 0; padding-top: 14px; font-size: 17px; }
+.root :global(.exam-stats > span) { border-right: 1px solid #aeb5a8; padding: 0 16px; }
+.root :global(.exam-stats > span:first-child) { padding-left: 0; }
+.root :global(.exam-stats > span:last-child) { border: 0; padding-right: 0; margin-left: auto; }
+.root :global(.exam-stats b) { color: #962850; font-variant-numeric: tabular-nums; letter-spacing: .5px; font-weight: 700; }
+.root :global(.timer) { white-space: nowrap; }
+.root :global(.urgent) { color: #b51f2c !important; }
+.root :global(.answer-area) { flex: 1; padding: 15px 18px 30px; }
+.root :global(.toolbar) { display: flex; gap: 26px; align-items: center; margin-bottom: 36px; }
+.root :global(.question-nav) { display: flex; flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
+.root :global(.answer-tools) { flex: 1; }
+.root :global(.flags) { border: 0; padding: 0; margin: 0 0 10px; display: flex; gap: 24px; align-items: center; min-width: 0; }
+.root :global(.flags legend) { float: left; margin: 0 15px 0 0; padding: 0; font-size: 17px; }
+.root :global(.flags label) { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; white-space: nowrap; font-size: 17px; }
+.root :global(.flags input), .root :global(.option input) { accent-color: #375b34; width: 18px; height: 18px; margin: 0; flex-shrink: 0; }
+.root :global(.flag) { font-size: 16px; line-height: 1; display: inline-block; text-shadow: 0 1px 1px #0002; }
+.root :global(.triangle) { color: #d1a010; }.root :global(.circle) { color: #ce3e26; }.root :global(.square) { color: #2a99b8; }
+.root :global(.single-note) { font-size: 15px; line-height: 1.7; margin: 0; max-width: 600px; }
+.root :global(.jump) { white-space: nowrap; font-size: 16px; }
+.root :global(.jump select) { padding: 3px 4px; min-width: 55px; border: 1px solid #8c9487; background: white; }
+.root :global(.question-caption) { display: flex; align-items: center; gap: 22px; margin: 0 0 21px; }
+.root :global(.question-caption h1) { font-size: 20px; font-weight: 400; margin: 0; }.root :global(.question-caption h1 b) { color: #92294d; }
+.root :global(.font-controls) { display: flex; align-items: center; gap: 14px; font-size: 14px; }.root :global(.font-controls button) { padding: 0; border: 0; background: none; text-decoration: underline; color: #8a2648; }.root :global(.font-controls span) { color: #454a42; }
+.root :global(.question-body) { font-family: "Noto Serif CJK TC", "PMingLiU", "Times New Roman", serif; font-size: calc(20px * var(--question-scale,1)); line-height: 1.65; overflow-wrap: anywhere; }
+.root :global(.stem) { margin: 0 0 22px; white-space: pre-line; }
+.root :global(.options) { border: none; padding: 0; margin: 0; }
+.root :global(.option) { display: flex; align-items: flex-start; gap: 24px; padding: 8px 14px 10px 8px; margin: 2px 0; max-width: 1120px; min-height: 65px; cursor: pointer; border: 1px solid transparent; border-radius: 2px; }
+.root :global(.option:hover) { background: #fafbf7; }.root :global(.option.selected) { background: #f2f7ed; border-color: #d4dfca; }
+.root :global(.option-key) { display: flex; flex-direction: column; align-items: center; line-height: 1.05; gap: 2px; min-width: 32px; }.root :global(.option input) { width: 20px; height: 20px; }
+.root :global(.option-text) { padding-top: 2px; }.root :global(.mobile-bottom) { display: none; }
+.root :global(.exam-footer) { margin-top: auto; border-top: 1px solid #e7e9e4; padding: 13px 20px; display: flex; justify-content: space-between; gap: 16px; color: #73776e; font-size: 12px; line-height: 1.6; }
+.root :global(.text-button) { border: 0; background: transparent; padding: 0; text-decoration: underline; color: #5a6752; white-space: nowrap; font-size: 12px; }
+.root :global(.review-area) { flex: 1; padding: 35px 42px 65px; }.root :global(.review-intro) { font-size: 15px; color: #565e50; margin: 0 0 21px; }.root :global(.review-intro b) { color: #962850; }
+.root :global(.review-table) { border: 1px solid #c9cfc2; }.root :global(.review-group) { overflow-x: auto; }.root :global(.review-group table) { border-collapse: collapse; table-layout: fixed; width: 100%; min-width: 690px; font-size: 17px; }.root :global(.review-group td), .root :global(.review-group th) { text-align: center; padding: 0; height: 39px; border-bottom: 1px solid #d5dacd; }.root :global(.review-group th) { font-weight: 400; background: #f1f1e8; width: 70px; }.root :global(.review-group tr:first-child) { background: #edf0e9; }.root :global(.review-group tr:first-child button) { color: #3c6479; }.root :global(.review-group td button) { background: transparent; width: 100%; min-height: 39px; padding: 5px 1px; border: 0; font-size: inherit; }.root :global(.review-group td button:hover) { box-shadow: inset 0 0 0 2px #66885a; }.root :global(.review-group .unanswered) { background: #f3bdc1; color: #7b3342; font-size: 13px; }.root :global(.review-group .answered) { background: #fffef3; color: #2a3924; }.root :global(.review-group .flag) { font-size: 12px; }
+.root :global(.review-legend) { font-size: 13px; color: #5a6155; line-height: 1.8; margin-top: 20px; }.root :global(.review-legend .flag) { margin-left: 4px; }.root :global(.legend-pink) { display: inline-block; width: 14px; height: 14px; background: #f3bdc1; vertical-align: -2px; border: 1px solid #d99ba1; }.root :global(.review-mobile-hint) { display: none; }
+.root :global(.preparation-area) { flex: 1; padding: 24px 36px; }.root :global(.prep-top) { text-align: right; }.root :global(.welcome) { margin: 50px auto 70px; padding: 35px 20px; max-width: 900px; border-top: 1px solid #c9cfc3; border-bottom: 1px solid #c9cfc3; text-align: center; line-height: 1.9; }.root :global(.welcome h1) { font-size: 22px; font-weight: 400; }.root :global(.welcome p) { font-size: 17px; }.root :global(.welcome .prep-small) { font-size: 14px; color: #777e70; }.root :global(.welcome .silver) { margin-top: 20px; }
+.root :global(.completed-area) { padding: 75px 25px; text-align: center; flex: 1; }.root :global(.completed-area h1) { font-size: 24px; font-weight: 500; }.root :global(.complete-icon) { display: inline-grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: #e3eed9; color: #4b6e3b; font-size: 30px; }.root :global(.muted) { color: #737b6d; font-size: 14px; line-height: 1.8; }
+.root :global(.dialog) { max-width: min(460px,calc(100vw - 32px)); border: 1px solid #9aa28f; border-radius: 6px; padding: 0; color: #2e3529; box-shadow: 0 12px 50px #0004; }.root :global(.dialog::backdrop) { background: #1821137a; }.root :global(.dialog h2) { font-size: 19px; font-weight: 500; padding: 13px 20px; background: linear-gradient(#d9ebca,#edf4e5); margin: 0; border-bottom: 1px solid #c7d5ba; }.root :global(.dialog .dialog-body) { padding: 10px 22px 18px; line-height: 1.8; font-size: 15px; }.root :global(.dialog b) { color: #962850; }.root :global(.dialog p) { margin: 13px 0; }.root :global(.dialog-actions) { display: flex; gap: 12px; justify-content: flex-end; padding: 0 22px 22px; }.root :global(.dialog .confirm) { background: #516d42; color: white; border: 1px solid #405936; border-radius: 5px; padding: 9px 15px; min-height: 42px; }
+.root :global(.storage-warning) { margin: 0; padding: 7px 18px; color: #8b3a24; background: #fff1dc; font-size: 13px; }.root :global(.sr-only) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (max-width: 1100px) { .root :global(.identity) { gap: 10px 25px; font-size: 15px; }.root :global(.exam-stats) { font-size: 15px; }.root :global(.exam-stats > span) { padding: 0 11px; }.root :global(.toolbar) { flex-wrap: wrap; gap: 18px; }.root :global(.answer-tools) { order: 2; flex-basis: 100%; }.root :global(.jump) { margin-left: auto; }.root :global(.flags) { justify-content: flex-start; }.root :global(.single-note) { max-width: none; } }
+@media (max-width: 640px) {
+ .root { background: #fff; }.root :global(.preview-bar) { padding: 10px 12px; font-size: 11px; gap: 7px; flex-wrap: wrap; }.root :global(.preview-bar small) { display: none; }.root :global(.preview-links) { gap: 12px; }.root :global(.preview-links button) { font-size: 11px; }.root :global(.exam-shell) { margin: 0; min-height: calc(100vh - 42px); border-left: 0; border-right: 0; box-shadow: none; }.root :global(.exam-header) { padding: 0 7px 6px; border-bottom-width: 3px; }.root :global(.exam-title) { font-size: 14px; padding: 7px; gap: 0; }.root :global(.preview-tag) { font-size: 10px; padding: 1px 4px; }.root :global(.candidate-panel) { padding: 10px 9px; border-radius: 0 0 7px 7px; }.root :global(.candidate-top) { display: block; padding-bottom: 11px; }.root :global(.identity) { grid-template-columns: 1fr 1fr; gap: 6px 10px; font-size: 13px; }.root :global(.identity > .seat) { display: none; }.root :global(.subject) { grid-column: auto; }.root :global(.header-actions) { padding-top: 13px; gap: 8px; justify-content: flex-end; }.root :global(.silver) { font-size: 13px; min-height: 39px; padding: 7px 10px; border-radius: 5px; }.root :global(.exam-stats) { font-size: 13px; gap: 8px 0; padding-top: 10px; }.root :global(.exam-stats .seat) { display: none; }.root :global(.exam-stats > span) { padding: 0 9px; }.root :global(.exam-stats > span:nth-child(2)) { padding-left: 0; }.root :global(.exam-stats > span:nth-child(4)) { border: 0; padding-right: 0; }.root :global(.exam-stats > span:last-child) { margin-left: 0; padding: 0; flex-basis: 100%; }.root :global(.timer b) { font-size: 19px; margin-left: 2px; }.root :global(.answer-area) { padding: 13px 12px 0; }.root :global(.toolbar) { gap: 14px 7px; margin-bottom: 23px; align-items: center; }.root :global(.question-nav) { gap: 5px; width: 100%; }.root :global(.question-nav .silver) { flex: 1; }.root :global(.answer-tools) { margin-top: 0; flex-basis: 100%; order: 3; }.root :global(.flags) { gap: 16px; margin: 0; flex-wrap: wrap; min-height: 30px; }.root :global(.flags legend) { font-size: 13px; margin-right: 1px; }.root :global(.flags label) { font-size: 13px; gap: 3px; }.root :global(.flags input) { width: 17px; height: 17px; }.root :global(.flag) { font-size: 14px; }.root :global(.single-note) { display: none; }.root :global(.jump) { order: 4; font-size: 13px; margin-left: 0; margin-top: 2px; }.root :global(.jump select) { padding: 5px; min-width: 62px; }.root :global(.question-caption) { gap: 12px; margin-bottom: 17px; align-items: flex-start; flex-wrap: wrap; }.root :global(.question-caption h1) { font-size: 18px; }.root :global(.font-controls) { gap: 12px; flex-wrap: wrap; font-size: 12px; line-height: 24px; }.root :global(.font-controls span) { font-size: 11px; }.root :global(.question-body) { font-size: calc(18px * var(--question-scale,1)); line-height: 1.7; }.root :global(.stem) { margin-bottom: 16px; }.root :global(.option) { min-height: 62px; gap: 13px; padding: 9px 7px 10px; margin: 1px 0; }.root :global(.option-key) { min-width: 25px; }.root :global(.option input) { width: 19px; height: 19px; }.root :global(.option-text) { padding: 0; }.root :global(.mobile-bottom) { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #dbe0d5; padding: 12px 0; margin-top: 27px; font-size: 13px; color: #66705d; }.root :global(.mobile-bottom .silver) { min-width: 106px; }.root :global(.exam-footer) { display: block; padding: 12px; font-size: 11px; }.root :global(.exam-footer .text-button) { margin-top: 8px; font-size: 11px; }.root :global(.review-area) { padding: 22px 12px 45px; }.root :global(.review-intro) { font-size: 13px; line-height: 1.7; }.root :global(.review-group table) { min-width: 625px; font-size: 15px; }.root :global(.review-group th) { width: 48px; position: sticky; left: 0; z-index: 1; }.root :global(.review-mobile-hint) { display: block; font-size: 12px; color: #6c7862; }.root :global(.review-legend) { font-size: 12px; }.root :global(.preparation-area) { padding: 18px 15px; }.root :global(.welcome) { margin-top: 26px; padding: 24px 0; }.root :global(.welcome h1) { font-size: 21px; }.root :global(.welcome p) { font-size: 15px; }.root :global(.completed-area) { padding: 55px 15px; }.root :global(.completed-area h1) { font-size: 21px; }
+}
+
+.root{isolation:isolate}.root :global(.save-notice){padding:10px 16px;background:#edf5e9;font-size:14px}.root :global(.error-notice){background:#fff0dd}.root :global(.standard-view){max-width:1000px;margin:20px auto;padding:0 16px}.root :global(.runtime-dialog){display:block;position:fixed;inset:0;margin:auto;z-index:10000;max-height:90vh;overflow:auto}.root :global(.dialog-shade){position:fixed;inset:0;z-index:9999;background:#1821137a}.root :global(.result-link){display:inline-block;padding:12px;border:1px solid #72816c;margin:10px}
+
+.root :global(.timer-policy){font-size:13px;line-height:1.7;margin:4px 0}.root :global(.timer-policy button){margin-left:8px}
+
+/* Plain desktop exam reconstruction. Scoped; original mobile/standard quiz stays unchanged. */
+.root { background:#fff; color:#111; font-family:Arial,"PMingLiU","Microsoft JhengHei",sans-serif; font-size:13px; }
+.root :global(.preview-bar){padding:4px 8px;font-size:11px;max-width:1220px;}
+.root :global(.exam-shell){max-width:1200px;margin:6px auto;min-height:calc(100vh - 60px);border:1px solid #aaa;box-shadow:none;}
+.root :global(.exam-header){padding:0 6px 4px;background:#fff;border-bottom:1px solid #aaa;}
+.root :global(.exam-title){min-height:22px;padding:2px 6px;font-size:13px;background:#dceccb;border:0;}
+.root :global(.preview-tag){border:0;padding:0;font-size:10px;}
+.root :global(.candidate-panel){padding:5px 7px;background:#f3f3f3;border:1px solid #aaa;border-radius:0;box-shadow:none;}
+.root :global(.candidate-top){gap:8px;padding-bottom:5px;}
+.root :global(.identity){font-size:13px;gap:3px 30px;}
+.root :global(.header-actions){padding:0;gap:6px;}
+.root :global(.silver),.root :global(.confirm){font-size:12px;min-height:24px;padding:2px 7px;border-radius:2px;border:1px solid #888;background:#e7e7e7;color:#111;box-shadow:none;text-shadow:none;}
+.root :global(.silver:not(:disabled):active){box-shadow:inset 1px 1px #aaa;transform:none;}
+.root :global(.exam-stats){font-size:13px;gap:4px;padding-top:5px;}
+.root :global(.exam-stats > span){padding:0 9px;}
+.root :global(.timer-policy){font-size:11px;line-height:1.3;margin:3px 0;}
+.root :global(.answer-area){padding:8px 10px 16px;}
+.root :global(.toolbar){gap:14px;margin-bottom:14px;}
+.root :global(.question-nav){gap:5px;}
+.root :global(.flags){gap:12px;margin:0 0 4px;}
+.root :global(.flags legend),.root :global(.flags label),.root :global(.jump){font-size:12px;}
+.root :global(.flags input),.root :global(.option input){width:13px;height:13px;}
+.root :global(.single-note){font-size:11px;line-height:1.4;}
+.root :global(.question-caption){gap:9px;margin-bottom:10px;}
+.root :global(.question-caption h1){font-size:14px;}
+.root :global(.font-controls){gap:7px;font-size:12px;}
+.root :global(.question-body){font-size:calc(15px * var(--question-scale,1));line-height:1.55;}
+.root :global(.option){min-height:30px;margin:0;padding:4px 3px;gap:8px;border-radius:0;}
+.root :global(.option.selected){background:#f0f0f0;box-shadow:none;}
+.root :global(.exam-footer){font-size:10px;padding:5px 8px;background:white;}
+.root :global(.save-notice){font-size:11px;padding:4px 8px;margin:0;background:#f5f5f5;}
+.root :global(.review-area){padding:10px;}.root :global(.review-group table){font-size:13px;}
+.root :global(.review-area h1){font-size:16px;}.root :global(.review-intro){font-size:12px;}
+.root :global(.entry-panel){max-width:920px;margin:12px auto;border:1px solid #aaa;background:#fff;padding:12px;}
+.root :global(.entry-panel h1){font-size:17px;font-weight:normal;background:#dceccb;margin:-12px -12px 12px;padding:5px 10px;}
+.root :global(.entry-disclaimer){max-width:920px;margin:8px auto;font-size:11px;}
+.root :global(.entry-field){display:block;margin:16px 0;}.root :global(.entry-field input){border:1px solid #888;padding:3px 5px;background:white;min-width:220px;}
+.root :global(.entry-panel p){margin:8px 0;}.root :global(.entry-panel fieldset){border:1px solid #aaa;padding:8px;margin:12px 0;}
+.root :global(.entry-table){border-collapse:collapse;margin:8px 0 14px;}.root :global(.entry-table th),.root :global(.entry-table td){border:1px solid #aaa;padding:5px 9px;text-align:left;}
+.root :global(.entry-table th){font-weight:normal;background:#eee;}
+.root :global(.practice-option){display:block;padding:5px 0;}.root :global(.entry-footnote){font-size:11px;color:#555;margin-top:15px;}
+.root :global(.preliminary-score){border:1px solid #999;padding:10px;margin:12px 0;font-size:15px;}
+@media(max-width:767px){.root :global(.entry-panel){margin:12px;padding:12px}.root :global(.dialog){max-width:calc(100vw - 24px);width:340px}.root :global(.dialog-actions){flex-wrap:wrap;}.root :global(.entry-disclaimer){margin:8px 12px}}
+.root :global(.option-key){font:inherit;color:inherit;min-width:0;padding:0;background:none;border:0;box-shadow:none}.root :global(.option-key)::before{content:"("}.root :global(.option-key)::after{content:")"}.root :global(.option-text){font:inherit;color:inherit;line-height:inherit}
+.root :global(.bottom-nav){margin-top:auto;padding-top:18px}.root :global(.answer-area){display:flex;flex-direction:column}.root :global(.question-body){margin-bottom:18px}
+.root :global(.review-group){margin:0;overflow:visible}.root :global(.review-group table){width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;font-size:14px}.root :global(.review-group td),.root :global(.review-group th){border:1px solid #999;padding:4px 2px;font-weight:normal;text-align:center}.root :global(.review-group tr:first-child){background:#e9eeee}.root :global(.review-group tr:nth-child(2) th){background:#ffffd1}.root :global(.review-group .unanswered){background:#ffb6c1}.root :global(.review-group .answered){background:#ffffc4}.root :global(.review-group button){padding:0;color:#245899;text-decoration:none;font:inherit}.root :global(.review-group .flag){margin-right:2px}.root :global(.review-table){gap:0;display:block}
+.root :global(.score-choice-panel){max-width:650px;margin:0 auto;padding:15px 20px;text-align:center;background:linear-gradient(#fff 85%,#ececec);border:1px solid #ddd}.root :global(.score-choice-panel fieldset){border:0;display:flex;justify-content:center;gap:14px;align-items:center;margin:8px 0;padding:4px}.root :global(.score-choice-panel legend){float:left;text-align:right;font-size:15px}.root :global(.score-choice-panel strong),.root :global(.simulation-warning){color:#c9003a}.root :global(.score-choice-panel p){font-size:12px}.root :global(.simulation-warning){font-size:13px;max-width:680px;margin:18px auto}
+
+/* Official public mock reference: full fictional header and two whole-page confirmations. */
+.root :global(.exam-title){background:linear-gradient(#bbdfac,#f4f9ee);font-size:15px;min-height:26px}
+.root :global(.candidate-panel){background:#eee;border-radius:0 0 6px 6px}
+.root :global(.identity){grid-template-columns:repeat(3,auto);font-size:15px;gap:4px 28px}
+.root :global(.exam-stats){font-size:15px;gap:4px 0;padding:9px 0 5px;flex-wrap:nowrap}
+.root :global(.exam-stats > span){padding:0 12px}.root :global(.exam-stats small){font-size:11px}
+.root :global(.silver){background:linear-gradient(#f8f8f8,#ddd 50%,#c4c4c4 51%,#f3f3f3);box-shadow:inset 1px 1px white,inset -1px -1px #aaa}
+.root :global(.confirm-page){min-height:90vh;background:linear-gradient(#fff 0 155px,#edf3bd 156px,#fff 380px);padding-bottom:40px}
+.root :global(.confirm-banner){height:115px;background:linear-gradient(165deg,#fff 20%,#fff999 21%,#fff9bc 65%,#fff 90%);padding:24px max(20px,calc((100vw - 800px)/2));white-space:nowrap;border-bottom:4px double #e4df75}
+.root :global(.confirm-banner span){display:block;font-size:13px;color:#555}.root :global(.confirm-banner strong){font-size:26px;color:#355b2b}
+.root :global(.confirm-sheet){width:min(640px,calc(100% - 40px));min-height:250px;margin:32px auto 120px;padding:45px 25px 35px;border:1px solid #eee;border-radius:8px;background:linear-gradient(white 85%,#e6e6e6);text-align:center}
+.root :global(.confirm-sheet h2),.root :global(.confirm-sheet > p:not(.confirm-count)){font-size:18px;font-weight:bold;color:#0000c5;margin:8px 0 22px}
+.root :global(.confirm-buttons){display:flex;justify-content:center;gap:10px}.root :global(.confirm-buttons button){min-width:90px;min-height:32px;font-size:17px;color:white;background:linear-gradient(#81c9c2,#41998e);border:1px solid #46978e}
+.root :global(.confirm-count){font-size:12px;color:#555;margin:8px 0}.root :global(.confirm-footnote){text-align:center;font-size:12px;color:#41683b}
+.root :global(.completion-paper){width:650px;max-width:calc(100% - 32px);min-height:600px;padding:20px 35px;margin:10px auto 25px;border:1px solid #ddd;box-shadow:8px 10px 8px #0004;background:white}
+.root :global(.completion-paper header span){font-size:14px;color:#666}.root :global(.completion-paper h1){font-size:25px;color:#31582a;font-weight:bold;margin:0 0 16px}
+.root :global(.completion-info){width:100%;border-collapse:collapse;font-size:16px}.root :global(.completion-info th){font-weight:normal;width:130px}.root :global(.completion-info td){text-align:center}.root :global(.completion-info tr:nth-child(even)){background:#edf0f0}.root :global(.completion-info th),.root :global(.completion-info td){padding:3px 7px}
+.root :global(.completion-paper h2){font-size:24px;text-align:center;margin:110px 0 20px;font-weight:bold}.root :global(.completion-paper > p){font-size:12px;text-align:center;color:#666}
+.root :global(.completion-links){max-width:650px;margin:10px auto 30px;font-size:12px}.root :global(.completion-links p){margin:8px 0}
+@media (max-width:1000px){.root :global(.exam-stats){flex-wrap:wrap}.root :global(.exam-stats > span:last-child){margin-left:0}.root :global(.identity){gap:3px 12px;font-size:13px}}
+
+.root :global(.option-key){display:inline-flex;flex-direction:row;gap:0;white-space:nowrap;line-height:inherit}
+
+.root :global(.review-group td),.root :global(.review-group th){height:26px;padding:2px 1px}.root :global(.review-group td button){min-height:22px;line-height:20px;padding:0}
+
+/* 2026-11-06: retain the old desktop UI's native scale and source raster controls.
+   No downsampling, blur, text rasterization, animation, or CSS zoom is applied. */
+.root{min-height:100vh;background:#fff;color:#000;font-family:Arial,"PMingLiU","MingLiU","Songti TC",serif;font-size:16px;display:flex;flex-direction:column}
+.root :global(.preview-bar){order:4;margin:0 20px;padding:4px 0;max-width:960px;font:11px Arial,sans-serif}
+.root :global(.save-notice){order:3;margin:0 20px;padding:3px 0;background:white;font:12px Arial,sans-serif}
+.root :global(.save-notice.error-notice){order:0;padding:8px;background:#fff0dd}
+.root :global(.exam-shell){order:1;max-width:none;width:100%;margin:10px 0 0;min-height:calc(100vh - 55px);border:0;box-shadow:none;border-radius:0}
+.root :global(.exam-header){width:960px;max-width:calc(100% - 40px);margin:0 20px;padding:0;border:0;background:white}
+.root :global(.exam-title){min-height:32px;padding:3px 10px;border:1px solid #d0d8cb;background:linear-gradient(#dff0d7,#bedfae 22%,#f4f8ed 95%);border-radius:6px 6px 0 0;font-size:18px;line-height:24px;gap:0;font-weight:normal}
+.root :global(.exam-title strong){font-weight:bold}.root :global(.preview-tag){display:none}
+.root :global(.candidate-panel){padding:5px 13px 8px;background:#eee;border:1px solid #c5c5c5;border-top:0;border-radius:0 0 6px 6px;box-shadow:1px 3px 3px #0003}
+.root :global(.candidate-top){min-height:62px;padding:0 0 10px;gap:8px;border-bottom:1px dotted #888;align-items:center}
+.root :global(.identity){grid-template-columns:210px 270px auto;gap:3px 25px;font-size:18px;line-height:25px}
+.root :global(.identity .subject){grid-column:1 / -1}.root :global(.identity > span:nth-child(2)){font-weight:bold;white-space:nowrap;max-width:270px;overflow-wrap:anywhere}.root :global([data-testid=exam-candidate-name]){overflow-wrap:anywhere;white-space:normal}
+.root :global(.header-actions){gap:12px;align-items:center}.root :global(.header-actions .silver){padding:5px 8px;font-size:14px;min-height:32px}
+.root :global(.exam-stats){gap:0;padding:12px 0 4px;font-size:17px;line-height:24px;flex-wrap:nowrap;white-space:nowrap}
+.root :global(.exam-stats > span){padding:0 9px;border-right:1px solid #bbb}.root :global(.exam-stats > span:first-child){padding-left:0;padding-right:28px}.root :global(.exam-stats > span:last-child){margin-left:0;padding-right:0;border:0}.root :global(.exam-stats b){color:#a72e57;letter-spacing:0;font-family:Arial,sans-serif}.root :global(.exam-stats small){font-size:11px}
+.root :global(.timer-policy){font-size:11px;margin:2px 0 0;line-height:14px;color:#555}
+.root :global(.silver){display:inline-flex;align-items:center;justify-content:center;gap:3px;min-height:32px;padding:4px 8px;border:1px solid #777;border-radius:5px;color:white;background:linear-gradient(#b8b8b8,#858585 45%,#777 55%,#aaa);box-shadow:inset 1px 1px #ddd,inset -1px -1px #666,0 1px 4px #0005;text-shadow:1px 1px #666;font:12px "PMingLiU","Songti TC",serif}
+.root :global(.silver:not(:disabled):hover){filter:none;border-color:#555}.root :global(.silver:not(:disabled):active){background:#888;box-shadow:inset 1px 1px #555;transform:none}.root :global(button:disabled){opacity:.45}
+.root :global(.legacy-button-icon){display:inline-block;width:auto;height:13px;max-width:17px;object-fit:contain;flex:none;image-rendering:auto;vertical-align:middle}.root :global(.legacy-flag-icon){display:inline-block;width:auto;height:15px;max-width:18px;object-fit:contain;flex:none;vertical-align:middle}
+.root :global(.answer-area){flex:1;max-width:1180px;width:100%;padding:15px 10px 0;display:flex;flex-direction:column}
+.root :global(.toolbar){display:grid;grid-template-columns:265px 540px 150px;gap:22px;margin:0 -7px 33px;align-items:start}
+.root :global(.question-nav){gap:9px;flex-wrap:nowrap}.root :global(.toolbar > .question-nav){margin-top:32px}.root :global(.question-nav .silver){min-width:65px;min-height:32px;padding:4px 6px}
+.root :global(.flags){gap:16px;margin:0 0 4px;min-height:23px;align-items:center;white-space:nowrap}.root :global(.flags legend){font-size:17px;margin:0 26px 0 0}.root :global(.flags label){font-size:17px;gap:5px}.root :global(.flags input){width:13px;height:13px;accent-color:auto}
+.root :global(.single-note){font-size:17px;line-height:1.55;max-width:540px;margin:0}.root :global(.jump){font-size:17px;margin:32px 0 0;white-space:nowrap}.root :global(.jump select){font-size:13px;min-width:38px;padding:0 2px;height:20px}
+.root :global(.question-caption){font-size:16px;gap:18px;margin:0 0 20px}.root :global(.question-caption h1){font-size:17px;line-height:22px;font-weight:normal}.root :global(.question-caption h1 b){color:#a52d50}.root :global(.font-controls){gap:12px;font-size:13px}.root :global(.font-controls span){font-size:15px;color:black}
+.root :global(.question-body){font-family:"Times New Roman","PMingLiU","MingLiU","Songti TC",serif;font-size:calc(18px * var(--question-scale,1));line-height:1.65;max-width:1150px;margin:0}
+.root :global(.question-body p){font-weight:normal;color:black}.root :global(.question-body > div:first-child){margin-bottom:12px}
+.root :global(.option){min-height:28px;gap:6px;margin:0;padding:0 4px;border:0;border-radius:0;max-width:none;background:white;align-items:baseline;line-height:1.65}
+.root :global(.option:hover),.root :global(.option.selected){background:white;border-color:transparent;box-shadow:none}.root :global(.option input){width:13px;height:13px;accent-color:auto;align-self:center}.root :global(.option-key){display:inline-flex;flex-direction:row;gap:0;line-height:inherit;min-width:0}.root :global(.option-key)::before{content:"("}.root :global(.option-key)::after{content:")"}
+.root :global(.option > div > div){gap:2px}.root :global(.option-text){padding:0;font:inherit;color:black}
+.root :global(.bottom-nav){margin:auto -7px 0;padding:30px 0 6px}.root :global(.bottom-nav .silver){font-size:14px;padding:5px 9px}
+.root :global(.exam-footer){padding:6px 20px;border:0;font-size:11px;max-width:980px;color:#555}
+.root :global(.review-area){flex:none;width:1000px;max-width:100%;padding:50px 40px 0}.root :global(.review-intro){display:none}
+.root :global(.review-group table){font-size:17px;min-width:0;table-layout:fixed;border-collapse:collapse}.root :global(.review-group td),.root :global(.review-group th){height:28px;padding:0;border:1px solid #aaa;border-top:0;border-bottom:0;font-weight:normal}
+.root :global(.review-group th){width:90px;background:#e8eded}.root :global(.review-group tr:first-child){background:#e8eded}.root :global(.review-group tr:nth-child(2) th),.root :global(.review-group .answered){background:#ffffc9}.root :global(.review-group .unanswered){background:#ffb1bd}
+.root :global(.review-group td button){font:17px Arial,"Songti TC",serif;min-height:27px;line-height:25px;color:#315a76;padding:0}.root :global(.review-group .unanswered button){color:black}.root :global(.review-group .legacy-flag-icon){height:12px;max-width:13px}.root :global(.review-legend){margin:18px 0 10px;font-size:13px;text-align:center;color:black}
+.root :global(.entry-panel),.root :global(.entry-disclaimer){align-self:flex-start;margin-left:20px;margin-right:20px;width:960px;max-width:calc(100% - 40px);border-radius:0;box-shadow:none;font-family:Arial,"Songti TC",serif}
+.root :global(.entry-panel h1){font-size:18px;font-weight:normal}.root :global(.entry-disclaimer){font-size:11px;margin-top:6px;margin-bottom:0}.root :global(.entry-panel){font-size:16px;line-height:1.5}
+.root :global(.confirm-page){width:100%;min-height:100vh}.root :global(.confirm-banner){padding-left:190px;padding-right:20px}.root :global(.confirm-sheet){margin:32px 0 120px 190px;max-width:calc(100% - 40px)}
+.root :global(.completion-paper){margin:10px 0 25px 250px}.root :global(.completion-links){margin:10px 0 30px 250px}
+@media(max-width:1050px){.root :global(.identity){grid-template-columns:1fr 1.35fr 1fr;gap:3px 10px;font-size:16px}.root :global(.header-actions){gap:6px}.root :global(.exam-stats){font-size:15px;flex-wrap:wrap}.root :global(.exam-stats > span:first-child){padding-right:9px}.root :global(.toolbar){grid-template-columns:230px minmax(300px,540px);gap:12px}.root :global(.jump){grid-column:2;margin:0}.root :global(.review-area){padding-left:20px;padding-right:20px}.root :global(.confirm-sheet){margin-left:20px}.root :global(.confirm-banner){padding-left:20px}.root :global(.completion-paper),.root :global(.completion-links){margin-left:20px}}
+@media(max-width:767px){.root :global(.entry-panel),.root :global(.entry-disclaimer){margin-left:12px;margin-right:12px;max-width:calc(100% - 24px)}.root :global(.dialog){font-family:Arial,"Songti TC",serif}}
+/* Align the old header columns and table rows at their native CSS-pixel sizes. */
+.root :global(.exam-stats > span:first-child){min-width:184px}.root :global(.exam-stats > span:nth-child(2)){min-width:104px}.root :global(.exam-stats > span:nth-child(3)){min-width:134px}.root :global(.exam-stats > span:nth-child(4)){min-width:154px}
+.root :global(.timer-policy:not(:has(button))){position:absolute;width:1px;height:1px;padding:0;margin:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.root :global(.review-area){padding:52px 40px 0 44px}.root :global(.review-group td button){display:block;width:100%;height:27px;min-height:27px;line-height:27px}.root :global(.review-group th){line-height:27px}
+@media(max-width:1050px){.root :global(.exam-stats > span:first-child),.root :global(.exam-stats > span:nth-child(2)),.root :global(.exam-stats > span:nth-child(3)),.root :global(.exam-stats > span:nth-child(4)){min-width:0}.root :global(.review-area){padding-left:20px;padding-right:20px}}
+/* Native legacy sans UI controls; exam text keeps the existing serif reading face. */
+.root :global(.flags),.root :global(.flags legend),.root :global(.flags label),.root :global(.single-note),.root :global(.jump),.root :global(.identity),.root :global(.exam-stats){font-family:Arial,"PMingLiU","Heiti TC",sans-serif}
+
+/* Centered exam screen and old Ming-family rendering; scoped to this mode. */
+.root :global(.exam-header),.root :global(.answer-area),.root :global(.review-area),.root :global(.exam-footer){margin-left:auto;margin-right:auto}
+.root :global(.entry-panel),.root :global(.entry-disclaimer),.root :global(.confirm-sheet),.root :global(.completion-paper),.root :global(.completion-links){margin-left:auto;margin-right:auto;align-self:center}
+.root,.root :global(.flags),.root :global(.flags legend),.root :global(.flags label),.root :global(.single-note),.root :global(.jump),.root :global(.identity),.root :global(.exam-stats){font-family:Arial,"PMingLiU","MingLiU","Songti TC",serif}
+
+/* 2026-11-06 font review: official Level3_1.css uses Arial/Helvetica sans
+   for UI/table text at 13pt and 28px lines. The question area's Chinese
+   serif face is matched visually; MingLiU is used only when installed.
+   Keep the selected 800x600 presentation and all layout/state rules. */
+.root{font-family:Arial,Helvetica,"Microsoft JhengHei","Heiti TC",sans-serif;font-synthesis:none}
+.root :global(.flags),.root :global(.flags legend),.root :global(.flags label),
+.root :global(.single-note),.root :global(.jump),.root :global(.identity),
+.root :global(.exam-stats),.root :global(.entry-panel),.root :global(.entry-disclaimer){
+  font-family:Arial,Helvetica,"Microsoft JhengHei","Heiti TC",sans-serif;
+  font-size:13pt;font-weight:400;letter-spacing:0;line-height:28px;
+}
+.root :global(.question-caption){font-family:"Times New Roman","PMingLiU","MingLiU","Songti TC",serif;font-weight:400}
+.root :global(.question-body){
+  font-family:"Times New Roman","PMingLiU","MingLiU","Songti TC",serif;
+  font-size:calc(13pt * var(--question-scale,1));font-weight:300;
+  line-height:calc(28px * var(--question-scale,1));letter-spacing:0;
+}
+.root :global(.question-body p){font-weight:inherit}
+.root :global(.review-group table),.root :global(.review-group td button){font-family:Arial,Helvetica,"Microsoft JhengHei","Heiti TC",sans-serif;font-size:13pt;font-weight:400;letter-spacing:0}
+.root :global(.silver){font-family:Arial,Helvetica,"Microsoft JhengHei","Heiti TC",sans-serif;font-weight:400;letter-spacing:0}

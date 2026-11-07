@@ -1,5 +1,7 @@
 "use client";
 
+import {useAuth} from "@/components/AuthProvider";
+import {pendingReplacement} from "@/lib/explanationReplacementClient";
 import {pendingExplanation,recoverPendingExplanation,explanationTiming,explanationDraft} from "@/lib/explanationRequestClient";
 import { useDeferredValue, useEffect, useState } from "react";
 import {
@@ -11,6 +13,7 @@ import {StructuredExplanationText} from "./StructuredExplanationText";
 import styles from "./ExplanationGenerationStatus.module.css";
 
 export function ExplanationGenerationStatus({ questionId, loading, error, resultVersion }: GenerationSignal) {
+  const {session}=useAuth();
   const [preview,setPreview]=useState({id:questionId,text:""});
   const draft=useDeferredValue(preview.id===questionId?preview.text:"");
   useEffect(()=>{setPreview({id:questionId,text:explanationDraft(questionId)});const update=(event:Event)=>{const d=(event as CustomEvent).detail;if(d.id===questionId)setPreview({id:questionId,text:d.text})};window.addEventListener('explanation-draft',update);return()=>window.removeEventListener('explanation-draft',update)},[questionId]);
@@ -19,7 +22,7 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
   const timingCaption=timing?.source==='recovered'?"已讀取背景完成的詳解":timing?`開始顯示 ${(Number(timing.firstTextMs??timing.textMs)/1000).toFixed(1)} 秒 · 全文 ${(Number(timing.textMs)/1000).toFixed(1)} 秒`:"";
   const [state, setState] = useState(INITIAL_GENERATION_STATUS);
   const [recovering,setRecovering]=useState(false);const [elapsed,setElapsed]=useState(0);
-  useEffect(()=>{if(loading||resultVersion||!pendingExplanation(questionId)){setRecovering(false);return}let cancelled=false,timer:ReturnType<typeof setTimeout>;let checks=0;setRecovering(true);const check=async()=>{try{if(await recoverPendingExplanation(questionId)){if(!cancelled)setRecovering(false);return}}catch{}if(cancelled)return;if(++checks<24)timer=setTimeout(check,5000);else setRecovering(false)};void check();return()=>{cancelled=true;clearTimeout(timer)}},[questionId,loading,resultVersion]);
+  useEffect(()=>{if(loading||(resultVersion&&!pendingReplacement(questionId))||!pendingExplanation(questionId)){setRecovering(false);return}let cancelled=false,timer:ReturnType<typeof setTimeout>;let checks=0;setRecovering(true);const check=async()=>{try{if(await recoverPendingExplanation(questionId,session?.access_token)){if(!cancelled)setRecovering(false);return}}catch{}if(cancelled)return;if(++checks<24)timer=setTimeout(check,5000);else setRecovering(false)};void check();return()=>{cancelled=true;clearTimeout(timer)}},[questionId,loading,resultVersion,session?.access_token]);
   useEffect(()=>{if(!loading&&!recovering)return;const start=pendingExplanation(questionId)||Date.now();const tick=()=>setElapsed(Math.max(0,Math.floor((Date.now()-start)/1000)));tick();const timer=setInterval(tick,1000);return()=>clearInterval(timer)},[questionId,loading,recovering]);
   const activeLoading=loading||(recovering&&!resultVersion);
   const visibleError = recovering ? null : error;

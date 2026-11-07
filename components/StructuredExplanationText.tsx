@@ -1,4 +1,8 @@
 "use client";
+import {usesFullGeneratedReading} from "@/lib/generatedExplanationReading";
+import {useEffect,useState} from "react";
+import {loadQuestionExplanationOverride} from "@/lib/storage";
+import type {QuestionExplanationOverride} from "@/types/quiz";
 import "@/app/explanation-reading.css";
 import { ExplanationMathText } from "@/components/ExplanationMathText";
 import { SectionFiguresProvider, SectionFigures } from "@/components/SectionExplanationFigures";
@@ -244,7 +248,26 @@ export function hasCollapsibleStructuredExplanation(text?: string | null) {
   );
 }
 
-export function StructuredExplanationText({
+export function StructuredExplanationText(props:StructuredExplanationTextProps){
+ const {questionId}=props;
+ const [version,setVersion]=useState<{id?:string;value?:QuestionExplanationOverride}>({});
+ useEffect(()=>{
+  const refresh=()=>setVersion({id:questionId,value:questionId?loadQuestionExplanationOverride(questionId):undefined});
+  refresh();window.addEventListener("explanation-version-changed",refresh);window.addEventListener("explanation-recovered",refresh);window.addEventListener("storage",refresh);
+  return()=>{window.removeEventListener("explanation-version-changed",refresh);window.removeEventListener("explanation-recovered",refresh);window.removeEventListener("storage",refresh);};
+ },[questionId,props.text]);
+ const replacement=version.id===questionId&&version.value?.replacementRevision?version.value:null;
+ if(questionId&&hasReviewedExplanation(questionId)){
+  if(!replacement)return <ReviewedExplanation questionId={questionId}/>;
+  return <><StructuredExplanationBody {...props} sectionFilter={undefined} text={replacement.explanation} replacementRevision={replacement.replacementRevision}/>
+   {replacement.optionAnalysis?<div className="mt-3 space-y-2" aria-label="新詳解選項解析">{Object.entries(replacement.optionAnalysis).map(([key,text])=><p key={key} className="min-w-0 text-sm leading-7"><strong>{key}　</strong><ExplanationMathText text={text||""}/></p>)}</div>:null}
+  </>;
+ }
+ return <StructuredExplanationBody {...props} sectionFilter={usesFullGeneratedReading(version.id===questionId?version.value:undefined,false)?undefined:props.sectionFilter} text={replacement?.explanation??props.text} replacementRevision={replacement?.replacementRevision}/>;
+}
+
+function StructuredExplanationBody({
+  replacementRevision,
   questionId,
   text,
   label = "詳解",
@@ -253,8 +276,8 @@ export function StructuredExplanationText({
   className = "",
   sectionFilter,
   fallbackToFullText = true
-}: StructuredExplanationTextProps) {
-  if (questionId && hasReviewedExplanation(questionId)) return <ReviewedExplanation questionId={questionId} />;
+}: StructuredExplanationTextProps & {replacementRevision?:string|null}) {
+
   const trimmedText = text?.trim();
   if (!trimmedText) return null;
 
@@ -291,13 +314,13 @@ export function StructuredExplanationText({
     "structured-explanation-table-cell min-w-[7.5rem] max-w-[16rem] whitespace-normal break-words [overflow-wrap:anywhere] [word-break:normal] sm:min-w-[8.5rem] sm:max-w-[18rem]";
 
   return (
-    <SectionFiguresProvider questionId={questionId} text={text || ""}><div data-reading-tone={tone} className={`structured-explanation-text reading-prose w-full max-w-full min-w-0 ${className}`}>
+    <SectionFiguresProvider key={text} questionId={questionId} text={text || ""}><div data-reading-tone={tone} className={`structured-explanation-text reading-prose w-full max-w-full min-w-0 ${className}`}>
       {label ? (
         <p className={`mb-3 text-[15px] font-black leading-6 ${labelClassName}`}>
           {label}
         </p>
       ) : null}
-      {questionId ? <VerifiedExplanationFigures questionId={questionId} /> : null}
+      {questionId ? <VerifiedExplanationFigures key={text} questionId={questionId} allowStatic={!replacementRevision} /> : null}
       <div className="w-full max-w-[52rem] min-w-0 space-y-4 sm:space-y-5">
         {sections.map((section, index) => (
           <section

@@ -11,20 +11,23 @@ export async function GET(request:NextRequest){
   const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data,error}=await db.rpc('list_approved_explanation_figures',{p_question:id});
   if(error||!Array.isArray(data))throw Error('unavailable');
-  const figures=data.filter(safeApprovedMeta).slice(0,3);
-  if(process.env.NEW_EXPLANATION_FIGURES_RENDER!=='1')return NextResponse.json({figures},{headers});
-  const saved=await db.from('question_explanation_overrides').select('explanation,figure_status').eq('question_id',id).maybeSingle();
+  let figures=data.filter(safeApprovedMeta).slice(0,3);
+  const saved=await db.from('question_explanation_overrides').select('explanation,figure_status,replacement_revision').eq('question_id',id).maybeSingle();
   if(saved.error)throw Error('unavailable');
   if(!saved.data)return NextResponse.json({figures},{headers});
+  // A replacement may only display images bound to its exact saved text.
+  // Old generic/reviewed images stay in storage and reappear after a restore.
+  const versioned=Boolean(saved.data.replacement_revision);
+  if(process.env.NEW_EXPLANATION_FIGURES_RENDER!=='1')return NextResponse.json({figures:versioned?[]:figures},{headers});
   const hash=createHash('sha256').update(saved.data.explanation).digest('hex');
   const published=publishedTrialFigure(id,hash);
   if(published)return NextResponse.json({figures:[],sectionFigures:[published],explanationHash:hash,imageStatus:'approved',sections:[{sectionTitle:published.section_heading}]},{headers});
   const jobs=await db.from('figure_queue_jobs').select('figure_needs,image_status').eq('question_id',id).eq('explanation_sha256',hash).maybeSingle();
-  const bound=await db.from('explanation_figure_candidates').select('id,section_anchor,section_heading,section_sha256,status').eq('question_id',id).eq('explanation_sha256',hash);
+  const bound=await db.from('explanation_figure_candidates').select('id,section_anchor,section_heading,section_sha256,status,explanation_sha256').eq('question_id',id).limit(100);
   if(jobs.error||bound.error)throw Error('unavailable');
-  const sectionFigures=figures.flatMap((x:any)=>{const m=bound.data?.find(y=>y.id===x.id&&y.status==='approved'&&y.section_anchor);return m?[{...x,...m}]:[]});
+  const sectionFigures=figures.flatMap((x:any)=>{const m=bound.data?.find(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved'&&y.section_anchor);return m?[{...x,...m}]:[]});
   let imageStatus=jobs.data?.image_status||saved.data.figure_status;
-  if(imageStatus==='pending_visual_review'&&!sectionFigures.length&&!bound.data?.some(x=>x.status==='pending'))imageStatus='awaiting_image';
-  return NextResponse.json({figures:figures.filter((x:any)=>!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus,sections:(jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
+  if(imageStatus==='pending_visual_review'&&!sectionFigures.length&&!bound.data?.some(x=>x.explanation_sha256===hash&&x.status==='pending'))imageStatus='awaiting_image';
+  return NextResponse.json({figures:versioned?[]:figures.filter((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved')&&!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus,sections:(jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
  }catch{return NextResponse.json({figures:[]},{status:503,headers})}
 }

@@ -262,6 +262,10 @@ export async function POST(request: NextRequest) {
 
     await withServerTimeout(
       (async () => {
+        if(process.env.QUIZ_STATS_REPAIR_ENABLED === "true" && attemptRows.length){
+          const {error}=await supabase.rpc("regrade_bound_quiz_sessions",{p_log_keys:Array.from(new Set(attemptRows.map(row=>normalizeAttemptSessionId(row.session_id))))});
+          if(error)throw error;
+        }
         await upsertAttemptRows(supabase, attemptRows);
 
         await Promise.all([

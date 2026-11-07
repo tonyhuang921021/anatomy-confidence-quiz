@@ -1,3 +1,4 @@
+import {pendingReplacement,setPendingReplacement,recoverReplacement} from "./explanationReplacementClient";
 import {readJsonEvents} from "./explanationStream";
 // One paid request per question in this browser. Navigation recovery only reads.
 function put(k:string,v:string){try{localStorage.setItem(k,v)}catch{}}
@@ -14,15 +15,19 @@ export async function recoverExplanation(id:string){
  const response=await fetch(`/api/question-background-data?kind=explanations&ids=${encodeURIComponent(id)}`,{cache:'no-store'});
  if(!response.ok)return null;const data=await response.json();const row=data.overrides?.find((x:any)=>x.question_id===id);
  if(!row?.explanation)return null;
- return {ok:true,sharedSaved:true,explanation:row.explanation,optionAnalysis:row.option_analysis||{},memoryTip:row.memory_tip||'',model:row.model};
+ return {ok:true,sharedSaved:true,explanation:row.explanation,optionAnalysis:row.option_analysis||{},memoryTip:row.memory_tip||'',model:row.model,readingFormat:row.reading_format === "full-v1" ? "full-v1" as const : null,updatedAt:row.updated_at};
 }
 export async function requestExplanation(_url:string,init:RequestInit):Promise<Response>{
- let id:string;try{id=JSON.parse(String(init.body)).question.id}catch{return fetch(_url,init)}
+ let id:string,body:any;try{body=JSON.parse(String(init.body));id=body.question.id}catch{return fetch(_url,init)}
  const existing=active.get(id);if(existing)return (await existing).clone();
- const prior=pendingExplanation(id),started=prior||Date.now();
+ const replacing=body.action==="replace";
+ const previousReplacement=pendingReplacement(id);
+ const prior=pendingExplanation(id),started=previousReplacement?.startedAt||prior||Date.now();
  const task=(async()=>{
   try{
+   if(previousReplacement){const saved=await recoverReplacement(id,body.accessToken);if(saved){remove(key(id));return Response.json(saved);}return Response.json({ok:false,code:"replacement_pending",message:"先前替換仍在確認中，不會重複生成。"},{status:409});}
    if(prior){const saved=await recoverExplanation(id);if(saved){remove(key(id));return Response.json(saved)}return Response.json({ok:false,code:'request_pending',message:'先前請求仍在確認中，請稍後查看；不會重複生成。'},{status:409})}
+   if(replacing)setPendingReplacement(id,{operationId:body.operationId,kind:"replace",startedAt:started});
    put(key(id),String(started));
    let firstTextMs:number|null=null;
    let response=await fetch(_url,{...init,headers:{...Object.fromEntries(new Headers(init.headers)),Accept:'text/event-stream'}});
@@ -36,11 +41,11 @@ export async function requestExplanation(_url:string,init:RequestInit):Promise<R
     const confirmed=final as {status:number;data:any};response=Response.json(confirmed.data,{status:confirmed.status});
    }
    const data=await response.clone().json();
-   if(data.ok&&data.explanation){remove(key(id));put(metricKey(id),JSON.stringify({startedAt:started,firstTextMs:firstTextMs??Date.now()-started,textMs:Date.now()-started,model:data.model,delivery:data.delivery||null}));}
-   else if(response.status===401||['unavailable','busy','actor_busy','rate','cooldown','account_banned','guard_unavailable','budget','safe_configuration_missing','reviewed_explanation_protected','untrusted_question','authentication_required','trusted_context_missing','source_image_not_supported'].includes(data.code))remove(key(id));
+   if(data.ok&&data.explanation){if(replacing)setPendingReplacement(id,null);remove(key(id));put(metricKey(id),JSON.stringify({startedAt:started,firstTextMs:firstTextMs??Date.now()-started,textMs:Date.now()-started,model:data.model,delivery:data.delivery||null}));}
+   else if(response.status===401||['unavailable','busy','actor_busy','rate','cooldown','account_banned','guard_unavailable','budget','safe_configuration_missing','reviewed_explanation_protected','untrusted_question','authentication_required','trusted_context_missing','source_image_not_supported','invalid_replacement','replacement_version_changed','trusted_question_incomplete','incomplete_explanation','replacement_not_written'].includes(data.code)){remove(key(id));if(replacing)setPendingReplacement(id,null);}
    return response;
   }catch{throw Error('request outcome unconfirmed')}
  })();active.set(id,task);
  try{return (await task).clone()}finally{active.delete(id);draft(id,"")}
 }
-export async function recoverPendingExplanation(id:string){const saved=await recoverExplanation(id);if(saved){const started=pendingExplanation(id);if(started)put(metricKey(id),JSON.stringify({startedAt:started,textMs:Date.now()-started,model:saved.model,source:'recovered'}));remove(key(id));const storage=await import('@/lib/storage');storage.saveQuestionExplanationOverride(id,{...saved,updatedAt:new Date().toISOString()});window.dispatchEvent(new CustomEvent('explanation-recovered',{detail:{id,saved}}))}return saved}
+export async function recoverPendingExplanation(id:string,accessToken?:string){if(pendingReplacement(id)){const recovered=await recoverReplacement(id,accessToken);if(recovered)remove(key(id));return recovered;}const saved=await recoverExplanation(id);if(saved){const started=pendingExplanation(id);if(started)put(metricKey(id),JSON.stringify({startedAt:started,textMs:Date.now()-started,model:saved.model,source:'recovered'}));remove(key(id));const storage=await import('@/lib/storage');storage.saveQuestionExplanationOverride(id,{...saved,updatedAt:new Date().toISOString()});window.dispatchEvent(new CustomEvent('explanation-recovered',{detail:{id,saved}}))}return saved}

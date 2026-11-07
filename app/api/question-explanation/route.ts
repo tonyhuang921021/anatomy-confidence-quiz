@@ -2,6 +2,7 @@ import {backgroundExplanationResponse} from "@/lib/explanationBackgroundResponse
 import {createReservedReads} from "@/lib/explanationReservedReads";
 import { explanationPrefix } from "@/lib/explanationStream";
 import {waitUntil} from '@vercel/functions';
+import { dispatchReplacementImages } from "@/lib/replacementFigures.cjs";
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 import { imageWindowOpen, buildNeedsWithFallback, IMAGE_PROMPT, processSavedImages } from "@/lib/newExplanationFigures.cjs";
 import { createHash } from "node:crypto";
@@ -24,7 +25,9 @@ import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { isServerTimeoutError, withServerTimeout } from "@/lib/serverTimeout";
 
 type QuestionExplanationRequestBody = {
-  action?: "generate" | "sync_override" | "sync_overrides";
+  operationId?: string;
+  baseVersion?: string;
+  action?: "replace" | "generate" | "sync_override" | "sync_overrides";
   visitorId?: string;
   accessToken?: string;
   question?: {
@@ -118,7 +121,7 @@ const QUESTION_EXPLANATION_PROMPT_PREFIX = [
   MATH_FORMAT_RULE,
   "若附有經核對的相關題資料，將共通機制、易混鑑別、延伸概念及可能變化整合到本題教學，不要只列相關題，也不要提年份、卷別或出題次數；仍補足相關題未提到但理解需要的內容。相關題中的可能原因或部分情況不可泛化成所有病例。",
   "圖片由網站根據已核對的資料提供；內部背景僅供教學整合，不輸出題目連結、題號、年份、圖片、引用或網址。",
-  "在 explanation 中提供一個精簡 Markdown 比較表，整理本題有助理解的機轉、概念或選項差異；表格只寫能由題目與可靠知識支持的內容，不確定的地方直接註明，不為湊格式編造。",
+  "依內容需要使用段落、粗體、條列或 Markdown 表格；只有比較多個機轉、條件或選項確實更清楚時才用表格，不要求每題有表格、延伸段落或圖片，不為湊格式切碎論述。",
   "只輸出 JSON，不要輸出 HTML、code block 或 JSON 外文字。explanation 為文字；optionAnalysis 僅包含實際存在的 A、B、C、D、E 選項鍵；memoryTip 沒有則留空字串。",
   '{"explanation":"整題詳解","optionAnalysis":{"A":"A 選項解析","B":"B 選項解析"},"memoryTip":""}'
 ].join("\n");
@@ -701,7 +704,7 @@ function parseExplanationPayload(text: string): ParsedExplanationPayload | null 
 
 /** Read-only configuration probe; never calls the model or exposes credentials. */
 export async function GET() {
-  return NextResponse.json({ model: QUESTION_EXPLANATION_MODEL, reviewedExplanationsProtected: true },
+  return NextResponse.json({ model: QUESTION_EXPLANATION_MODEL, reviewedExplanationsProtected: true, explicitReplacementAvailable: true },
     { headers: { "Cache-Control": "no-store" } });
 }
 
@@ -719,7 +722,7 @@ export async function POST(request: NextRequest) {
   const targetIds = action === "sync_override" ? [body.override?.questionId]
     : action === "sync_overrides" && Array.isArray(body.overrides) ? body.overrides.map(x => x?.questionId)
     : [body.question?.id];
-  if (targetIds.some(id => typeof id === "string" && hasReviewedExplanation(id.trim()))) {
+  if (action !== "replace" && targetIds.some(id => typeof id === "string" && hasReviewedExplanation(id.trim()))) {
     return NextResponse.json({ok:false,code:"reviewed_explanation_protected",message:"此題已有已審核完整詳解，保留原文與圖片。"},{status:409});
   }
   if (action === "sync_override" || action === "sync_overrides") {
@@ -742,7 +745,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ok:true,configured:true,syncedCount:row.inserted+row.unchanged,insertedCount:row.inserted,unchangedCount:row.unchanged});
     } catch { return NextResponse.json({ok:false,code:"sync_unavailable",recoverable:true,message:"同步暫時不可用，既有詳解不受影響。"},{status:503}); }
   }
-  if (action !== "generate") return NextResponse.json({ok:false,code:"unsupported_action"},{status:400});
+  if (action !== "generate" && action !== "replace") return NextResponse.json({ok:false,code:"unsupported_action"},{status:400});
   // Neither a missing service role, an unverified credit scope nor an absent
   // price ceiling is permission to send a paid request.
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -758,8 +761,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ok:false,code:"safe_configuration_missing",message:"AI 詳解暫時不可用，既有詳解不受影響。"},{status:503});
   }
   const db = createClient(url, serviceRole || anonKey!, {auth:{persistSession:false,autoRefreshToken:false}});
+  const replacing=action==="replace";
+  let replacementReservationAttempted=false;
   const newFigures=process.env.NEW_EXPLANATION_FIGURES_CAPTURE === "1" && imageWindowOpen(process.env);
-  const figureQueue=!newFigures && captureEnabled(process.env,url);
+  const figureQueue=!replacing && !newFigures && captureEnabled(process.env,url);
   let actorId = "", verifiedEmail = "";
   // Source commit identifies the reviewed index, independently of deployment commit.
   // Keep it while the verified index is identical; change it only with an atomic,
@@ -773,11 +778,46 @@ export async function POST(request: NextRequest) {
   let sharedReads=0;
   const reservedReads=createReservedReads(async(id:string)=>measured(++sharedReads===1?"initialSharedMs":"postReserveSharedMs",async()=>{
     const {data,error}=await withServerTimeout(db.from("question_explanation_overrides")
-      .select("question_id,explanation,option_analysis,memory_tip,model,updated_at")
+      .select("question_id,explanation,option_analysis,memory_tip,model,updated_at,reading_format")
       .eq("question_id",id).maybeSingle(),1600,"共享詳解讀取逾時");
     if(error)throw error;
-    return data?{explanation:data.explanation,optionAnalysis:data.option_analysis??{},memoryTip:data.memory_tip??"",model:data.model}:null;
+    return data?{explanation:data.explanation,optionAnalysis:data.option_analysis??{},memoryTip:data.memory_tip??"",model:data.model,readingFormat:data.reading_format??null,updatedAt:data.updated_at}:null;
   }));
+  const reserveRequest=async({actorId:actor,questionId,operationId,baseVersion}:{actorId:string;questionId:string;operationId?:string;baseVersion?:string})=>{
+        const runUntil=Date.parse(process.env.QUESTION_EXPLANATION_RUN_UNTIL || "");
+        if(!Number.isFinite(runUntil)||Date.now()>=runUntil)return {ok:false,code:"budget"};
+        if (!serviceRole || !isOpenAIConfigured() || !promoVerified || !["gpt-6.1-sol","gpt-6.1-terra"].includes(model || "") || (model === "gpt-6.1-terra" && mode !== "default") ||
+            !["low","default"].includes(mode) || !pricingRevision || !Number.isSafeInteger(inRate) || inRate <= 0 ||
+            !Number.isSafeInteger(outRate) || outRate <= 0) return {ok:false,code:"safe_configuration_missing"};
+        // Do not use the legacy helper's missing-table fail-open behaviour.
+        const banQuery = await measured("accountCheckMs",()=>withServerTimeout(db.from("ai_account_bans").select("banned_until")
+          .eq("user_email",verifiedEmail).maybeSingle(),1600,"帳號限制查詢逾時"));
+        if (banQuery.error) return {ok:false,code:"guard_unavailable"};
+        if (banQuery.data?.banned_until) {
+          const until = Date.parse(banQuery.data.banned_until);
+          if (!Number.isFinite(until)) return {ok:false,code:"guard_unavailable"};
+          if (until > Date.now() && !isBypassEmail(verifiedEmail)) return {ok:false,code:"account_banned"};
+        }
+        const id = operationId || crypto.randomUUID();
+        if(operationId)replacementReservationAttempted=true;
+        const {data,error} = await measured("reserveMs",()=>withServerTimeout(db.rpc(operationId ? "ai_guard_reserve_replacement" : figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit,...(operationId?{p_base_version:baseVersion}:{})}),1600,"預算預留逾時"));
+        if (error || data !== "reserved") {if(operationId && !error && typeof data==="string")replacementReservationAttempted=false;return {ok:false,code:typeof data === "string" ? data : "reservation_unavailable"};}
+        // Reservation is committed. These independent reads run together;
+        // neither is skipped, and start_call still follows full grant validation.
+        const fetched = await (operationId ? (work:()=>Promise<any>)=>work() : (work:()=>Promise<any>)=>reservedReads.confirmAndRead(questionId,work))(()=>measured("grantReadMs",()=>withServerTimeout(db.rpc("ai_guard_read_reservation",{p_id:id,p_actor:actor}),1600,"預留驗證逾時")));
+        const row = Array.isArray(fetched.data) ? fetched.data[0] : fetched.data;
+        if (fetched.error || !row || row.model !== model || row.pricing_revision !== pricingRevision) return {ok:false,code:"reservation_unconfirmed_held"};
+        // Token count cannot exceed UTF-8 bytes for normal encoded text. The
+        // configured rates must be conservative for the actual provider tier.
+        const inputBound = 16000 * inRate, outputBound = 2400 * outRate;
+        if (!Number.isSafeInteger(inputBound) || !Number.isSafeInteger(outputBound) ||
+            !Number.isSafeInteger(inputBound + outputBound)) return {ok:false,code:"price_ceiling_unconfirmed_held"};
+        const worst = Math.ceil((inputBound + outputBound) / 1_000_000);
+        const ceiling = Number(row.per_call_ceiling_microusd);
+        if (!Number.isSafeInteger(worst) || !Number.isSafeInteger(ceiling) || ceiling < worst) return {ok:false,code:"price_ceiling_unconfirmed_held"};
+        return {ok:true,leaseId:id,fence:id,actorId:actor,model,mode,maxCalls:1,ceiling};
+  };
+  const replacementValue=(row:any)=>({explanation:row.explanation,optionAnalysis:row.option_analysis??{},memoryTip:row.memory_tip??"",model:row.model,updatedAt:row.updated_at,replacementRevision:row.replacement_revision,readingFormat:row.reading_format??null});
   const wantsStream=request.headers.get("accept")?.includes("text/event-stream");
   let emit: (event:any)=>void = ()=>{};
   const run=async()=>{
@@ -809,38 +849,21 @@ export async function POST(request: NextRequest) {
         stages.promptPrepareMs=Date.now()-prepareStart;return Buffer.byteLength(canonicalPrompt,"utf8") <= 16000;
       },
       readShared: reservedReads.read,
-      reserve: async ({actorId: actor, questionId}: {actorId:string;questionId:string}) => {
-        const runUntil=Date.parse(process.env.QUESTION_EXPLANATION_RUN_UNTIL || "");
-        if(!Number.isFinite(runUntil)||Date.now()>=runUntil)return {ok:false,code:"budget"};
-        if (!serviceRole || !isOpenAIConfigured() || !promoVerified || !["gpt-6.1-sol","gpt-6.1-terra"].includes(model || "") || (model === "gpt-6.1-terra" && mode !== "default") ||
-            !["low","default"].includes(mode) || !pricingRevision || !Number.isSafeInteger(inRate) || inRate <= 0 ||
-            !Number.isSafeInteger(outRate) || outRate <= 0) return {ok:false,code:"safe_configuration_missing"};
-        // Do not use the legacy helper's missing-table fail-open behaviour.
-        const banQuery = await measured("accountCheckMs",()=>withServerTimeout(db.from("ai_account_bans").select("banned_until")
-          .eq("user_email",verifiedEmail).maybeSingle(),1600,"帳號限制查詢逾時"));
-        if (banQuery.error) return {ok:false,code:"guard_unavailable"};
-        if (banQuery.data?.banned_until) {
-          const until = Date.parse(banQuery.data.banned_until);
-          if (!Number.isFinite(until)) return {ok:false,code:"guard_unavailable"};
-          if (until > Date.now() && !isBypassEmail(verifiedEmail)) return {ok:false,code:"account_banned"};
-        }
-        const id = crypto.randomUUID();
-        const {data,error} = await measured("reserveMs",()=>withServerTimeout(db.rpc(figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit}),1600,"預算預留逾時"));
-        if (error || data !== "reserved") return {ok:false,code:typeof data === "string" ? data : "reservation_unavailable"};
-        // Reservation is committed. These independent reads run together;
-        // neither is skipped, and start_call still follows full grant validation.
-        const fetched = await reservedReads.confirmAndRead(questionId,()=>measured("grantReadMs",()=>withServerTimeout(db.rpc("ai_guard_read_reservation",{p_id:id,p_actor:actor}),1600,"預留驗證逾時")));
-        const row = Array.isArray(fetched.data) ? fetched.data[0] : fetched.data;
-        if (fetched.error || !row || row.model !== model || row.pricing_revision !== pricingRevision) return {ok:false,code:"reservation_unconfirmed_held"};
-        // Token count cannot exceed UTF-8 bytes for normal encoded text. The
-        // configured rates must be conservative for the actual provider tier.
-        const inputBound = 16000 * inRate, outputBound = 2400 * outRate;
-        if (!Number.isSafeInteger(inputBound) || !Number.isSafeInteger(outputBound) ||
-            !Number.isSafeInteger(inputBound + outputBound)) return {ok:false,code:"price_ceiling_unconfirmed_held"};
-        const worst = Math.ceil((inputBound + outputBound) / 1_000_000);
-        const ceiling = Number(row.per_call_ceiling_microusd);
-        if (!Number.isSafeInteger(worst) || !Number.isSafeInteger(ceiling) || ceiling < worst) return {ok:false,code:"price_ceiling_unconfirmed_held"};
-        return {ok:true,leaseId:id,fence:id,actorId:actor,model,mode,maxCalls:1,ceiling};
+      reserve: reserveRequest,
+      reserveReplacement: reserveRequest,
+      readReplacement: async ({actorId:actor,questionId,operationId}:any)=>{
+        const {data,error}=await withServerTimeout(db.rpc("explanation_replacement_status",{p_actor:actor,p_question:questionId,p_operation:operationId}),1600,"替換狀態讀取逾時");
+        if(error||!data)throw Error("replacement status unavailable");
+        if(data.status==="not_found")return null;
+        if(data.status==="not_written")return {state:"not_written"};
+        return data.status==="completed"?{state:"completed",value:replacementValue(data.value)}:{state:"pending"};
+      },
+      commitReplacement: async (g:any,id:string,result:any)=>{
+        const {data,error}=await measured("commitMs",()=>withServerTimeout(db.rpc("ai_guard_commit_replacement",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip??"",p_needs:newFigures?buildNeedsWithFallback(result.explanation,result.figureNeeds,(resolveTrustedExplanationQuestion(id) as any).question):null}),1600,"替換儲存狀態未確認"));
+        if(error||!data)return null;
+        if(data.status==="replacement_version_changed")return {conflict:true};
+        if(data.status!=="replaced"||data.value?.question_id!==id||data.value?.replacement_revision!==g.leaseId)return null;
+        return {winner:{...replacementValue(data.value),figureQueued:data.figureQueued===true,figureTextHash:createHash("sha256").update(data.value.explanation,"utf8").digest("hex")}};
       },
       cancelIfShared: async (g:any) => {
         const {data,error} = await withServerTimeout(db.rpc(figureQueue ? "figure_guard_cancel_if_cached" : "ai_guard_cancel_if_cached",{p_id:g.leaseId,p_actor:actorId}),1600,"預留取消逾時");
@@ -884,7 +907,11 @@ export async function POST(request: NextRequest) {
         if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
         // Text is already durably saved. Image failure never retries paid generation.
         if(row.status==='inserted'&&newFigures){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)waitUntil(processSavedImages({db,question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)}));}
-        return {inserted:row.status === "inserted",winner:{explanation:row.explanation,optionAnalysis:row.option_analysis ?? {},memoryTip:row.memory_tip ?? "",model:row.model}};
+        // RPC signature stays compatible with existing queue wrappers. Read the committed marker,
+        // never accept a provider/client-supplied format. Failed read is unknown, not a new generation.
+        const confirmed=await db.from("question_explanation_overrides").select("question_id,explanation,option_analysis,memory_tip,model,updated_at,reading_format").eq("question_id",id).maybeSingle();
+        if(confirmed.error || !confirmed.data || confirmed.data.explanation!==row.explanation)return null;
+        return {inserted:row.status === "inserted",winner:{explanation:row.explanation,optionAnalysis:row.option_analysis ?? {},memoryTip:row.memory_tip ?? "",model:row.model,updatedAt:confirmed.data.updated_at,readingFormat:confirmed.data.reading_format??null}};
       },
       close: async (g:any) => {
         const {data,error} = await measured("closeMs",()=>withServerTimeout(db.rpc(figureQueue ? "figure_guard_close" : "ai_guard_close",{p_id:g.leaseId}),1600,"預留結束逾時"));
@@ -892,6 +919,9 @@ export async function POST(request: NextRequest) {
       }
     });
     const messages: Record<string,string> = {
+      replacement_version_changed:"詳解已被更新，保留較新的版本；請重新確認後再操作。",
+      replacement_pending:"先前替換仍在確認中，不會重複生成。",
+      replacement_unavailable:"替換功能尚未啟用，原詳解仍可閱讀。",
       invalid_id:"題號不足，無法產生詳解。", authentication_required:"請登入後再使用。",
       untrusted_question:"此題尚無可驗證的官方或站內來源，不會使用客戶端題文生成。",
       trusted_context_missing:"此題缺少可驗證的承上題情境。", source_image_not_supported:"此題需要原圖判讀，請先使用原題及既有詳解。",
@@ -900,6 +930,8 @@ export async function POST(request: NextRequest) {
       actor_busy:"此帳號已有請求進行中。", cooldown:"請稍後再試。", rate:"目前使用次數已達限制，請稍後再試。"
     };
     if (outcome.status === 200 && outcome.value) {
+      if(replacing){const trusted=resolveTrustedExplanationQuestion(body.question?.id);if(trusted.ok)dispatchReplacementImages({enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&process.env.NEW_EXPLANATION_FIGURES_CAPTURE==='1'&&imageWindowOpen(process.env),outcome,operationId:body.operationId,question:trusted.question,schedule:waitUntil,processImages:({question,requestId,explanationHash}:any)=>processSavedImages({db,question,actor:actorId,search:async(q:string)=>{if(!imageWindowOpen(process.env))throw Error("image window ended");return commonsSearch(q)},loadImage:async(url:string)=>{if(!imageWindowOpen(process.env))throw Error("image window ended");return readBoundedImage(url)},enabled:true,requestId,explanationHash})});}
+
       // Final success is emitted only after usage settlement and durable text commit.
       // Images continue independently via waitUntil above.
       const timing={...delivery,stages,responseMs:Date.now()-requestStarted,source:outcome.code,region:process.env.VERCEL_REGION||"unknown"};
@@ -910,7 +942,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ok:false,code:outcome.code,recoverable:true,message:messages[outcome.code] || "暫時無法產生詳解，既有詳解不受影響。"},{status:outcome.status});
   } catch (error) {
     console.error("question_explanation_safe_candidate_error",error instanceof Error ? error.message : "unknown");
-    return NextResponse.json({ok:false,code:"guard_unavailable",recoverable:true,message:"詳解暫時不可用，既有內容不受影響。"},{status:503});
+    return NextResponse.json({ok:false,code:replacing && replacementReservationAttempted?"replacement_unconfirmed_held":"guard_unavailable",recoverable:true,message:"詳解暫時不可用，既有內容不受影響。"},{status:503});
   }
   };
   return backgroundExplanationResponse(nextEmit=>{emit=nextEmit;return run()},waitUntil,Boolean(wantsStream));

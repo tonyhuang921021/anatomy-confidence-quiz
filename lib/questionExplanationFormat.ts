@@ -160,6 +160,9 @@ export function normalizeQuestionExplanationOverride(
   override?: QuestionExplanationOverride | null
 ): QuestionExplanationOverride | null {
   if (!override) return null;
+  // Confirmed replacement content is already normalized on the server. Preserve
+  // its exact bytes so paragraph/image hashes cannot drift in a later client pass.
+  if((override.replacementRevision || override.readingFormat === "full-v1") && typeof override.explanation==="string" && override.explanation.trim())return {...override};
 
   const normalized = normalizeQuestionExplanationPayload({
     explanation: override.explanation,

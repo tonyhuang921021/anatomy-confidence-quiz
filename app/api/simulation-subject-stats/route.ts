@@ -14,39 +14,49 @@ export async function GET(request: NextRequest) {
   if (!/^[A-Z0-9-]{3,80}$/i.test(key) || [...request.nextUrl.searchParams.keys()].some(k=>k!=="paperKey")) return NextResponse.json({error:"invalid paper"},{status:400});
   const paper=getComparisonPaper(key);
   if (!paper) return NextResponse.json({error:"unsupported paper"},{status:404});
-  const old=cache.get(key);
+  const repairEnabled=process.env.QUIZ_STATS_REPAIR_ENABLED === "true";
+  const cacheKey=`${repairEnabled?"repair-v1":"legacy"}:${key}`;
+  const old=cache.get(cacheKey);
   let value=old && old.expires>Date.now() ? old.value : undefined;
   if (!value) {
-    if (!pending.has(key)) pending.set(key,(async()=>{
+    if (!pending.has(cacheKey)) pending.set(cacheKey,(async()=>{
       const url=process.env.NEXT_PUBLIC_SUPABASE_URL, secret=process.env.SUPABASE_SERVICE_ROLE_KEY;
       if (!url || !secret || isSupabaseRecoveryMode()) return unavailableSubjectStats(paper);
       const db=createClient(url,secret,{auth:{persistSession:false,autoRefreshToken:false}});
+      const started=Date.now();let stage="scores";
       const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
       try {
         return await loadSimulationSubjectCohort(paper,{
           readScores:async(paperKey,limit)=>{
-            const {data,error}=await db.from("simulation_paper_scores").select("session_id,completed_at").eq("paper_key",paperKey).order("completed_at",{ascending:false}).order("session_id",{ascending:false}).limit(limit).abortSignal(controller.signal);
+            stage="scores";
+            const {data,error}=await db.from("simulation_paper_scores").select("session_id,completed_at").eq("paper_key",paperKey).gt("score",3).order("completed_at",{ascending:false}).order("session_id",{ascending:false}).limit(limit).abortSignal(controller.signal);
             if(error)throw error; return data ?? [];
           },
           readSessions:async(ids)=>{
+            stage="sessions";
             const {data,error}=await db.from("quiz_sessions").select("id,user_id,mode,completed_at,updated_at").in("id",ids).limit(101).abortSignal(controller.signal);
             if(error)throw error; return data ?? [];
           },
           readAnswers:async(ids,limit)=>{
+            stage="answers";
             const {data,error}=await db.from("quiz_session_attempts").select("session_id,question_id,selected_answer").in("session_id",ids).limit(limit).abortSignal(controller.signal);
             if(error)throw error; return data ?? [];
           }
         });
-      } catch { return unavailableSubjectStats(paper); }
+      } catch {
+        // Deliberately exclude raw database errors, IDs, answers and auth data.
+        console.warn("simulation-subject-stats unavailable",{paperKey:key,stage,elapsedMs:Date.now()-started,reason:controller.signal.aborted?"timeout":"read_failed"});
+        return unavailableSubjectStats(paper);
+      }
       finally { clearTimeout(timer); }
     })().then(result=>{
       if(cache.size>=128)cache.delete(cache.keys().next().value!);
-      cache.set(key,{expires:Date.now()+(result.reason==="unavailable"?30000:900000),value:result});
+      cache.set(cacheKey,{expires:Date.now()+(result.reason==="unavailable"?30000:repairEnabled?60000:900000),value:result});
       return result;
-    }).finally(()=>pending.delete(key)));
-    value=await pending.get(key)!;
+    }).finally(()=>pending.delete(cacheKey)));
+    value=await pending.get(cacheKey)!;
   }
   // Only aggregate counts/means. Never return session IDs, account IDs, answers,
   // completion times of people, or exact counts for groups smaller than five.
-  return NextResponse.json(value,{headers:{"Cache-Control":value.reason==="unavailable"?"no-store":"public, s-maxage=900, stale-while-revalidate=900"}});
+  return NextResponse.json(value,{headers:{"Cache-Control":repairEnabled||value.reason==="unavailable"?"no-store":"public, s-maxage=900, stale-while-revalidate=900"}});
 }

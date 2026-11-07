@@ -49,6 +49,7 @@ const REVIEW_ENTRIES = [
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  { time: "11/8", title: "仿國考介面與新詳解閱讀", body: "整卷作答可切換仿國考介面，沿用同一回合作答、結果與歷史。新產生的 AI 詳解直接完整呈現；配圖可原位放大、查看來源，陽明／補充／類似題切換保留。" },
   {
     time: "11/8",
     title: "詳解閱讀與來源切換整理",

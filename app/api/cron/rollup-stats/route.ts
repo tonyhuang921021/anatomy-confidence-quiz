@@ -243,6 +243,11 @@ export async function GET(request: NextRequest) {
 
     const result = await withAbortableServerTimeout(
       async (signal) => {
+        // Repair historical mutations independently of the created_at cursor.
+        if(process.env.QUIZ_STATS_REPAIR_ENABLED === "true"){
+          const {error}=await supabase.rpc("drain_quiz_stats_dirty",{p_limit:25}).abortSignal(signal);
+          if(error)throw error;
+        }
         const previousValue = await readRollupCursor(supabase, signal);
         const plan = planRollup(previousValue, new Date().toISOString());
         const page = await fetchRollupPage(supabase, plan, signal);

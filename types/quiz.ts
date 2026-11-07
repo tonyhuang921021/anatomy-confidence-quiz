@@ -148,6 +148,9 @@ export type QuizSettings = {
 };
 
 export type QuizSession = {
+  /** Local cache of a server-accepted exact completion, never server authorization. */
+  completionReceipt?: string;
+  answerEdits?: import("../lib/quizAnswerEdits").QuizAnswerEdits;
   id: string;
   subject: SubjectName;
   startedAt: string;
@@ -162,6 +165,8 @@ export type QuizSession = {
   isReviewingAnswer?: boolean;
   scoreRevisions?: AnswerKeyScoreRevision[];
   attempts: Attempt[];
+  /** Present only for explicit exam-like sessions; legacy sessions retain their existing behaviour. */
+  examSessionSync?: import("../lib/examSessionSync").ExamSessionSync;
 };
 
 export type AnswerKeyScoreRevision = {
@@ -397,6 +402,8 @@ export type QuestionCommunityStats = {
 };
 
 export type QuestionExplanationOverride = {
+  readingFormat?: "full-v1" | null;
+  replacementRevision?: string | null;
   explanation: string;
   optionAnalysis?: Partial<Record<OptionKey, string>>;
   memoryTip?: string;

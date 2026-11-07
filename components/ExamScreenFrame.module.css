@@ -1,0 +1,14 @@
+.frame{width:min(1024px,calc(100% - 32px));margin:14px auto 24px;color:#111;font:13px Arial,"PMingLiU","MingLiU","Songti TC",serif}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 6px;flex-wrap:wrap}.controls label{display:inline-flex;gap:6px;align-items:center}.controls select,.controls button{font:inherit;border:1px solid #888;background:#eee;color:#111;padding:2px 7px;border-radius:0}.controls button:focus-visible,.controls select:focus-visible{outline:2px solid #245fa8;outline-offset:2px}
+.display{position:relative;width:100%;aspect-ratio:4/3;background:white;border:1px solid #777;box-sizing:border-box}
+.viewport{position:absolute;inset:0;overflow:auto;background:white}
+.bitmap{position:absolute;left:0;top:0;pointer-events:none;image-rendering:pixelated;z-index:2;background:white}
+.status{font-size:12px;margin:5px 0 0;color:#444;min-height:18px}
+.frame [data-exam-pixel-source]>main{min-height:var(--exam-screen-height,768px)!important}
+.frame :global(.exam-shell){min-height:calc(var(--exam-screen-height,768px) - 55px)!important}
+.frame :global(.confirm-page){min-height:var(--exam-screen-height,768px)!important}
+.frame :global(.toolbar){grid-template-columns:minmax(200px,265px) minmax(300px,540px) minmax(100px,150px)}
+.frame :global(.exam-header){margin-left:auto;margin-right:auto}
+.frame :global(.answer-area),.frame :global(.review-area),.frame :global(.exam-footer){margin-left:auto;margin-right:auto}
+.frame :global(.entry-panel),.frame :global(.entry-disclaimer),.frame :global(.confirm-sheet),.frame :global(.completion-paper),.frame :global(.completion-links){margin-left:auto;margin-right:auto;align-self:center}
+.frame :global(.confirm-banner){padding-left:40px;padding-right:20px}

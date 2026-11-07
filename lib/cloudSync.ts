@@ -1,3 +1,5 @@
+import {acceptCanonicalCompletion,isAcceptedCompletion} from "./quizAnswerEdits";
+import { assertLegacyCloudSyncAllowed } from "./examSessionSync";
 import type { User } from "@supabase/supabase-js";
 import { getOfficialPaperKeyFromQuestionId } from "./officialPaperIdentity";
 import type {
@@ -23,6 +25,7 @@ import type {
   VisitorStats
 } from "@/types/quiz";
 import {
+  reconcileServerQuizSession,
   compactGeneratedQuestionsForStorage,
   compactQuestionForStorage,
   compactSessionForStorage,
@@ -142,6 +145,8 @@ type QuestionAccuracyStatRow = {
 };
 
 type QuestionExplanationOverrideRow = {
+  reading_format?: "full-v1" | null;
+  replacement_revision?: string | null;
   question_id: string;
   explanation: string;
   option_analysis?: Record<string, string> | null;
@@ -826,6 +831,8 @@ function buildSessionPayloadForCloud(
     settings: compacted.settings,
     questionOrder: compacted.questionOrder,
     optionEliminationMap: compacted.optionEliminationMap,
+    examSessionSync: compacted.examSessionSync,
+    answerEdits: compacted.answerEdits,
     simulationElapsedSeconds: compacted.simulationElapsedSeconds,
     simulationTimerDurationSeconds: compacted.simulationTimerDurationSeconds,
     scoreRevisions: compacted.scoreRevisions,
@@ -1077,6 +1084,7 @@ async function syncSessionsThroughServer(
   sessions: QuizSession[],
   options: { activeCheckpoint?: boolean } = {}
 ) {
+  assertLegacyCloudSyncAllowed(sessions);
   let accessToken = await getCloudSessionSyncAccessToken();
   if (!accessToken) {
     throw new Error("登入狀態讀取失敗，先保留本機紀錄。");
@@ -1112,11 +1120,26 @@ async function syncSessionsThroughServer(
   const payload = (await response.json().catch(() => null)) as {
     ok?: boolean;
     message?: string;
+    canonicalSessions?: QuizSession[];
+    acceptedCanonicalSessions?: QuizSession[];
   } | null;
 
-  if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || "伺服器雲端同步失敗。");
+  const reconciled:QuizSession[]=[];
+  for(const value of [...(payload?.acceptedCanonicalSessions??[]),...(payload?.canonicalSessions??[])]){
+    const proposal=sessions.find(s=>s.id===value.id);
+    if(!proposal)throw Error('COMPLETION_SCOPE_MISMATCH');
+    // Exact prefix established by the original authenticated namespace mapping.
+    const ownerMatch=/^user-([0-9a-f-]{36}):/.exec(value.id);
+    if(!ownerMatch)throw Error('COMPLETION_SCOPE_MISMATCH');
+    let canonical=acceptCanonicalCompletion(normalizeSessions([value])[0]);
+    if(proposal.completedAt||canonical.completedAt)canonical=reconcileServerQuizSession(ownerMatch[1],canonical,proposal)??canonical;
+    reconciled.push(canonical);
   }
+  if (!response.ok || !payload?.ok) {
+    throw Object.assign(new Error(payload?.message || "作答版本已更新，已保留本機送出版本並取回最新作答，請確認後再交卷。"),{canonicalSessions:reconciled});
+  }
+  if(sessions.some(s=>s.answerEdits&&!reconciled.some(c=>c.id===s.id)))throw Error('CANONICAL_ACK_MISSING');
+  return reconciled;
 }
 
 function getCurrentSessionSyncSignature(session: QuizSession) {
@@ -1129,7 +1152,8 @@ function getCurrentSessionSyncSignature(session: QuizSession) {
     session.id,
     session.currentQuestionIndex ?? 0,
     session.attempts.length,
-    latestAttemptAt
+    latestAttemptAt,
+    JSON.stringify(session.answerEdits??null)
   ].join("|");
 }
 
@@ -1472,7 +1496,7 @@ function mapRowToSession(
       } as QuizSession["settings"])
     : undefined;
 
-  return normalizeSessions([
+  const mapped=normalizeSessions([
     {
       id: row.id,
       subject: (payload.subject as SubjectName | undefined) ?? (row.subject as SubjectName),
@@ -1492,6 +1516,8 @@ function mapRowToSession(
       questionOrder: resolvedQuestionOrder,
       generatedQuestions: payload.generatedQuestions ?? [],
       optionEliminationMap: payload.optionEliminationMap,
+      examSessionSync: payload.examSessionSync,
+      answerEdits: payload.answerEdits,
       simulationElapsedSeconds: payload.simulationElapsedSeconds,
       simulationTimerDurationSeconds: payload.simulationTimerDurationSeconds,
       currentQuestionIndex: payload.currentQuestionIndex,
@@ -1499,6 +1525,7 @@ function mapRowToSession(
       attempts: resolvedAttempts
     }
   ])[0] ?? null;
+  return mapped&&row.completed_at?acceptCanonicalCompletion({...mapped,completedAt:row.completed_at}):mapped;
 }
 
 function getLatestAttemptAnsweredAt(attempts: Attempt[]) {
@@ -2027,6 +2054,8 @@ function mapQuestionExplanationOverrideRow(
   row: QuestionExplanationOverrideRow
 ): QuestionExplanationOverride {
   const normalized = normalizeQuestionExplanationOverride({
+    replacementRevision: row.replacement_revision??null,
+    readingFormat: row.reading_format === "full-v1" ? "full-v1" : null,
     explanation: row.explanation,
     optionAnalysis: row.option_analysis ?? {},
     memoryTip: row.memory_tip ?? undefined,
@@ -2035,6 +2064,8 @@ function mapQuestionExplanationOverrideRow(
   });
 
   return normalized ?? {
+    replacementRevision: row.replacement_revision??null,
+    readingFormat: row.reading_format === "full-v1" ? "full-v1" : null,
     explanation: row.explanation,
     optionAnalysis: row.option_analysis ?? {},
     memoryTip: row.memory_tip ?? undefined,
@@ -2073,6 +2104,7 @@ function buildLatestAttemptStatsSession(session: QuizSession) {
 }
 
 async function upsertQuestionAttemptLogs(sessions: QuizSession[]) {
+  assertLegacyCloudSyncAllowed(sessions);
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
@@ -2407,6 +2439,10 @@ async function upsertSessionsForUser(
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
+  if(sessions.some(s=>s.answerEdits)){
+    await syncSessionsThroughServer(sessions,{activeCheckpoint:options.activeCheckpoint});
+    return; // Versioned cancellation must NEVER fall back to direct upsert.
+  }
   const shouldUseServerFallback = typeof window !== "undefined";
   const runDirectUpsert = async () => {
   const supabase = getSupabaseBrowserClient();
@@ -3135,6 +3171,7 @@ export async function syncLocalCurrentSessionForCurrentUser(userId: string) {
 }
 
 export async function pushCompletedSessionToSupabase(session: QuizSession) {
+  assertLegacyCloudSyncAllowed([session]);
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
 
@@ -3143,6 +3180,15 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
 
   if (data.user) {
     const canonicalSessions = canonicalizeSessionsForUser(data.user.id, [session]);
+    if(session.answerEdits){
+      queuePendingCompletedSessionUploadForUser(data.user.id,canonicalSessions);
+      const resolved=await syncSessionsThroughServer(canonicalSessions);
+      const accepted=resolved.find(s=>s.id===canonicalSessions[0].id&&isAcceptedCompletion(s));
+      if(!accepted)throw Error('COMPLETION_NOT_ACCEPTED');
+      commitUploadedCompletedSessionsForUser(data.user.id,[accepted]);
+      return accepted;
+    }
+
     for (const canonicalSession of canonicalSessions) {
       clearCurrentSessionSyncStateForSession(data.user.id, canonicalSession.id);
     }
@@ -3217,6 +3263,10 @@ export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) 
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
   if (session.completedAt) {
+    if(session.answerEdits&&!isAcceptedCompletion(session)){
+      const {data}=await getSupabaseBrowserClient().auth.getSession();
+      if(data.session?.user)return;
+    }
     await syncQuestionStatsForSessionsSafely([session]);
     return;
   }
@@ -3230,6 +3280,7 @@ export async function pushCurrentSessionToSupabase(
   session: QuizSession,
   options: { force?: boolean } = {}
 ) {
+  assertLegacyCloudSyncAllowed([session]);
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || session.completedAt) return;
   if (isCurrentSessionDiscarded(session.id)) return;
@@ -3242,6 +3293,11 @@ export async function pushCurrentSessionToSupabase(
 
   const canonicalSession = canonicalizeSessionsForUser(userId, [session])[0];
   if (!canonicalSession) return;
+
+  if(canonicalSession.answerEdits){
+    await upsertSessionsForUser(userId,[canonicalSession],{activeCheckpoint:true,protectedServerOnly:true});
+    return; // A lower attempt count may be an intentional cancellation, not an incomplete draft.
+  }
 
   const remoteActiveRows = await withCloudFallback<QuizSessionRow[] | null>(
     fetchActiveQuizSessionRowsForUser(userId),
@@ -3752,6 +3808,11 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
       );
 
       if (isFreshBackgroundPayload(payload)) {
+        const storage=await import("@/lib/storage");
+        for(const questionId of requestIds){
+          const local=storage.loadQuestionExplanationOverride(questionId),remote=mappedOverrides.get(questionId)??null;
+          if((local?.replacementRevision && (!remote || local.replacementRevision!==remote.replacementRevision)) || (local?.readingFormat === "full-v1" && remote && remote.readingFormat !== "full-v1" && Date.parse(remote.updatedAt)>=Date.parse(local.updatedAt)))storage.applyConfirmedExplanationVersion(questionId,remote);
+        }
         for (const questionId of requestIds) {
           writeBackgroundCache(
             `explanation:${questionId}`,
