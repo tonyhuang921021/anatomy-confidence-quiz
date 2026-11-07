@@ -510,46 +510,6 @@ function getOptionKeysFromQuestion(question: Question) {
   );
 }
 
-type DeferredQuestionToolsProps = {
-  question: Question;
-  aiExplanationContent?: ReactNode;
-  relatedQuestionsContent?: () => ReactNode;
-  moreActionsContent?: ReactNode;
-};
-
-function DeferredQuestionTools({
-  question,
-  aiExplanationContent,
-  relatedQuestionsContent,
-  moreActionsContent
-}: DeferredQuestionToolsProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <details
-      className="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5"
-      onToggle={(event) => {
-        if (event.currentTarget !== event.target) return;
-        setIsOpen(event.currentTarget.open);
-      }}
-    >
-      <summary className="cursor-pointer text-sm font-semibold text-slate-700">
-        更多詳解與工具
-      </summary>
-      {isOpen ? (
-        <QuestionExplanationTabs
-          question={question}
-          compact
-          className="mt-3"
-          aiExplanationContent={aiExplanationContent}
-          relatedQuestionsContent={relatedQuestionsContent}
-          moreActionsContent={moreActionsContent}
-        />
-      ) : null}
-    </details>
-  );
-}
-
 function renderQuestionReview(
   item: ReviewQuestionItem,
   renderedQuestion: Question,
@@ -570,7 +530,42 @@ function renderQuestionReview(
     />
   ) : undefined;
   const questionTools = (
-    <QuestionExplanationTabs
+    <QuestionExplanationTabs mainExplanationContent={<>
+<StructuredExplanationText
+        text={renderedQuestion.explanation}
+        label="重點解析"
+        compact
+        questionId={renderedQuestion.id}
+        sectionFilter={
+          shouldCollapseAiExplanation
+            ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
+            : undefined
+        }
+      />
+      {!hasReviewedExplanation(renderedQuestion.id) && renderedQuestion.optionAnalysis ? (
+        <div className="space-y-2">
+          {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
+            const text = renderedQuestion.optionAnalysis?.[key];
+            if (!text) return null;
+            return (
+              <div
+                key={`${renderedQuestion.id}-analysis-${key}`}
+                className="rounded-xl border border-slate-200 bg-slate-50/90 px-3 py-2.5 sm:px-4"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                    {key}
+                  </span>
+                  <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
+                    {text}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+</>}
       question={renderedQuestion}
       compact
       className="mt-3"
@@ -621,48 +616,9 @@ function renderQuestionReview(
         </p>
       </div>
       <QuestionAiMetadataBadges question={renderedQuestion} />
-      <StructuredExplanationText
-        text={renderedQuestion.explanation}
-        label="重點解析"
-        compact
-        questionId={renderedQuestion.id}
-        sectionFilter={
-          shouldCollapseAiExplanation
-            ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
-            : undefined
-        }
-      />
-      {!hasReviewedExplanation(renderedQuestion.id) && renderedQuestion.optionAnalysis ? (
-        <div className="space-y-2">
-          {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
-            const text = renderedQuestion.optionAnalysis?.[key];
-            if (!text) return null;
-            return (
-              <div
-                key={`${renderedQuestion.id}-analysis-${key}`}
-                className="rounded-xl border border-slate-200 bg-slate-50/90 px-3 py-2.5 sm:px-4"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                    {key}
-                  </span>
-                  <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
-                    {text}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
-      {deferAdditionalTools ? (
-        <DeferredQuestionTools
-          question={renderedQuestion}
-          aiExplanationContent={aiExplanationContent}
-          relatedQuestionsContent={relatedQuestionsContent}
-          moreActionsContent={footer}
-        />
-      ) : questionTools}
+      {questionTools}
+      
+      
     </div>
   );
 }

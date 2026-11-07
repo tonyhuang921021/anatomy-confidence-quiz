@@ -1,4 +1,5 @@
 "use client";
+import "@/app/explanation-reading.css";
 import { ExplanationMathText } from "@/components/ExplanationMathText";
 import { SectionFiguresProvider, SectionFigures } from "@/components/SectionExplanationFigures";
 
@@ -26,6 +27,7 @@ type StructuredExplanationTextProps = {
 };
 
 type ExplanationBlock =
+  | { type: "list"; ordered: boolean; items: {text:string; value?:number}[] }
   | {
       type: "heading";
       title: string;
@@ -42,7 +44,7 @@ type ExplanationBlock =
 
 type ExplanationSection = {
   title?: string;
-  blocks: Array<Extract<ExplanationBlock, { type: "paragraph" | "table" }>>;
+  blocks: Array<Extract<ExplanationBlock, { type: "paragraph" | "table" | "list" }>>;
 };
 
 const STRUCTURED_HEADING_ALIASES = new Set([
@@ -160,6 +162,20 @@ function parseExplanationBlocks(text: string): ExplanationBlock[] {
       }
     }
 
+    const listMatch = line.trim().match(/^(?:(\d+)[.)．、]|([-*•]))\s+(.+)$/);
+    if (listMatch) {
+      flushParagraph();
+      const ordered = Boolean(listMatch[1]);
+      const items: {text:string; value?:number}[] = [];
+      while(index < lines.length) {
+        const item=lines[index].trim().match(/^(?:(\d+)[.)．、]|([-*•]))\s+(.+)$/);
+        if(!item || Boolean(item[1])!==ordered) break;
+        items.push({text:item[3], ...(ordered?{value:Number(item[1])}:{})}); index++;
+      }
+      index--;
+      blocks.push({type:"list",ordered,items});
+      continue;
+    }
     const heading = parseHeadingLine(line);
     if (heading) {
       flushParagraph();
@@ -255,13 +271,10 @@ export function StructuredExplanationText({
   }
 
   const labelClassName = tone === "dark" ? "text-white" : "text-ink";
-  const sectionClassName =
-    tone === "dark"
-      ? "border-white/20"
-      : "border-teal-200";
+
   const headingClassName = tone === "dark" ? "text-teal-50" : "text-teal-900";
   const paragraphClassName = tone === "dark" ? "text-slate-50" : "text-slate-800";
-  const leadBackgroundClassName = tone === "dark" ? "bg-white/5" : "bg-white/60";
+
   const tableShellClassName =
     tone === "dark"
       ? "border-white/15 bg-white/5"
@@ -278,7 +291,7 @@ export function StructuredExplanationText({
     "structured-explanation-table-cell min-w-[7.5rem] max-w-[16rem] whitespace-normal break-words [overflow-wrap:anywhere] [word-break:normal] sm:min-w-[8.5rem] sm:max-w-[18rem]";
 
   return (
-    <SectionFiguresProvider questionId={questionId} text={text || ""}><div className={`structured-explanation-text w-full max-w-full min-w-0 ${className}`}>
+    <SectionFiguresProvider questionId={questionId} text={text || ""}><div data-reading-tone={tone} className={`structured-explanation-text reading-prose w-full max-w-full min-w-0 ${className}`}>
       {label ? (
         <p className={`mb-3 text-[15px] font-black leading-6 ${labelClassName}`}>
           {label}
@@ -289,7 +302,7 @@ export function StructuredExplanationText({
         {sections.map((section, index) => (
           <section
             key={`${section.title ?? "section"}-${index}`}
-            className={`w-full max-w-full min-w-0 border-l-4 pl-3 sm:pl-4 ${sectionClassName}`}
+            className="reading-section w-full max-w-full min-w-0"
           >
             {section.title ? (
               <h4 className={`mb-2 text-[16px] font-black leading-7 sm:text-[17px] ${headingClassName}`}>
@@ -297,13 +310,14 @@ export function StructuredExplanationText({
               </h4>
             ) : null}
             {section.blocks.length > 0 ? (
-              <div className={`w-full min-w-0 rounded-2xl px-3 py-3 sm:px-4 ${leadBackgroundClassName}`}>
+              <div className="reading-section-body w-full min-w-0">
                 <div className="space-y-3">
                   {section.blocks.map((block, blockIndex) => {
                     if (block.type === "table") {
                       return (
                         <div
                           key={`${section.title ?? "table"}-${blockIndex}`}
+                          tabIndex={0} role="region" aria-label={section.title ? `${section.title}比較表` : "詳解比較表"}
                           className={`structured-explanation-table-shell w-full max-w-full touch-pan-x overscroll-x-contain overflow-x-auto rounded-2xl border shadow-[inset_-18px_0_18px_-20px_rgba(15,23,42,0.65)] [-webkit-overflow-scrolling:touch] ${tableShellClassName}`}
                         >
                           <table className="structured-explanation-table w-full min-w-max max-w-none table-auto border-collapse text-left text-[14px] leading-7 sm:text-[15px]">
@@ -311,7 +325,7 @@ export function StructuredExplanationText({
                               <tr>
                                 {block.headers.map((header, headerIndex) => (
                                   <th
-                                    key={`${header}-${headerIndex}`}
+                                    scope="col" key={`${header}-${headerIndex}`}
                                     className={`border-b px-3 py-2.5 font-black ${tableCellClassName} ${tableTextWrapClassName}`}
                                   >
                                     <InlineEmphasis text={header} />
@@ -338,6 +352,10 @@ export function StructuredExplanationText({
                       );
                     }
 
+                    if (block.type === "list") {
+                      const List=block.ordered ? "ol" : "ul";
+                      return <List className="reading-list" key={`list-${blockIndex}`}>{block.items.map((item,i)=><li key={i} value={item.value}><InlineEmphasis text={item.text}/></li>)}</List>;
+                    }
                     return (
                       <p
                         key={`${section.title ?? "paragraph"}-${blockIndex}`}

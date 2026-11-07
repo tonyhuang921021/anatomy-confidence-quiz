@@ -2475,7 +2475,8 @@ function ResultsPageContent() {
         </div>
         <ExplanationGenerationStatus key={question.id} questionId={question.id} loading={explanationLoadingMap[question.id]} error={explanationErrorMap[question.id]} resultVersion={explanationOverrides[question.id]?.updatedAt} />
         <QuestionAiMetadataBadges question={question} className="mb-3" />
-        <StructuredExplanationText
+        <QuestionExplanationTabs mainExplanationContent={<>
+<StructuredExplanationText
           text={question.explanation}
           label="詳解"
           compact
@@ -2487,7 +2488,7 @@ function ResultsPageContent() {
           }
         />
         {!hasReviewedExplanation(question.id) ? renderOptionAnalysis(question) : null}
-        <QuestionExplanationTabs
+</>}
           question={question}
           compact
           className="mt-3"
@@ -2501,6 +2502,8 @@ function ResultsPageContent() {
           )}
           moreActionsContent={renderExplanationFooter(question, attempt)}
         />
+
+        
       </div>
     );
   }

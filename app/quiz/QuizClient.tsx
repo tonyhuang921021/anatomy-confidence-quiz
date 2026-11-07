@@ -2787,10 +2787,11 @@ export default function QuizPage() {
                         className="mb-3"
                       />
                       {!hasReviewedExplanation(currentQuestion.id)&&!currentExplanationOverride&&<button type="button" disabled={currentExplanationLoading} onClick={()=>void handleGenerateQuestionExplanation(currentQuestion,submittedAttempt)} className="mb-3 min-h-11 rounded-xl bg-brand-700 px-4 py-2 font-semibold text-white disabled:opacity-60">{currentExplanationLoading?'詳解生成中…':'產生圖文詳解'}</button>}
-                      {shouldShowAiExplanationDetails ? (
+                      <QuestionExplanationTabs mainExplanationContent={<>
+{shouldShowAiExplanationDetails ? (
                         <StructuredExplanationText text={currentQuestion.explanation} label={!currentExplanationOverride&&!hasReviewedExplanation(currentQuestion.id)?"題庫既有說明":"整題詳解"} compact questionId={currentQuestion.id} />
                       ) : null}
-                      <QuestionExplanationTabs
+</>}
                         question={currentQuestion}
                         className="mt-3"
                         relatedQuestionsContent={() => (
@@ -2843,6 +2844,8 @@ export default function QuizPage() {
                           </>
                         )}
                       />
+
+                      
                     </>
                   ) : null}
                   {specialScoringNote ? (

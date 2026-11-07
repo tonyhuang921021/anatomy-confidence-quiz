@@ -175,7 +175,8 @@ export function RelatedQuestionsPanel({
                       {getAnswerLabel(relatedQuestion)}
                     </p>
                   </div>
-                  <StructuredExplanationText
+                  <QuestionExplanationTabs mainExplanationContent={<>
+<StructuredExplanationText
                     text={relatedQuestion.explanation}
                     label="重點解析"
                     compact
@@ -186,12 +187,14 @@ export function RelatedQuestionsPanel({
                         : undefined
                     }
                   />
-                  <QuestionExplanationTabs
+</>}
                     question={relatedQuestion}
                     compact
                     className="mt-3"
                     aiExplanationContent={aiExplanationContent}
                   />
+
+                  
                 </div>
               ) : null}
             </div>

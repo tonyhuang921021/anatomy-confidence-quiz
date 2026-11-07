@@ -1,4 +1,6 @@
 "use client";
+import "@/app/explanation-reading.css";
+import {formatReviewedTypography} from "@/lib/reviewedTypography";
 
 import { memo, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { reviewedImageSource } from "@/lib/reviewedImageSource";
@@ -28,6 +30,8 @@ const ReviewedHtml = memo(function ReviewedHtml({ html }: { html: string }) {
   useEffect(() => {
     const element = root.current;
     if (!element) return;
+    const tables=Array.from(element.querySelectorAll<HTMLElement>(".reviewed-table-scroll"));
+    tables.forEach(table=>{table.tabIndex=0;table.setAttribute("role","region");table.setAttribute("aria-label","詳解比較表");});
     const enhanced: Array<{ element: HTMLImageElement; tabIndex: string | null; role: string | null; label: string | null; expanded: string | null; title: string | null }> = [];
     element.querySelectorAll<HTMLImageElement>("img").forEach((image) => {
       if (!reviewedImageSource(image.getAttribute("src"), window.location.origin)) return;
@@ -147,7 +151,7 @@ export function ReviewedExplanation({ questionId }: { questionId: string }) {
         <div id={panelId} className="reviewed-reader study-disclosure" data-reader-mode={detailed ? "detailed" : "short"}>
           {!detailed ? <h3>{current.title}</h3> : null}
           {/* HTML is generated only from hash-pinned accepted sources by the strict allowlist importer. */}
-          <ReviewedHtml html={detailed ? current.html : current.shortHtml} />
+          <ReviewedHtml html={formatReviewedTypography(questionId, detailed ? current.html : current.shortHtml)} />
         </div>
       ) : null}
 

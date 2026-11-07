@@ -14,6 +14,7 @@ import { createPortal } from "react-dom";
 import { useSurfaceTransition } from "@/components/useSurfaceTransition";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
+import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import {
   QuestionOptionBlock,
@@ -1259,6 +1260,9 @@ function SearchPageContent() {
 
                 <ExplanationGenerationStatus key={renderedQuestion.id} questionId={renderedQuestion.id} loading={loading} error={error} resultVersion={override?.updatedAt} />
                 {shouldShowAnswer ? (
+                <div className="search-result-action-dock">
+                  <QuestionExplanationTabs mainExplanationContent={<>
+{shouldShowAnswer ? (
                   <StructuredExplanationText text={renderedQuestion.explanation} label={!override&&!hasReviewedExplanation(renderedQuestion.id)?"題庫既有說明":"詳解"} compact questionId={renderedQuestion.id} />
                 ) : null}
                 {shouldShowAnswer && !hasReviewedExplanation(renderedQuestion.id) && renderedQuestion.optionAnalysis ? (
@@ -1284,10 +1288,9 @@ function SearchPageContent() {
                     })}
                   </div>
                 ) : null}
-                {shouldShowAnswer ? (
-                <div className="search-result-action-dock">
-                  <QuestionExplanationTabs
+</>}
                     question={renderedQuestion}
+                    relatedQuestionsContent={() => <RelatedQuestionsPanel question={renderedQuestion} relatedQuestions={allQuestions} savedQuestionSource="search" />}
                     compact
                     className="search-result-source-tabs"
                     moreActionsContent={(
@@ -1336,6 +1339,8 @@ function SearchPageContent() {
                   {error ? <p className="text-sm font-medium text-rose-700" role="alert">{error}</p> : null}
                 </div>
                 ) : null}
+
+                
               </div>
               ) : (
                 <span id={detailsId} hidden />

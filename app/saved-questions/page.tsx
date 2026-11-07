@@ -412,8 +412,11 @@ export default function SavedQuestionsPage() {
                         ? "本題一律給分"
                         : selectedItem.question.answer}
                   </p>
-                  <StructuredExplanationText text={selectedItem.question.explanation} label="詳解" compact questionId={selectedItem.question.id} />
-                  <QuestionExplanationTabs question={selectedItem.question} compact className="mt-3" />
+                  <QuestionExplanationTabs mainExplanationContent={<>
+<StructuredExplanationText text={selectedItem.question.explanation} label="詳解" compact questionId={selectedItem.question.id} />
+</>} question={selectedItem.question} compact className="mt-3" />
+
+                  
                 </div>
               ) : null}
             </article>

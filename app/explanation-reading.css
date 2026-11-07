@@ -1,0 +1,37 @@
+/* Presentation-only reading layer. No generated text/source mutation. */
+.reviewed-explanation { padding:clamp(18px,3vw,36px); border-radius:12px; }
+.reviewed-explanation .reviewed-reader, .reading-prose > div { max-width:44rem; margin-inline:auto; }
+.reviewed-explanation-controls { max-width:44rem; margin:0 auto 1.5rem; }
+.reviewed-reader, .reading-prose { font-size:17px; line-height:1.85; font-weight:400; word-break:normal; overflow-wrap:break-word; }
+.reviewed-reader h2 { font-size:1.35rem; font-weight:650; line-height:1.5; margin:0 0 1rem; text-wrap:pretty; }
+.reviewed-reader h3, .reviewed-reader h4, .reading-prose .reading-section h4 { font-size:1.08rem; font-weight:650; line-height:1.6; margin:1.75rem 0 .65rem; text-wrap:pretty; }
+.reviewed-reader p, .reading-prose .reading-section p { font-size:1em; font-weight:400; line-height:1.85; margin:.8rem 0; }
+.reviewed-reader strong, .reading-prose strong { font-weight:650; }
+.reviewed-reader .reviewed-official-answer { border:0; background:none; padding:0; margin:.5rem 0 1rem; color:#52665b; font-size:.875rem; font-weight:500; }
+.reviewed-reader figure { max-width:36rem; border:0; padding:0; background:none; border-radius:0; margin:1.4rem auto; }
+.reviewed-reader figcaption { font-size:.81rem; line-height:1.65; color:#627169; margin:.6rem 0 0; }
+.reviewed-reader .reviewed-image-frame { --reviewed-image-max-height:12rem; border-radius:4px; }
+.reviewed-reader .reviewed-image-frame[data-reviewed-expanded="true"] { --reviewed-image-max-height:100rem; width:100%; }
+.reviewed-reader .reviewed-table-scroll, .reading-prose .structured-explanation-table-shell { border:1px solid #dce4df; border-radius:6px; margin:1.25rem 0; overflow-x:auto; overscroll-behavior-x:contain; }
+.reviewed-reader table, .reading-prose .structured-explanation-table { font-size:15px; line-height:1.65; min-width:32rem; }
+.reviewed-reader th, .reviewed-reader td { border:0; border-bottom:1px solid #dce4df; padding:.75rem 1rem; min-width:8rem; }
+.reviewed-reader th, .reading-prose th { font-weight:600; background:#f2f6f3; }
+.reviewed-reader tbody tr:nth-child(even), .reading-prose tbody tr:nth-child(even) { background:rgba(110,140,125,.04); }
+.reading-prose .reading-section { padding:0; border:0; }
+.reading-prose .reading-section-body { background:none; border-radius:0; padding:0; }
+.reading-prose .reading-list, .reviewed-reader ul, .reviewed-reader ol { margin:.85rem 0; padding-inline-start:1.5em; list-style:revert; }
+.reading-prose li, .reviewed-reader li { padding-left:.2em; margin:.45rem 0; }
+.reviewed-reader .reviewed-term { white-space:nowrap; }
+.reviewed-reader .reviewed-term sub { font-size:.75em; line-height:0; position:relative; bottom:-.25em; vertical-align:baseline; }
+.reviewed-reader .reviewed-equation { font-size:1.12rem; margin:1.25rem 0; padding:.65rem 0; white-space:nowrap; overflow-x:auto; text-align:center; }
+.reviewed-reader .reviewed-equation strong { font-weight:500; }
+.reviewed-table-scroll:focus-visible, .structured-explanation-table-shell:focus-visible { outline:2px solid #39765a; outline-offset:3px; }
+.reading-prose[data-reading-tone="dark"] th { background:rgba(255,255,255,.08); }
+@media(max-width:600px) {
+ .reviewed-explanation { padding:18px 14px; }
+ .reviewed-reader, .reading-prose { font-size:16px; }
+ .reviewed-reader h2 { font-size:1.2rem; }
+ .reviewed-reader h3, .reviewed-reader h4, .reading-prose .reading-section h4 { font-size:1.04rem; }
+ .reviewed-reader .reviewed-equation { font-size:1.02rem; }
+ .reviewed-reader .reviewed-image-frame { --reviewed-image-max-height:10rem; }
+}
