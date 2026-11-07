@@ -1,3 +1,4 @@
+import {figureCaptureAllowed} from "@/lib/figureCaptureGate.cjs";
 import {backgroundExplanationResponse} from "@/lib/explanationBackgroundResponse";
 import {createReservedReads} from "@/lib/explanationReservedReads";
 import { explanationPrefix } from "@/lib/explanationStream";
@@ -763,8 +764,8 @@ export async function POST(request: NextRequest) {
   const db = createClient(url, serviceRole || anonKey!, {auth:{persistSession:false,autoRefreshToken:false}});
   const replacing=action==="replace";
   let replacementReservationAttempted=false;
-  const newFigures=process.env.NEW_EXPLANATION_FIGURES_CAPTURE === "1" && imageWindowOpen(process.env);
-  const figureQueue=!replacing && !newFigures && captureEnabled(process.env,url);
+  const newFigures=process.env.NEW_EXPLANATION_FIGURES_CAPTURE === "1" && imageWindowOpen(process.env) && await figureCaptureAllowed(db);
+  let figureQueue=!replacing && !newFigures && captureEnabled(process.env,url) && imageWindowOpen(process.env) && await figureCaptureAllowed(db);
   let actorId = "", verifiedEmail = "";
   // Source commit identifies the reviewed index, independently of deployment commit.
   // Keep it while the verified index is identical; change it only with an atomic,
@@ -785,7 +786,8 @@ export async function POST(request: NextRequest) {
   }));
   const reserveRequest=async({actorId:actor,questionId,operationId,baseVersion}:{actorId:string;questionId:string;operationId?:string;baseVersion?:string})=>{
         const runUntil=Date.parse(process.env.QUESTION_EXPLANATION_RUN_UNTIL || "");
-        if(!Number.isFinite(runUntil)||Date.now()>=runUntil)return {ok:false,code:"budget"};
+        if(!Number.isFinite(runUntil))return {ok:false,code:"safe_configuration_missing"};
+        if(Date.now()>=runUntil)return {ok:false,code:"run_window_expired"};
         if (!serviceRole || !isOpenAIConfigured() || !promoVerified || !["gpt-6.1-sol","gpt-6.1-terra"].includes(model || "") || (model === "gpt-6.1-terra" && mode !== "default") ||
             !["low","default"].includes(mode) || !pricingRevision || !Number.isSafeInteger(inRate) || inRate <= 0 ||
             !Number.isSafeInteger(outRate) || outRate <= 0) return {ok:false,code:"safe_configuration_missing"};
@@ -798,6 +800,7 @@ export async function POST(request: NextRequest) {
           if (!Number.isFinite(until)) return {ok:false,code:"guard_unavailable"};
           if (until > Date.now() && !isBypassEmail(verifiedEmail)) return {ok:false,code:"account_banned"};
         }
+        if(figureQueue && (!imageWindowOpen(process.env)||!await figureCaptureAllowed(db)))figureQueue=false;
         const id = operationId || crypto.randomUUID();
         if(operationId)replacementReservationAttempted=true;
         const {data,error} = await measured("reserveMs",()=>withServerTimeout(db.rpc(operationId ? "ai_guard_reserve_replacement" : figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit,...(operationId?{p_base_version:baseVersion}:{})}),1600,"預算預留逾時"));
@@ -859,7 +862,8 @@ export async function POST(request: NextRequest) {
         return data.status==="completed"?{state:"completed",value:replacementValue(data.value)}:{state:"pending"};
       },
       commitReplacement: async (g:any,id:string,result:any)=>{
-        const {data,error}=await measured("commitMs",()=>withServerTimeout(db.rpc("ai_guard_commit_replacement",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip??"",p_needs:newFigures?buildNeedsWithFallback(result.explanation,result.figureNeeds,(resolveTrustedExplanationQuestion(id) as any).question):null}),1600,"替換儲存狀態未確認"));
+        const captureNow=newFigures && imageWindowOpen(process.env) && await figureCaptureAllowed(db);
+        const {data,error}=await measured("commitMs",()=>withServerTimeout(db.rpc("ai_guard_commit_replacement",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip??"",p_needs:captureNow?buildNeedsWithFallback(result.explanation,result.figureNeeds,(resolveTrustedExplanationQuestion(id) as any).question):null}),1600,"替換儲存狀態未確認"));
         if(error||!data)return null;
         if(data.status==="replacement_version_changed")return {conflict:true};
         if(data.status!=="replaced"||data.value?.question_id!==id||data.value?.replacement_revision!==g.leaseId)return null;
@@ -902,11 +906,13 @@ export async function POST(request: NextRequest) {
         return !error && data === "settled";
       },
       insertIfAbsentFenced: async (g:any, id:string, result:any) => {
-        const {data,error} = await measured("commitMs",()=>withServerTimeout(db.rpc(newFigures ? "figure_guard_commit_new_images" : figureQueue ? "figure_guard_commit" : "ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? "",...(newFigures ? {p_needs:buildNeedsWithFallback(result.explanation,result.figureNeeds,resolveTrustedExplanationQuestion(id).ok ? (resolveTrustedExplanationQuestion(id) as any).question : null)} : {})}),1600,"共享詳解寫入逾時"));
+        const captureNow=newFigures && imageWindowOpen(process.env) && await figureCaptureAllowed(db);
+        const legacyCapture=figureQueue && imageWindowOpen(process.env) && await figureCaptureAllowed(db);
+        const {data,error} = await measured("commitMs",()=>withServerTimeout(db.rpc(captureNow ? "figure_guard_commit_new_images" : legacyCapture ? "figure_guard_commit" : "ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? "",...(captureNow ? {p_needs:buildNeedsWithFallback(result.explanation,result.figureNeeds,resolveTrustedExplanationQuestion(id).ok ? (resolveTrustedExplanationQuestion(id) as any).question : null)} : {})}),1600,"共享詳解寫入逾時"));
         const row = Array.isArray(data) ? data[0] : data;
         if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
         // Text is already durably saved. Image failure never retries paid generation.
-        if(row.status==='inserted'&&newFigures){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)waitUntil(processSavedImages({db,question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)}));}
+        if(row.status==='inserted'&&captureNow){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)waitUntil(processSavedImages({db,question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)}));}
         // RPC signature stays compatible with existing queue wrappers. Read the committed marker,
         // never accept a provider/client-supplied format. Failed read is unknown, not a new generation.
         const confirmed=await db.from("question_explanation_overrides").select("question_id,explanation,option_analysis,memory_tip,model,updated_at,reading_format").eq("question_id",id).maybeSingle();
@@ -926,7 +932,10 @@ export async function POST(request: NextRequest) {
       untrusted_question:"此題尚無可驗證的官方或站內來源，不會使用客戶端題文生成。",
       trusted_context_missing:"此題缺少可驗證的承上題情境。", source_image_not_supported:"此題需要原圖判讀，請先使用原題及既有詳解。",
       incomplete_explanation:"詳解未包含所有選項，未儲存，請稍後再試。",
-      budget:"本階段額度已用完，既有詳解仍可閱讀。", question_busy:"此題正在產生，請稍後再試。",
+      run_window_expired:"本次詳解開放期限已到，既有詳解仍可閱讀。",
+      unavailable:"詳解生成的信用核實或安全設定目前不可用，既有詳解仍可閱讀。",
+      safe_configuration_missing:"詳解生成的信用核實或安全設定目前不可用，既有詳解仍可閱讀。",
+      budget:"本次網站設定的生成額度不足以開始新請求，既有詳解仍可閱讀。", question_busy:"此題正在產生，請稍後再試。",
       actor_busy:"此帳號已有請求進行中。", cooldown:"請稍後再試。", rate:"目前使用次數已達限制，請稍後再試。"
     };
     if (outcome.status === 200 && outcome.value) {

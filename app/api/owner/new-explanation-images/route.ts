@@ -1,3 +1,4 @@
+import {figureCaptureAllowed,guardFigureTraffic} from "@/lib/figureCaptureGate.cjs";
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {imageWindowOpen,buildNeeds,approveConcepts,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
@@ -21,7 +22,7 @@ export async function POST(request:NextRequest){
    if(unplanned.error)throw unplanned.error;
    return reply({ok:true,jobs:data,catalog:CATALOG,unplanned:unplanned.data});
   }
-  if(body.action==='plan_saved'&&!imageWindowOpen(process.env))return reply({ok:false,code:'worker_disabled'},503);
+  if(['run_one','retry_image','plan_saved'].includes(body.action) && (!imageWindowOpen(process.env)||process.env.NEW_EXPLANATION_FIGURES_CAPTURE!=='1'||!await figureCaptureAllowed(db)))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='plan_saved'){
    if(typeof body.questionId!=='string'||! /^[A-Za-z0-9_-]{1,200}$/.test(body.questionId))return reply({ok:false},400);
    const saved=await db.from('question_explanation_overrides').select('explanation,figure_status').eq('question_id',body.questionId).maybeSingle();
@@ -34,7 +35,7 @@ export async function POST(request:NextRequest){
   if(['run_one','retry_image','plan_saved'].includes(body.action)&&!imageWindowOpen(process.env))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='run_one'){
    if(process.env.NEW_EXPLANATION_FIGURES_WORKER!=='1')return reply({ok:false,code:'worker_disabled'},503);
-   return reply({ok:true,...await runOne({store:createStore(db),search:commonsSearch,loadImage:readBoundedImage,enabled:true})});
+   return reply({ok:true,...await runOne({store:createStore(db),search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),enabled:true})});
   }
   if(typeof body.id!=='string'||! /^[0-9a-f-]{36}$/i.test(body.id))return reply({ok:false},400);
   if(body.action==='retry_image'){const r=await db.rpc('figure_image_retry',{p_id:body.id});return reply({ok:!r.error&&r.data==='pending',status:r.data});}

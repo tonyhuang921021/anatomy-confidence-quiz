@@ -42,7 +42,7 @@ export async function requestExplanation(_url:string,init:RequestInit):Promise<R
    }
    const data=await response.clone().json();
    if(data.ok&&data.explanation){if(replacing)setPendingReplacement(id,null);remove(key(id));put(metricKey(id),JSON.stringify({startedAt:started,firstTextMs:firstTextMs??Date.now()-started,textMs:Date.now()-started,model:data.model,delivery:data.delivery||null}));}
-   else if(response.status===401||['unavailable','busy','actor_busy','rate','cooldown','account_banned','guard_unavailable','budget','safe_configuration_missing','reviewed_explanation_protected','untrusted_question','authentication_required','trusted_context_missing','source_image_not_supported','invalid_replacement','replacement_version_changed','trusted_question_incomplete','incomplete_explanation','replacement_not_written'].includes(data.code)){remove(key(id));if(replacing)setPendingReplacement(id,null);}
+   else if(response.status===401||['unavailable','busy','actor_busy','rate','cooldown','account_banned','guard_unavailable','run_window_expired','budget','safe_configuration_missing','reviewed_explanation_protected','untrusted_question','authentication_required','trusted_context_missing','source_image_not_supported','invalid_replacement','replacement_version_changed','trusted_question_incomplete','incomplete_explanation','replacement_not_written'].includes(data.code)){remove(key(id));if(replacing)setPendingReplacement(id,null);}
    return response;
   }catch{throw Error('request outcome unconfirmed')}
  })();active.set(id,task);
