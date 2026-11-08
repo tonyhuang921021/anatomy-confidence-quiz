@@ -1,7 +1,7 @@
 import {figureCaptureAllowed,guardFigureTraffic} from "@/lib/figureCaptureGate.cjs";
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {imageWindowOpen,buildNeeds,approveConcepts,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
+import {boundedImageTarget,imageWindowOpen,buildNeeds,approveConcepts,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 const reply=(x:any,status=200)=>NextResponse.json(x,{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(request:NextRequest){
@@ -24,10 +24,13 @@ export async function POST(request:NextRequest){
   }
   if(['run_one','retry_image','plan_saved'].includes(body.action) && (!imageWindowOpen(process.env)||process.env.NEW_EXPLANATION_FIGURES_CAPTURE!=='1'||!await figureCaptureAllowed(db)))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='plan_saved'){
+   const target=boundedImageTarget(process.env);
+   if(target&&body.questionId!==target.questionId)return reply({ok:false,code:'outside_single_batch'},403);
    if(typeof body.questionId!=='string'||! /^[A-Za-z0-9_-]{1,200}$/.test(body.questionId))return reply({ok:false},400);
    const saved=await db.from('question_explanation_overrides').select('explanation,figure_status').eq('question_id',body.questionId).maybeSingle();
    if(saved.error||!saved.data?.figure_status)return reply({ok:false},404);
    const needs=buildNeeds(saved.data.explanation,body.hints);
+   if(target&&needs?.explanationHash!==target.textHash)return reply({ok:false,code:'stale_single_batch'},409);
    if(!needs?.items?.length)return reply({ok:false,code:'heading_not_found'},400);
    const result=await db.rpc('figure_image_plan_saved',{p_question:body.questionId,p_needs:needs});
    return reply({ok:!result.error&&['awaiting','existing'].includes(result.data)});

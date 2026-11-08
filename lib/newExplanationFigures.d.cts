@@ -11,3 +11,5 @@ export function processSavedImages(args:any):Promise<any>;
 export function buildNeedsWithFallback(text:string,hints:unknown,question:any):any;
 
 export function imageWindowOpen(env:Record<string,string|undefined>,now?:number):boolean;
+
+export function boundedImageTarget(env:Record<string,string|undefined>):{questionId:string;textHash:string}|null;
