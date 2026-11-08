@@ -12,4 +12,6 @@ export function buildNeedsWithFallback(text:string,hints:unknown,question:any):a
 
 export function imageWindowOpen(env:Record<string,string|undefined>,now?:number):boolean;
 
-export function boundedImageTarget(env:Record<string,string|undefined>):{questionId:string;textHash:string}|null;
+export function boundedImageTarget(env:Record<string,string|undefined>,questionId?:string):{questionId:string;textHash:string}|null;
+
+export function boundedImageTargets(env:Record<string,string|undefined>):Array<{questionId:string;textHash:string}>;

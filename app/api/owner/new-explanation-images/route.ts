@@ -3,7 +3,7 @@ import {createFinalFigureReviewer} from "@/lib/finalFigureRuntime.cjs";
 import {figureCaptureAllowed,guardFigureTraffic} from "@/lib/figureCaptureGate.cjs";
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {boundedImageTarget,imageWindowOpen,buildNeeds,approveConcepts,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
+import {boundedImageTargets,boundedImageTarget,imageWindowOpen,buildNeeds,approveConcepts,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 const reply=(x:any,status=200)=>NextResponse.json(x,{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(request:NextRequest){
@@ -17,6 +17,9 @@ export async function POST(request:NextRequest){
   const auth=await db.auth.getUser(body.accessToken),u=auth.data?.user;
   const allowed=(process.env.NEXT_PUBLIC_ADMIN_EMAILS||'').split(',').map(x=>x.trim().toLowerCase());
   if(auth.error||!u?.id||!u.email||!allowed.includes(u.email.toLowerCase()))return reply({ok:false},403);
+  const pilotTargets=boundedImageTargets(process.env);
+  if(process.env.NEW_EXPLANATION_IMAGES_SINGLE_BATCH&&!pilotTargets.length)return reply({ok:false,code:'invalid_pilot'},503);
+  if(pilotTargets.length>1&&(!process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID||u.id!==process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID))return reply({ok:false,code:'pilot_operator'},403);
   if(body.action==='list'){
    const {data,error}=await db.from('figure_queue_jobs').select('request_id,question_id,figure_needs,needs_state,image_status,state,attempts').in('state',['pending','done','failed']).order('created_at').limit(20);
    if(error)throw error;
@@ -24,9 +27,8 @@ export async function POST(request:NextRequest){
    if(unplanned.error)throw unplanned.error;
    // A bounded saved-text pilot may add a fresh plan without regenerating text
    // or reopening any previous attempted job. No general catalog expansion.
-   const target=boundedImageTarget(process.env);
-   const available=[...(unplanned.data||[])];
-   if(target){
+   const available=[...(unplanned.data||[])].filter(x=>!pilotTargets.length||pilotTargets.some(t=>t.questionId===x.question_id));
+   for(const target of pilotTargets){
     const old=await db.from('figure_queue_jobs').select('request_id').eq('question_id',target.questionId).limit(1);
     const saved=await db.from('question_explanation_overrides').select('question_id,explanation,figure_status').eq('question_id',target.questionId).maybeSingle();
     if(old.error||saved.error)throw Error('target lookup failed');
@@ -37,8 +39,8 @@ export async function POST(request:NextRequest){
   }
   if(['run_one','retry_image','plan_saved'].includes(body.action) && (!imageWindowOpen(process.env)||process.env.NEW_EXPLANATION_FIGURES_CAPTURE!=='1'||!await figureCaptureAllowed(db)))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='plan_saved'){
-   const target=boundedImageTarget(process.env);
-   if(target&&body.questionId!==target.questionId)return reply({ok:false,code:'outside_single_batch'},403);
+   const target=boundedImageTarget(process.env,body.questionId);
+   if(pilotTargets.length&&!target)return reply({ok:false,code:'outside_single_batch'},403);
    if(typeof body.questionId!=='string'||! /^[A-Za-z0-9_-]{1,200}$/.test(body.questionId))return reply({ok:false},400);
    const saved=await db.from('question_explanation_overrides').select('explanation,figure_status').eq('question_id',body.questionId).maybeSingle();
    if(saved.error||!saved.data?.explanation)return reply({ok:false},404);
