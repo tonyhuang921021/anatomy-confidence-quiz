@@ -787,10 +787,16 @@ export async function POST(request: NextRequest) {
     return data?{explanation:data.explanation,optionAnalysis:data.option_analysis??{},memoryTip:data.memory_tip??"",model:data.model,readingFormat:data.reading_format??null,updatedAt:data.updated_at}:null;
   }));
   const reserveRequest=async({actorId:actor,questionId,operationId,baseVersion}:{actorId:string;questionId:string;operationId?:string;baseVersion?:string})=>{
+        // Explicit persisted replacement plan, never a client cash flag. Missing
+        // RPC/schema leaves the original credit and authorization checks intact.
+        let boundedCash=false;
+        if(operationId && baseVersion){
+          try{const r=await withServerTimeout(db.rpc('figure_text_cash_allowed',{p_id:operationId,p_actor:actor,p_question:questionId,p_base:baseVersion}),1600,'批次狀態讀取逾時');boundedCash=!r.error&&r.data===true}catch{}
+        }
         const windowState=authorizationWindow(process.env.QUESTION_EXPLANATION_RUN_UNTIL);
-        if(windowState==="missing")return {ok:false,code:"safe_configuration_missing"};
-        if(windowState==="expired")return {ok:false,code:"run_window_expired"};
-        if (!serviceRole || !isOpenAIConfigured() || !promoVerified || !["gpt-6.1-sol","gpt-6.1-terra"].includes(model || "") || (model === "gpt-6.1-terra" && mode !== "default") ||
+        if(!boundedCash && windowState==="missing")return {ok:false,code:"safe_configuration_missing"};
+        if(!boundedCash && windowState==="expired")return {ok:false,code:"run_window_expired"};
+        if (!serviceRole || !isOpenAIConfigured() || (!promoVerified && !boundedCash) || !["gpt-6.1-sol","gpt-6.1-terra"].includes(model || "") || (model === "gpt-6.1-terra" && mode !== "default") ||
             !["low","default"].includes(mode) || !pricingRevision || !Number.isSafeInteger(inRate) || inRate <= 0 ||
             !Number.isSafeInteger(outRate) || outRate <= 0) return {ok:false,code:"safe_configuration_missing"};
         // Do not use the legacy helper's missing-table fail-open behaviour.
