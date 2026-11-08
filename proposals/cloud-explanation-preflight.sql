@@ -1,0 +1,9 @@
+-- Read-only preflight. Run before any installation; stop on drift.
+do $$ begin if encode(sha256(convert_to(btrim(pg_get_functiondef('public.ai_guard_reserve_replacement(uuid,uuid,text,text,text,text)'::regprocedure),E' \t\r\n'),'UTF8')),'hex') <> '0bb28e3a793617624af70326e93596341aa6c66daa5e5a55f772337a6e9415c1' then raise exception 'production function changed: ai_guard_reserve_replacement';end if;end $$;
+do $$ begin if encode(sha256(convert_to(btrim(pg_get_functiondef('public.ai_guard_start_call(uuid,integer)'::regprocedure),E' \t\r\n'),'UTF8')),'hex') <> '460704aa214801375f1d5babab61287990463a1bd74ff6e737abbdb6ecb39b0e' then raise exception 'production function changed: ai_guard_start_call';end if;end $$;
+do $$ begin if encode(sha256(convert_to(btrim(pg_get_functiondef('public.figure_model_reserve(uuid,uuid,text,jsonb,text,text,bigint)'::regprocedure),E' \t\r\n'),'UTF8')),'hex') <> '894d81bd06c89d789f3c17651f39dfd9106928b669333ffd19bd99024b8c0f20' then raise exception 'production function changed: figure_model_reserve';end if;end $$;
+do $$ begin if encode(sha256(convert_to(btrim(pg_get_functiondef('public.ai_guard_commit_replacement(uuid,uuid,text,jsonb,text,jsonb)'::regprocedure),E' \t\r\n'),'UTF8')),'hex') <> '7e2280bfe1d7c031a52f505b1f6aab0da80e02229f486e2126a2280be7b594e8' then raise exception 'production function changed: ai_guard_commit_replacement';end if;end $$;
+do $$ begin
+ if exists(select 1 from public.ai_guard_budget where id and (cap_microusd>2000000 or spent_microusd<0 or reserved_microusd<0)) then raise exception 'shared budget requires reconciliation';end if;
+ if to_regclass('explanation_private.generation_results') is not null or to_regclass('explanation_private.sitewide_policy') is not null then raise exception 'candidate objects already exist; check outcome before retry';end if;
+end $$;

@@ -5,6 +5,11 @@ import {getTeachingEntityCandidates,teachingEntityQualifierConflict} from '@/lib
 import {createHash} from 'node:crypto';
 import auditedSnapshots from '@/data/auditedTeachingSnapshots.json';
 import contextExclusions from '@/data/teachingContextExclusions.json';
+import reviewedFingerprints from '@/data/reviewedTeachingLinkFingerprints.json';
+
+export function reviewedTeachingFingerprint(q:Question){return createHash('sha256').update(JSON.stringify({stem:q.stem,options:['A','B','C','D','E'].map(k=>q.options[k as OptionKey]??null),answer:q.answer,acceptedAnswers:[...(q.acceptedAnswers??[])].sort(),answerCreditType:q.answerCreditType??'standard',sharedContext:q.sharedContext??null,subject:q.subject})).digest('hex')}
+export function hasReviewedTeachingFingerprint(q:Question){return (reviewedFingerprints as Record<string,string>)[q.id]===reviewedTeachingFingerprint(q)}
+export function uncertainTeachingSource(q:Question){return Boolean(q.needsHumanReview||q.answerConfidence==='low'||/待核|無法辨識|難以辨識|缺漏/.test((q.officialSource?.transcriptionNotice||'')+' '+(q.officialSource?.displayNotice||''))||contextExclusions.some(row=>row.id===q.id&&createHash('sha256').update(q.stem).digest('hex')===row.stemSha256))}
 
 // Internal teaching context only: these links do not feed public recommendation UI.
 const TEACHING_LINKS: typeof CURATED = {
@@ -110,14 +115,14 @@ function isUsableOfficial(q: Question, conflictingIds: ReadonlySet<string>): boo
  return baseExclusion(q,conflictingIds)===null;
 }
 function selectTrustedRelatedQuestions(current: Question, corpus: readonly Question[], conflictingIds: ReadonlySet<string>, limit=3,audit=false): Question[] {
-  const currentKeys=acceptedKeys(current); const contentConflicts=conflictingContent(corpus); if (!currentKeys.length||conflictingIds.has(current.id)||contentConflicts.has(identity(current))) return [];
-  const curated=TEACHING_LINKS[current.id]??CURATED[current.id];
+  const currentKeys=acceptedKeys(current); const contentConflicts=conflictingContent(corpus); if (!currentKeys.length||uncertainTeachingSource(current)||conflictingIds.has(current.id)||contentConflicts.has(identity(current))) return [];
+  const curated=hasReviewedTeachingFingerprint(current)?TEACHING_LINKS[current.id]??CURATED[current.id]:null;
   let reviewed: Question[] = [];
   if(curated) {
     if(currentKeys.length!==1 || currentKeys[0]!==curated.sourceAnswer || !normalize(current.stem).includes(normalize(curated.sourceFragment))) return [];
     const byId = new Map(corpus.map(q=>[q.id,q]));
     reviewed = curated.links.flatMap(link=>{
-      const q=byId.get(link.id); if(!q || identity(q)===identity(current) || (!isUsableOfficial(q,conflictingIds)||contentConflicts.has(identity(q)))) return [];
+      const q=byId.get(link.id); if(!q || !hasReviewedTeachingFingerprint(q) || identity(q)===identity(current) || (!isUsableOfficial(q,conflictingIds)||contentConflicts.has(identity(q)))) return [];
       const keys=acceptedKeys(q);
       if(keys.length!==1 || keys[0]!==link.expectedAnswer || !link.stemFragments.every(fragment=>normalize(q.stem).includes(normalize(fragment)))) return [];
       return [q];

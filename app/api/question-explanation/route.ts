@@ -6,6 +6,8 @@ import {createReservedReads} from "@/lib/explanationReservedReads";
 import { explanationPrefix } from "@/lib/explanationStream";
 import {waitUntil} from '@vercel/functions';
 import { dispatchReplacementImages } from "@/lib/replacementFigures.cjs";
+import { createGenerationJournal } from "@/lib/generationResultJournal.cjs";
+import { uncertainTeachingSource } from '@/lib/trustedRelatedContext';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 import { imageWindowOpen, buildNeedsWithFallback, IMAGE_PROMPT, processSavedImages } from "@/lib/newExplanationFigures.cjs";
 import { createHash } from "node:crypto";
@@ -765,7 +767,9 @@ export async function POST(request: NextRequest) {
   }
   const db = createClient(url, serviceRole || anonKey!, {auth:{persistSession:false,autoRefreshToken:false}});
   const replacing=action==="replace";
+  const sitewide=process.env.EXPLANATION_SITEWIDE_ENABLED==='1';
   let replacementReservationAttempted=false;
+  let generationReservationAttempted=false;
   const newFigures=process.env.NEW_EXPLANATION_FIGURES_CAPTURE === "1" && imageWindowOpen(process.env) && await figureCaptureAllowed(db);
   let figureQueue=!replacing && !newFigures && captureEnabled(process.env,url) && imageWindowOpen(process.env) && await figureCaptureAllowed(db);
   let actorId = "", verifiedEmail = "";
@@ -786,11 +790,15 @@ export async function POST(request: NextRequest) {
     if(error)throw error;
     return data?{explanation:data.explanation,optionAnalysis:data.option_analysis??{},memoryTip:data.memory_tip??"",model:data.model,readingFormat:data.reading_format??null,updatedAt:data.updated_at}:null;
   }));
-  const reserveRequest=async({actorId:actor,questionId,operationId,baseVersion}:{actorId:string;questionId:string;operationId?:string;baseVersion?:string})=>{
+  const reserveRequest=async({actorId:actor,questionId,operationId,baseVersion,generationOperationId}:{actorId:string;questionId:string;operationId?:string;baseVersion?:string;generationOperationId?:string})=>{
         // Explicit persisted replacement plan, never a client cash flag. Missing
         // RPC/schema leaves the original credit and authorization checks intact.
         let boundedCash=false;
-        if(operationId && baseVersion){
+        if(sitewide){
+          try{const r=await withServerTimeout(db.rpc('explanation_sitewide_allowed',{p_actor:actor,p_question:questionId}),1600,'全站接單狀態讀取逾時');boundedCash=!r.error&&r.data===true}catch{}
+          if(!boundedCash)return {ok:false,code:'sitewide_admission_unavailable'};
+        }
+        if(!sitewide && operationId && baseVersion){
           try{const r=await withServerTimeout(db.rpc('figure_text_cash_allowed',{p_id:operationId,p_actor:actor,p_question:questionId,p_base:baseVersion}),1600,'批次狀態讀取逾時');boundedCash=!r.error&&r.data===true}catch{}
         }
         const windowState=authorizationWindow(process.env.QUESTION_EXPLANATION_RUN_UNTIL);
@@ -809,14 +817,15 @@ export async function POST(request: NextRequest) {
           if (until > Date.now() && !isBypassEmail(verifiedEmail)) return {ok:false,code:"account_banned"};
         }
         if(figureQueue && (!imageWindowOpen(process.env)||!await figureCaptureAllowed(db)))figureQueue=false;
-        if(operationId && process.env.EXPLANATION_RESULT_JOURNAL_ENABLED==='1'){
+        if(!sitewide && operationId && process.env.EXPLANATION_RESULT_JOURNAL_ENABLED==='1'){
           const probe=await db.rpc('figure_text_result_recover',{p_id:operationId,p_actor:actor});
           if(probe.error || probe.data?.status!=='missing')return {ok:false,code:'result_journal_unavailable'};
         }
-        const id = operationId || crypto.randomUUID();
+        const id = operationId || generationOperationId || crypto.randomUUID();
         if(operationId)replacementReservationAttempted=true;
-        const {data,error} = await measured("reserveMs",()=>withServerTimeout(db.rpc(operationId ? "ai_guard_reserve_replacement" : figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit,...(operationId?{p_base_version:baseVersion}:{})}),1600,"預算預留逾時"));
-        if (error || data !== "reserved") {if(operationId && !error && typeof data==="string")replacementReservationAttempted=false;return {ok:false,code:typeof data === "string" ? data : "reservation_unavailable"};}
+        if(generationOperationId)generationReservationAttempted=true;
+        const {data,error} = await measured("reserveMs",()=>withServerTimeout(db.rpc(sitewide?'explanation_sitewide_reserve':operationId ? "ai_guard_reserve_replacement" : figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit,...(sitewide?{p_action:operationId?'replace':'generate',p_base_version:baseVersion??null}:operationId?{p_base_version:baseVersion}:{})}),1600,"預算預留逾時"));
+        if (error || data !== "reserved") {if(operationId && !error && typeof data==="string")replacementReservationAttempted=false;if(generationOperationId && !error && typeof data==="string")generationReservationAttempted=false;return {ok:false,code:typeof data === "string" ? data : "reservation_unavailable"};}
         // Reservation is committed. These independent reads run together;
         // neither is skipped, and start_call still follows full grant validation.
         const fetched = await (operationId ? (work:()=>Promise<any>)=>work() : (work:()=>Promise<any>)=>reservedReads.confirmAndRead(questionId,work))(()=>measured("grantReadMs",()=>withServerTimeout(db.rpc("ai_guard_read_reservation",{p_id:id,p_actor:actor}),1600,"預留驗證逾時")));
@@ -838,6 +847,10 @@ export async function POST(request: NextRequest) {
   const run=async()=>{
   try {
     const outcome = await handleExplanation(body, {
+      ...(sitewide||process.env.EXPLANATION_GENERATION_JOURNAL_ENABLED==='1'?createGenerationJournal({db,needsFor:async(response:any)=>{
+        const q=resolveTrustedExplanationQuestion(body.question?.id);
+        return newFigures&&imageWindowOpen(process.env)&&await figureCaptureAllowed(db)&&q.ok?buildNeedsWithFallback(response.value?.explanation,response.value?.figureNeeds,q.question):null;
+      }}):{}),
       isReviewed: async (id: string) => hasReviewedExplanation(id),
       auth: async (token: string | undefined) => {
         if (!token) return null;
@@ -853,6 +866,7 @@ export async function POST(request: NextRequest) {
         const q = found.question;
         // Mark restrictions without blocking access to an existing shared row.
         return {...q,trustedContext:found.sharedContext,requiresContext:found.requiresContext,
+          hasUncertainSource:uncertainTeachingSource(q),
           hasUnresolvedImage:Boolean(q.stemImage || (q.optionImages && Object.values(q.optionImages).some(Boolean)))};
       },
       prepare: async (q:any) => {
@@ -873,7 +887,18 @@ export async function POST(request: NextRequest) {
         if(data.status==="not_written")return {state:"not_written"};
         return data.status==="completed"?{state:"completed",value:replacementValue(data.value)}:{state:"pending"};
       },
-      ...(process.env.EXPLANATION_RESULT_JOURNAL_ENABLED==='1'?{
+      ...(sitewide?{
+        checkpointBeforeUsage:true,
+        checkpointResult:createGenerationJournal({db,stageRpc:'explanation_sitewide_result_stage',needsFor:async(response:any)=>{
+          const q=resolveTrustedExplanationQuestion(body.question?.id);
+          return newFigures&&await figureCaptureAllowed(db)&&q.ok?buildNeedsWithFallback(response.value?.explanation,response.value?.figureNeeds,q.question):null;
+        }}).checkpointGeneration,
+        recoverResult:async({operationId,actorId:actor,questionId}:any)=>{
+          const r=await db.rpc('explanation_sitewide_result_recover',{p_id:operationId,p_actor:actor,p_question:questionId});
+          if(!r.error&&r.data?.status==='not_written')return {state:'not_written'};
+          return !r.error&&r.data?.status==='completed'&&r.data.value?.question_id===questionId?{state:'completed',value:replacementValue(r.data.value)}:{state:'pending'};
+        }
+      }:process.env.EXPLANATION_RESULT_JOURNAL_ENABLED==='1'?{
         checkpointResult:async(g:any,seq:number,response:any)=>{
           const q=resolveTrustedExplanationQuestion(body.question?.id);
           const needs=newFigures&&imageWindowOpen(process.env)&&await figureCaptureAllowed(db)&&q.ok?buildNeedsWithFallback(response.value?.explanation,response.value?.figureNeeds,q.question):null;
@@ -937,7 +962,7 @@ export async function POST(request: NextRequest) {
         const row = Array.isArray(data) ? data[0] : data;
         if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
         // Text is already durably saved. Image failure never retries paid generation.
-        if(row.status==='inserted'&&captureNow){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)waitUntil(processSavedImages({db,finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)}));}
+        if(row.status==='inserted'&&captureNow){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)waitUntil(processSavedImages({db,finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),question:trusted.question,actor:actorId,requestId:g.leaseId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)}));}
         // RPC signature stays compatible with existing queue wrappers. Read the committed marker,
         // never accept a provider/client-supplied format. Failed read is unknown, not a new generation.
         const confirmed=await db.from("question_explanation_overrides").select("question_id,explanation,option_analysis,memory_tip,model,updated_at,reading_format").eq("question_id",id).maybeSingle();
@@ -976,7 +1001,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ok:false,code:outcome.code,recoverable:true,message:messages[outcome.code] || "暫時無法產生詳解，既有詳解不受影響。"},{status:outcome.status});
   } catch (error) {
     console.error("question_explanation_safe_candidate_error",error instanceof Error ? error.message : "unknown");
-    return NextResponse.json({ok:false,code:replacing && replacementReservationAttempted?"replacement_unconfirmed_held":"guard_unavailable",recoverable:true,message:"詳解暫時不可用，既有內容不受影響。"},{status:503});
+    return NextResponse.json({ok:false,code:replacing && replacementReservationAttempted?"replacement_unconfirmed_held":generationReservationAttempted?"generation_unconfirmed_held":"guard_unavailable",recoverable:true,message:"詳解暫時不可用，既有內容不受影響。"},{status:503});
   }
   };
   return backgroundExplanationResponse(nextEmit=>{emit=nextEmit;return run()},waitUntil,Boolean(wantsStream));

@@ -61,6 +61,8 @@ export function getTeachingEntityCandidates(current:Question,corpus:readonly Que
  return [...scores.values()].sort((a,b)=>b.primary-a.primary||b.score-a.score||Number(b.question.subject===current.subject)-Number(a.question.subject===current.subject)||a.question.id.localeCompare(b.question.id));
 }
 export function teachingEntityQualifierConflict(a:Question,b:Question,corpus:readonly Question[]){
- const index=indexFor(corpus),x=index.evidence.get(a.id)?.all,y=index.evidence.get(b.id)?.all;if(!x||!y||[...x].some(t=>y.has(t)))return false;
- return [...x].some(t=>y.has('non-'+t)||(t.startsWith('non-')&&y.has(t.slice(4))));
+ const index=indexFor(corpus),x=index.evidence.get(a.id)?.all,y=index.evidence.get(b.id)?.all;if(!x||!y)return false;
+ // Sharing a different entity cannot erase a subtype contradiction. A question
+ // explicitly comparing both forms is not treated as claiming just one form.
+ return [...x].some(t=>!t.startsWith('non-') ? !x.has('non-'+t)&&y.has('non-'+t)&&!y.has(t) : !x.has(t.slice(4))&&y.has(t.slice(4))&&!y.has(t));
 }
