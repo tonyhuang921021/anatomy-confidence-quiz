@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {isMobileExamClient} from '@/lib/examEntryPolicy';
-import {paintExamPixels,type PixelAssetCache,type PixelStyleCache} from '@/lib/examPixelRenderer';
+import {paintExamPixels,pixelBitmapSize,type PixelAssetCache,type PixelStyleCache} from '@/lib/examPixelRenderer';
 import styles from './ExamScreenFrame.module.css';
 import {createPortal} from 'react-dom';
 export function ExamScreenFrame({children,standard=false}:{children:ReactNode;standard?:boolean}){
@@ -20,7 +20,7 @@ export function ExamScreenFrame({children,standard=false}:{children:ReactNode;st
   const content=source.current,view=viewport.current,target=canvas.current;if(!content||!view||!target)return;
   let stopped=false,scheduled:ReturnType<typeof setTimeout>|undefined,running=false,wanted=0,broken=false;let cache:PixelStyleCache=new WeakMap();const assets:PixelAssetCache=new Map();setReady(false);setFailed(false);setRevision(0);setRequested(0);
   const render=async()=>{scheduled=undefined;if(stopped||broken||running)return;running=true;const token=wanted;
-   try{const painted=await paintExamPixels({source:content,viewport:view,canvas:target,width:size,height:Math.round(size*3/4),styles:cache,assets,current:()=>!stopped&&token===wanted});if(painted){setReady(true);setRevision(token);}}
+   try{const painted=await paintExamPixels({source:content,viewport:view,canvas:target,...pixelBitmapSize(size,view.clientWidth,view.clientHeight),styles:cache,assets,current:()=>!stopped&&token===wanted});if(painted){setReady(true);setRevision(token);}}
    catch{if(!stopped){broken=true;setFailed(true);setReady(false);}}
    finally{running=false;if(!stopped&&!broken&&wanted!==token)scheduled=setTimeout(()=>void render(),60);}
   };
@@ -36,8 +36,8 @@ export function ExamScreenFrame({children,standard=false}:{children:ReactNode;st
  if(standard||mobile===true)return <>{children}</>;
  if(mobile===null)return <p role="status">正在準備模擬畫面…</p>;
  return createPortal(<section className={styles.frame} data-testid="exam-screen-frame" data-pixel-status={failed?'fallback':editing?'editing':enabled&&ready?'ready':enabled?'rendering':'clear'} data-pixel-revision={revision} data-pixel-request={requested} style={{'--exam-screen-height':`${box.height}px`} as React.CSSProperties}>
-  <div className={styles.controls}><span>模擬螢幕</span><div><label>顯示方式 <select aria-label="模擬螢幕解析度" value={enabled?size:0} onChange={e=>{const value=Number(e.target.value);setEnabled(value!==0);if(value)setSize(value);}}><option value={896}>稍清晰像素 896 × 672</option><option value={800}>原像素顯示 800 × 600</option><option value={640}>較粗像素 640 × 480</option><option value={0}>清晰顯示</option></select></label></div></div>
-  <div className={styles.display}><div className={styles.viewport} ref={viewport} data-testid="exam-screen-viewport"><div ref={source} data-exam-pixel-source>{children}</div></div><canvas ref={canvas} className={styles.bitmap} width={size} height={Math.round(size*3/4)} style={{width:box.width,height:box.height}} hidden={!enabled||!ready||editing||failed} aria-hidden="true" data-testid="exam-pixel-canvas"/></div>
+  <div className={styles.controls}><span>模擬螢幕</span><div><label>顯示方式 <select aria-label="模擬螢幕解析度" value={enabled?size:0} onChange={e=>{const value=Number(e.target.value);setEnabled(value!==0);if(value)setSize(value);}}><option value={896}>稍清晰像素 {pixelBitmapSize(896,box.width,box.height).width} × {pixelBitmapSize(896,box.width,box.height).height}</option><option value={800}>原像素顯示 {pixelBitmapSize(800,box.width,box.height).width} × {pixelBitmapSize(800,box.width,box.height).height}</option><option value={640}>較粗像素 {pixelBitmapSize(640,box.width,box.height).width} × {pixelBitmapSize(640,box.width,box.height).height}</option><option value={0}>清晰顯示</option></select></label></div></div>
+  <div className={styles.display}><div className={styles.viewport} ref={viewport} data-testid="exam-screen-viewport"><div ref={source} data-exam-pixel-source>{children}</div></div><canvas ref={canvas} className={styles.bitmap} width={pixelBitmapSize(size,box.width,box.height).width} height={pixelBitmapSize(size,box.width,box.height).height} style={{width:box.width,height:box.height}} hidden={!enabled||!ready||editing||failed} aria-hidden="true" data-testid="exam-pixel-canvas"/></div>
   <p className={styles.status} role="status">{failed?'像素效果暫不可用，已改用清晰畫面。':editing?'輸入或選取文字時暫用清晰畫面。':enabled?'整個模擬畫面以低解析度呈現；可隨時切回清晰顯示。':'清晰顯示；作答與保存方式不變。'}</p>
  </section>,document.body);
 }

@@ -4,6 +4,13 @@ const PROPS=['display','position','inset','top','right','bottom','left','z-index
 export type PixelStyleCache=WeakMap<Element,{key:string;css:string}>;
 export type PixelAssetCache=Map<string,{data:string;size:number}>;
 const MAX_CACHE=16*1024*1024,MAX_FILE=8*1024*1024;
+/** Keep the sampling grid proportional to the visible DOM, including wide screens.
+ * The 2048px ceiling bounds allocation for unusually tall desktop viewports. */
+export function pixelBitmapSize(requestedWidth:number,viewWidth:number,viewHeight:number){
+ if(![requestedWidth,viewWidth,viewHeight].every(n=>Number.isFinite(n)&&n>0))throw Error('invalid_pixel_geometry');
+ const scale=Math.min(requestedWidth/viewWidth,2048/viewWidth,2048/viewHeight);
+ return {width:Math.max(1,Math.round(viewWidth*scale)),height:Math.max(1,Math.round(viewHeight*scale))};
+}
 export function trustedPixelAssetPath(raw:string,origin:string):string|null {
  try{if(/(?:^|[\/\\])\.\.(?:[\/\\]|$)/.test(decodeURIComponent(raw)))return null;const u=new URL(raw,origin);return u.origin===origin&&!u.search&&!u.hash&&!u.username&&!u.password&&/^\/(exam-legacy|question-media)\/[A-Za-z0-9_.\/-]+$/.test(u.pathname)&&!u.pathname.split('/').includes('..')?u.href:null;}catch{return null;}
 }
