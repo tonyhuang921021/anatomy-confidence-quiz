@@ -1,5 +1,6 @@
 import {resolveTrustedExplanationQuestion} from "@/lib/trustedQuestionLoader";
 import {createFinalFigureReviewer} from "@/lib/finalFigureRuntime.cjs";
+import {reviewStagedFigure} from "@/lib/stagedFigureReview.cjs";
 import {figureCaptureAllowed,guardFigureTraffic} from "@/lib/figureCaptureGate.cjs";
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
@@ -35,7 +36,9 @@ export async function POST(request:NextRequest){
     const eligible=await db.rpc('ai_guard_image_eligible',{p_question:target.questionId,p_text_sha:target.textHash});
     if(!eligible.error&&eligible.data===true&&!old.data?.length&&saved.data?.explanation&&buildNeeds(saved.data.explanation,[])?.explanationHash===target.textHash&&!available.some(x=>x.question_id===target.questionId))available.push({question_id:target.questionId});
    }
-   return reply({ok:true,operatorId:u.id,jobs:data,catalog:CATALOG,unplanned:available});
+   const pending=pilotTargets.length?await db.from('explanation_figure_candidates').select('id,question_id,explanation_sha256,section_title,source_url').eq('status','pending').in('question_id',pilotTargets.map(t=>t.questionId)).limit(20):{data:[],error:null};
+   if(pending.error)throw pending.error;
+   return reply({ok:true,operatorId:u.id,jobs:data,catalog:CATALOG,unplanned:available,staged:(pending.data||[]).filter(x=>pilotTargets.some(t=>t.questionId===x.question_id&&t.textHash===x.explanation_sha256))});
   }
   if(['run_one','retry_image','plan_saved'].includes(body.action) && (!imageWindowOpen(process.env)||process.env.NEW_EXPLANATION_FIGURES_CAPTURE!=='1'||!await figureCaptureAllowed(db)))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='plan_saved'){
@@ -58,6 +61,11 @@ export async function POST(request:NextRequest){
    return reply({ok:true,...await runOne({finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),store:createStore(db),search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),enabled:true})});
   }
   if(typeof body.id!=='string'||! /^[0-9a-f-]{36}$/i.test(body.id))return reply({ok:false},400);
+  if(body.action==='review_staged'){
+   if(!pilotTargets.length||u.id!==process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID)return reply({ok:false,code:'pilot_operator'},403);
+   if(process.env.NEW_EXPLANATION_FIGURES_WORKER!=='1'||process.env.FIGURE_LUNA_REVIEW_ENABLED!=='1'||!imageWindowOpen(process.env)||!await figureCaptureAllowed(db))return reply({ok:false,code:'worker_disabled'},503);
+   return reply({ok:true,...await reviewStagedFigure({db,candidateId:body.id,targets:pilotTargets,reviewer:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const r=resolveTrustedExplanationQuestion(id);return r.ok?r.question:null}})})});
+  }
   if(body.action==='model_status'){const result=await db.rpc('figure_model_candidate_status',{p_candidate:body.id});return result.error?reply({ok:false,code:'unavailable'},503):reply({ok:true,review:result.data});}
   if(body.action==='retry_image')return reply({ok:false,code:'prior_attempt_requires_review'},409);
   const found=await db.from('figure_queue_jobs').select('figure_needs,question_id').eq('request_id',body.id).maybeSingle();
