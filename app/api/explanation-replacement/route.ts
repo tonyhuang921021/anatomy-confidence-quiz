@@ -19,7 +19,14 @@ export async function POST(request:NextRequest){
   const result=await withServerTimeout(db.rpc(action==="restore"?"explanation_replacement_restore":"explanation_replacement_status",{p_actor:auth.data.user.id,p_question:questionId,...(action==="restore"?{p_revision:operationId,p_base_version:baseVersion}:{p_operation:operationId??null})}),2000,"replacement outcome unconfirmed");
   if(result.error||!result.data)return reply({ok:false,code:"replacement_unavailable"},503);
   // Whitelist presentation fields; private snapshot/actor/source references never leave SQL.
-  const data=result.data,row=data.value;
+  let data=result.data;
+  if(action==='status'&&operationId&&data.status==='pending'&&process.env.EXPLANATION_RESULT_JOURNAL_ENABLED==='1'){
+   // Resume only a previously persisted provider result. This RPC has no network
+   // transport or new budget reservation; absent evidence remains pending.
+   const recovered=await withServerTimeout(db.rpc('figure_text_result_recover',{p_id:operationId,p_actor:auth.data.user.id}),2000,'result recovery unconfirmed');
+   if(!recovered.error&&recovered.data?.status==='replaced'&&recovered.data.value?.question_id===questionId)data={...recovered.data,status:'completed'};
+  }
+  const row=data.value;
   return reply({ok:true,status:data.status,baseVersion:data.baseVersion,revision:data.revision,canRestore:data.canRestore===true,
    value:row?{explanation:row.explanation,optionAnalysis:row.option_analysis??{},memoryTip:row.memory_tip??"",model:row.model,updatedAt:row.updated_at,replacementRevision:row.replacement_revision??null,readingFormat:row.reading_format??null}:null});
  }catch{return reply({ok:false,code:"replacement_outcome_unconfirmed"},503);}

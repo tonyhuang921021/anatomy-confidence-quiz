@@ -809,6 +809,10 @@ export async function POST(request: NextRequest) {
           if (until > Date.now() && !isBypassEmail(verifiedEmail)) return {ok:false,code:"account_banned"};
         }
         if(figureQueue && (!imageWindowOpen(process.env)||!await figureCaptureAllowed(db)))figureQueue=false;
+        if(operationId && process.env.EXPLANATION_RESULT_JOURNAL_ENABLED==='1'){
+          const probe=await db.rpc('figure_text_result_recover',{p_id:operationId,p_actor:actor});
+          if(probe.error || probe.data?.status!=='missing')return {ok:false,code:'result_journal_unavailable'};
+        }
         const id = operationId || crypto.randomUUID();
         if(operationId)replacementReservationAttempted=true;
         const {data,error} = await measured("reserveMs",()=>withServerTimeout(db.rpc(operationId ? "ai_guard_reserve_replacement" : figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit,...(operationId?{p_base_version:baseVersion}:{})}),1600,"預算預留逾時"));
@@ -869,6 +873,19 @@ export async function POST(request: NextRequest) {
         if(data.status==="not_written")return {state:"not_written"};
         return data.status==="completed"?{state:"completed",value:replacementValue(data.value)}:{state:"pending"};
       },
+      ...(process.env.EXPLANATION_RESULT_JOURNAL_ENABLED==='1'?{
+        checkpointResult:async(g:any,seq:number,response:any)=>{
+          const q=resolveTrustedExplanationQuestion(body.question?.id);
+          const needs=newFigures&&imageWindowOpen(process.env)&&await figureCaptureAllowed(db)&&q.ok?buildNeedsWithFallback(response.value?.explanation,response.value?.figureNeeds,q.question):null;
+          const r=await db.rpc('figure_text_result_stage',{p_id:g.leaseId,p_actor:actorId,p_response:{...response,needs}});
+          return !r.error&&r.data==='saved';
+        },
+        recoverResult:async({operationId,actorId:actor,questionId}:any)=>{
+          const r=await db.rpc('figure_text_result_recover',{p_id:operationId,p_actor:actor});
+          if(r.error)return {state:'pending'};
+          return r.data?.status==='replaced'&&r.data.value?.question_id===questionId?{state:'completed',value:replacementValue(r.data.value)}:{state:'pending'};
+        }
+      }:{}),
       commitReplacement: async (g:any,id:string,result:any)=>{
         const captureNow=newFigures && imageWindowOpen(process.env) && await figureCaptureAllowed(db);
         const {data,error}=await measured("commitMs",()=>withServerTimeout(db.rpc("ai_guard_commit_replacement",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip??"",p_needs:captureNow?buildNeedsWithFallback(result.explanation,result.figureNeeds,(resolveTrustedExplanationQuestion(id) as any).question):null}),1600,"替換儲存狀態未確認"));
@@ -899,7 +916,7 @@ export async function POST(request: NextRequest) {
         } : undefined);
         delivery={firstTextMs,providerMs:Date.now()-providerStart,preProviderMs:providerStart-requestStarted,model:result.servedModel,inputTokens:result.usage.inputTokens,outputTokens:result.usage.outputTokens};
         const parseStart=Date.now();const parsed=parseExplanationPayload(result.text);const value=validPublicTeaching(parsed)?parsed:null;stages.payloadParseMs=Date.now()-parseStart;
-        return {usage:result.usageKnown && result.servedModel === args.model ? result.usage : null,value};
+        return {rawText:result.text,responseId:result.responseId,model:result.servedModel,usage:result.usageKnown && result.servedModel === args.model ? result.usage : null,value};
       },
       settle: async (g:any, seq:number, usage:any) => {
         // A provider-side bound violation makes the estimate unsafe for every
