@@ -1,4 +1,5 @@
-import type {QuizSession} from '@/types/quiz';
+import {editCanonicalAnswer} from './quizAnswerEdits';
+import type {ConfidenceLevel,QuizSession} from '@/types/quiz';
 import type {ExamFlag} from './examSessionSync';
 type Entries=NonNullable<QuizSession['examQuestionFlags']>;
 export function normalizedExamFlags(s:QuizSession):Entries {
@@ -18,3 +19,18 @@ export function setExamQuestionFlag(s:QuizSession,id:string,value:ExamFlag,actor
  return {...s,answerEdits,examQuestionFlags:{...entries,[id]:{value,counter,actor}}};
 }
 export function examFlagValue(s:QuizSession|undefined|null,id:string):ExamFlag {return s?normalizedExamFlags(s)[id]?.value??'':'';}
+
+/** Explicit new UI action only. Never reinterpret persisted historical marks on read. */
+export function confidenceForExamFlag(value:ExamFlag):ConfidenceLevel {
+ return value==='circle'?1:value==='triangle'?2:value==='square'?3:4;
+}
+export function setExamConfidenceFlag(s:QuizSession,id:string,value:ExamFlag,actor=crypto.randomUUID()):QuizSession {
+ const marked=setExamQuestionFlag(s,id,value,actor);
+ if(marked===s)return s;
+ const attempt=marked.attempts.find(a=>a.questionId===id);
+ return attempt?editCanonicalAnswer(marked,id,{...attempt,confidence:confidenceForExamFlag(value)},actor):marked;
+}
+/** A new answer uses the currently selected mark; loading old attempts never calls this. */
+export function confidenceForNewExamAnswer(s:QuizSession,id:string):ConfidenceLevel {
+ return confidenceForExamFlag(examFlagValue(s,id));
+}

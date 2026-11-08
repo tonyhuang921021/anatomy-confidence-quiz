@@ -1,5 +1,5 @@
 "use client";
-import {setExamQuestionFlag} from "@/lib/examQuestionFlags";
+import {setExamConfidenceFlag,confidenceForExamFlag,confidenceForNewExamAnswer} from "@/lib/examQuestionFlags";
 import {getActiveStorageUser} from "@/lib/storage";
 import {editCanonicalAnswer,syncAnswerEditMetadata,isAcceptedCompletion,canonicalCompletionResponse} from "@/lib/quizAnswerEdits";
 import { ExplanationMathText } from "@/components/ExplanationMathText";
@@ -2663,7 +2663,7 @@ function OwnerQuizPage() {
         : null;
 
   if(examPresentation&&process.env.NEXT_PUBLIC_EXAM_RENDERER_ENABLED==='true'&&session.settings?.mode==='simulation'&&!session.completedAt&&!session.examSessionSync){
-    return <>{completionNotice?<p role="status" className="mx-auto max-w-5xl p-3">{completionNotice}</p>:null}<OriginalSessionExamRenderer key={`${authSession?.user?.id??'guest'}:${session.id}`} session={session} questions={questionSet} owner={authSession?.user?.id??'guest'} elapsed={simulationTimerElapsedSeconds} paused={simulationTimerPaused} disabled={isSubmittingAnswer} onAnswer={option=>handleSubmit(option,true)} onClear={clearExamAnswer} onFlag={value=>persistSession(setExamQuestionFlag(latestCurrentSessionRef.current??session,currentQuestion.id,value))} onNavigate={handleJumpToQuestion} onFinish={finishExamPresentation} onPause={handleToggleSimulationTimerPaused}/></>;
+    return <>{completionNotice?<p role="status" className="mx-auto max-w-5xl p-3">{completionNotice}</p>:null}<OriginalSessionExamRenderer key={`${authSession?.user?.id??'guest'}:${session.id}`} session={session} questions={questionSet} owner={authSession?.user?.id??'guest'} elapsed={simulationTimerElapsedSeconds} paused={simulationTimerPaused} disabled={isSubmittingAnswer} onAnswer={option=>{confidenceRef.current=confidenceForNewExamAnswer(latestCurrentSessionRef.current??session,currentQuestion.id);setConfidence(confidenceRef.current);handleSubmit(option,true);}} onClear={clearExamAnswer} onFlag={value=>{confidenceRef.current=confidenceForExamFlag(value);setConfidence(confidenceRef.current);persistSession(setExamConfidenceFlag(latestCurrentSessionRef.current??session,currentQuestion.id,value));}} onNavigate={handleJumpToQuestion} onFinish={finishExamPresentation} onPause={handleToggleSimulationTimerPaused}/></>;
   }
 
   return (

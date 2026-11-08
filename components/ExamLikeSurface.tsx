@@ -1,4 +1,5 @@
 "use client";
+import {ExamQuestionFlagBadge} from './ExamQuestionFlagBadge';
 import type {Question,QuizSession,OptionKey} from '@/types/quiz';
 import {ExamCandidateIdentity} from './ExamCandidateIdentity';
 import type {ExamIdentityUser} from '@/lib/examCandidateIdentity';
@@ -6,8 +7,8 @@ import type {ExamFlag} from '@/lib/examSessionSync';
 import {QuestionStemBlock,QuestionOptionBlock} from '@/components/QuestionMediaBlock';
 import {getSimulationTimerPresentation} from '@/lib/simulationPaperStats';
 import {examElapsed,formatExamClock} from '@/lib/examRuntimeClock';
-export const examFlags:Record<ExamFlag,{text:string;symbol:string}>={triangle:{text:'黃色三角',symbol:'▲'},circle:{text:'橘色圓形',symbol:'●'},square:{text:'藍色方塊',symbol:'■'},'':{text:'不註記',symbol:''}};
-function FlagIcon({value}:{value:ExamFlag}){return value?<img alt="" src={`/exam-legacy/${value}.png`} className="legacy-flag-icon"/>:null;}
+export const examFlags:Record<ExamFlag,{text:string;symbol:string}>={triangle:{text:'咖啡色三角形，信心 2',symbol:'▲'},circle:{text:'紅色圓形，信心 1',symbol:'●'},square:{text:'藍色正方形，信心 3',symbol:'■'},'':{text:'不註記',symbol:''}};
+function FlagIcon({value}:{value:ExamFlag}){return <ExamQuestionFlagBadge value={value}/>;}
 function ButtonIcon({name}:{name:string}){return <img alt="" src={`/exam-legacy/${name}.png`} className="legacy-button-icon"/>;}
 type Props={previewUser?:ExamIdentityUser;session:QuizSession;questions:Question[];review:boolean;scale:number;now:number;disabled:boolean;onAnswer:(option:OptionKey)=>void;onClear:()=>void;onFlag:(value:ExamFlag)=>void;onNavigate:(index:number)=>void;onReview:()=>void;onFinish:()=>void;onStandard?:()=>void;onScale:(value:number)=>void;onPause:()=>void};
 export function ExamLikeSurface(p:Props){
