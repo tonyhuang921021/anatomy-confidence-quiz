@@ -7,10 +7,14 @@ const MAX_CACHE=16*1024*1024,MAX_FILE=8*1024*1024;
 export function trustedPixelAssetPath(raw:string,origin:string):string|null {
  try{if(/(?:^|[\/\\])\.\.(?:[\/\\]|$)/.test(decodeURIComponent(raw)))return null;const u=new URL(raw,origin);return u.origin===origin&&!u.search&&!u.hash&&!u.username&&!u.password&&/^\/(exam-legacy|question-media)\/[A-Za-z0-9_.\/-]+$/.test(u.pathname)&&!u.pathname.split('/').includes('..')?u.href:null;}catch{return null;}
 }
-function styleFor(el:Element,cache:PixelStyleCache){
- const h=el as HTMLElement,key=[el.getAttribute('class'),el.getAttribute('style'),h.clientWidth,h.clientHeight,el.matches(':hover'),el.matches(':focus'),el.matches(':focus-visible'),el.matches(':focus-within'),el.matches(':active'),el.hasAttribute('disabled')].join('|'),old=cache.get(el);
- if(old?.key===key)return old.css;
- const computed=getComputedStyle(el),css=PROPS.map(p=>{const v=computed.getPropertyValue(p);return p==='background-image'&&/url\(/i.test(v)?`${p}:none;`:`${p}:${v};`;}).join('');cache.set(el,{key,css});return css;
+export function snapshotPixelStyle(el:Element){
+ // Computed margins and alignment depend on ancestors, not just this element's
+ // class/clientWidth. Reusing them can shift the bitmap while the live DOM stays put.
+ const computed=getComputedStyle(el);
+ return PROPS.map(p=>{const v=computed.getPropertyValue(p);return p==='background-image'&&/url\(/i.test(v)?`${p}:none;`:`${p}:${v};`;}).join('');
+}
+export function pixelHorizontalBox(left:number,width:number,parentLeft:number,parentBorder:number,parentPadding:number){
+ return {marginLeft:`${left-parentLeft-parentBorder-parentPadding}px`,marginRight:'0px',alignSelf:'flex-start',boxSizing:'border-box',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`};
 }
 function pseudoText(el:Element,which:'::before'|'::after'){
  const c=getComputedStyle(el,which).content;if(!c||c==='none'||c==='normal')return '';
@@ -27,9 +31,14 @@ export async function paintExamPixels(input:{source:HTMLElement;viewport:HTMLEle
  const viewWidth=viewport.clientWidth,viewHeight=viewport.clientHeight,scrollLeft=viewport.scrollLeft,scrollTop=viewport.scrollTop;
  const unchanged=()=>current()&&viewport.clientWidth===viewWidth&&viewport.clientHeight===viewHeight&&viewport.scrollLeft===scrollLeft&&viewport.scrollTop===scrollTop;
  const viewRect=viewport.getBoundingClientRect();const originals=[source,...Array.from(source.querySelectorAll('*'))];if(originals.length>3000)throw Error('complex_view');
+ const geometry=originals.map(el=>{const r=el.getBoundingClientRect();return [r.x,r.y,r.width,r.height,(el as HTMLElement).scrollLeft,(el as HTMLElement).scrollTop].join('|');});
+ const geometryUnchanged=()=>unchanged()&&originals.every((el,i)=>{const r=el.getBoundingClientRect();return geometry[i]===[r.x,r.y,r.width,r.height,(el as HTMLElement).scrollLeft,(el as HTMLElement).scrollTop].join('|');});
  const clone=source.cloneNode(true) as HTMLElement,copies=[clone,...Array.from(clone.querySelectorAll('*'))],tasks:Promise<void>[]=[];let assetBytes=0;
  for(let i=0;i<originals.length;i++){
-  const el=originals[i],copy=copies[i] as HTMLElement;copy.setAttribute('style',/^(COL|COLGROUP)$/.test(el.tagName)?((el as HTMLElement).getAttribute('style')||''):styleFor(el,styles));
+  const el=originals[i],copy=copies[i] as HTMLElement;copy.setAttribute('style',/^(COL|COLGROUP)$/.test(el.tagName)?((el as HTMLElement).getAttribute('style')||''):snapshotPixelStyle(el));
+  // Pin centered block boxes to their measured DOM positions. The SVG document
+  // must not resolve auto margins / flex centering a second time.
+  if(el.matches('.entry-panel,.entry-disclaimer,.exam-header,.answer-area,.review-area,.exam-footer,.confirm-sheet,.completion-paper,.completion-links')&&el.parentElement){const r=el.getBoundingClientRect(),p=el.parentElement,pr=p.getBoundingClientRect(),ps=getComputedStyle(p);Object.assign(copy.style,pixelHorizontalBox(r.left,r.width,pr.left,parseFloat(ps.borderLeftWidth)||0,parseFloat(ps.paddingLeft)||0));}
   for(const a of Array.from(copy.attributes))if(/^on/i.test(a.name))copy.removeAttribute(a.name);
   if(/^(SCRIPT|LINK|IFRAME|OBJECT|EMBED|VIDEO|AUDIO|CANVAS)$/.test(el.tagName)){copy.style.display='none';copy.replaceChildren();continue;}
   if(el instanceof HTMLInputElement){copy.removeAttribute('value');if(el.type==='radio'||el.type==='checkbox'){if(el.checked)copy.setAttribute('checked','checked');else copy.removeAttribute('checked');}else(copy as HTMLInputElement).value='';}
@@ -46,10 +55,10 @@ export async function paintExamPixels(input:{source:HTMLElement;viewport:HTMLEle
   const inner=document.createElement('div');inner.style.cssText=`transform:translate(${-original.scrollLeft}px,${-original.scrollTop}px);width:100%;`;
   while(copy.firstChild)inner.append(copy.firstChild);copy.append(inner);copy.style.overflow='hidden';
  }
- await Promise.all(tasks);if(!unchanged())return false;
+ await Promise.all(tasks);if(!geometryUnchanged())return false;
  const host=document.createElement('div');host.setAttribute('xmlns','http://www.w3.org/1999/xhtml');host.style.cssText=`width:${viewWidth}px;height:${viewHeight}px;overflow:hidden;background:#fff;position:relative;`;
  clone.style.margin='0';clone.style.width=`${viewWidth}px`;clone.style.transform=`translate(${-scrollLeft}px,${-scrollTop}px)`;clone.style.transformOrigin='0 0';host.append(clone);
  const xml=new XMLSerializer().serializeToString(host),svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" preserveAspectRatio="none" viewBox="0 0 ${viewWidth} ${viewHeight}"><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
- const image=new Image();await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(Error('raster_unavailable'));image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);});if(!unchanged())return false;
+ const image=new Image();await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(Error('raster_unavailable'));image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);});if(!geometryUnchanged())return false;
  const context=canvas.getContext('2d',{alpha:false});if(!context)throw Error('raster_unavailable');canvas.width=width;canvas.height=height;context.fillStyle='#fff';context.fillRect(0,0,width,height);context.drawImage(image,0,0,width,height);return true;
 }
