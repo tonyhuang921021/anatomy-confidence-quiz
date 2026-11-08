@@ -30,7 +30,8 @@ export async function POST(request:NextRequest){
     const old=await db.from('figure_queue_jobs').select('request_id').eq('question_id',target.questionId).limit(1);
     const saved=await db.from('question_explanation_overrides').select('question_id,explanation,figure_status').eq('question_id',target.questionId).maybeSingle();
     if(old.error||saved.error)throw Error('target lookup failed');
-    if(!old.data?.length&&saved.data?.figure_status&&saved.data.explanation&&buildNeeds(saved.data.explanation,[])?.explanationHash===target.textHash&&!available.some(x=>x.question_id===target.questionId))available.push({question_id:target.questionId});
+    const eligible=await db.rpc('ai_guard_image_eligible',{p_question:target.questionId,p_text_sha:target.textHash});
+    if(!eligible.error&&eligible.data===true&&!old.data?.length&&saved.data?.explanation&&buildNeeds(saved.data.explanation,[])?.explanationHash===target.textHash&&!available.some(x=>x.question_id===target.questionId))available.push({question_id:target.questionId});
    }
    return reply({ok:true,operatorId:u.id,jobs:data,catalog:CATALOG,unplanned:available});
   }
@@ -40,10 +41,12 @@ export async function POST(request:NextRequest){
    if(target&&body.questionId!==target.questionId)return reply({ok:false,code:'outside_single_batch'},403);
    if(typeof body.questionId!=='string'||! /^[A-Za-z0-9_-]{1,200}$/.test(body.questionId))return reply({ok:false},400);
    const saved=await db.from('question_explanation_overrides').select('explanation,figure_status').eq('question_id',body.questionId).maybeSingle();
-   if(saved.error||!saved.data?.figure_status)return reply({ok:false},404);
+   if(saved.error||!saved.data?.explanation)return reply({ok:false},404);
    const needs=buildNeeds(saved.data.explanation,body.hints);
    if(target&&needs?.explanationHash!==target.textHash)return reply({ok:false,code:'stale_single_batch'},409);
    if(!needs?.items?.length)return reply({ok:false,code:'heading_not_found'},400);
+   const eligible=await db.rpc('ai_guard_image_eligible',{p_question:body.questionId,p_text_sha:needs.explanationHash});
+   if(eligible.error||eligible.data!==true)return reply({ok:false,code:'saved_text_not_eligible'},409);
    const result=await db.rpc('figure_image_plan_saved',{p_question:body.questionId,p_needs:needs});
    return reply({ok:!result.error&&['awaiting','existing'].includes(result.data)});
   }
