@@ -1,3 +1,4 @@
+import {authorizationWindow} from "@/lib/authorizationWindow.cjs";
 import {figureCaptureAllowed} from "@/lib/figureCaptureGate.cjs";
 import {backgroundExplanationResponse} from "@/lib/explanationBackgroundResponse";
 import {createReservedReads} from "@/lib/explanationReservedReads";
@@ -785,9 +786,9 @@ export async function POST(request: NextRequest) {
     return data?{explanation:data.explanation,optionAnalysis:data.option_analysis??{},memoryTip:data.memory_tip??"",model:data.model,readingFormat:data.reading_format??null,updatedAt:data.updated_at}:null;
   }));
   const reserveRequest=async({actorId:actor,questionId,operationId,baseVersion}:{actorId:string;questionId:string;operationId?:string;baseVersion?:string})=>{
-        const runUntil=Date.parse(process.env.QUESTION_EXPLANATION_RUN_UNTIL || "");
-        if(!Number.isFinite(runUntil))return {ok:false,code:"safe_configuration_missing"};
-        if(Date.now()>=runUntil)return {ok:false,code:"run_window_expired"};
+        const windowState=authorizationWindow(process.env.QUESTION_EXPLANATION_RUN_UNTIL);
+        if(windowState==="missing")return {ok:false,code:"safe_configuration_missing"};
+        if(windowState==="expired")return {ok:false,code:"run_window_expired"};
         if (!serviceRole || !isOpenAIConfigured() || !promoVerified || !["gpt-6.1-sol","gpt-6.1-terra"].includes(model || "") || (model === "gpt-6.1-terra" && mode !== "default") ||
             !["low","default"].includes(mode) || !pricingRevision || !Number.isSafeInteger(inRate) || inRate <= 0 ||
             !Number.isSafeInteger(outRate) || outRate <= 0) return {ok:false,code:"safe_configuration_missing"};

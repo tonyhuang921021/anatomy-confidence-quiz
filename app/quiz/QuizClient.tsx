@@ -1,4 +1,5 @@
 "use client";
+import {setExamQuestionFlag} from "@/lib/examQuestionFlags";
 import {getActiveStorageUser} from "@/lib/storage";
 import {editCanonicalAnswer,syncAnswerEditMetadata,isAcceptedCompletion,canonicalCompletionResponse} from "@/lib/quizAnswerEdits";
 import { ExplanationMathText } from "@/components/ExplanationMathText";
@@ -838,10 +839,10 @@ function OwnerQuizPage() {
   const incrementalPracticePrefetchRef = useRef(false);
   const simulationExamTimerStateRef = useRef<SimulationExamTimerState | null>(null);
   const simulationExamTimerSessionIdRef = useRef<string | null>(null);
-  const [examPresentation,setExamPresentation] = useState(false);
   const completingIds = useRef(new Set<string>());
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
+  const examPresentation = session?.settings?.mode === "simulation" && session.settings.simulationPresentation === "exam";
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   useEffect(()=>{const change=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;setExplanationOverrides(current=>{const next={...current};if(saved)next[id]=saved;else delete next[id];return next;});};window.addEventListener("explanation-version-changed",change);return()=>window.removeEventListener("explanation-version-changed",change);},[]);
@@ -2172,11 +2173,6 @@ function OwnerQuizPage() {
     }
   }
 
-  function switchExamPresentation(next:boolean) {
-    if(!session||session.completedAt)return;
-    persistSession(examPresentation ? (latestCurrentSessionRef.current??session) : getSessionWithCurrentDraft(session));
-    setExamPresentation(next);
-  }
   function clearExamAnswer() {
     if(!session||!currentQuestion||session.completedAt)return;
     persistSession(clearRendererAttempt(latestCurrentSessionRef.current??session,currentQuestion.id));
@@ -2667,14 +2663,13 @@ function OwnerQuizPage() {
         : null;
 
   if(examPresentation&&process.env.NEXT_PUBLIC_EXAM_RENDERER_ENABLED==='true'&&session.settings?.mode==='simulation'&&!session.completedAt&&!session.examSessionSync){
-    return <>{completionNotice?<p role="status" className="mx-auto max-w-5xl p-3">{completionNotice}</p>:null}<OriginalSessionExamRenderer key={`${authSession?.user?.id??'guest'}:${session.id}`} session={session} questions={questionSet} owner={authSession?.user?.id??'guest'} elapsed={simulationTimerElapsedSeconds} paused={simulationTimerPaused} disabled={isSubmittingAnswer} onAnswer={option=>handleSubmit(option,true)} onClear={clearExamAnswer} onNavigate={handleJumpToQuestion} onStandard={()=>switchExamPresentation(false)} onFinish={finishExamPresentation} onPause={handleToggleSimulationTimerPaused}/></>;
+    return <>{completionNotice?<p role="status" className="mx-auto max-w-5xl p-3">{completionNotice}</p>:null}<OriginalSessionExamRenderer key={`${authSession?.user?.id??'guest'}:${session.id}`} session={session} questions={questionSet} owner={authSession?.user?.id??'guest'} elapsed={simulationTimerElapsedSeconds} paused={simulationTimerPaused} disabled={isSubmittingAnswer} onAnswer={option=>handleSubmit(option,true)} onClear={clearExamAnswer} onFlag={value=>persistSession(setExamQuestionFlag(latestCurrentSessionRef.current??session,currentQuestion.id,value))} onNavigate={handleJumpToQuestion} onFinish={finishExamPresentation} onPause={handleToggleSimulationTimerPaused}/></>;
   }
 
   return (
     <main id="main-content" data-answer-actions={submittedAttempt ? "true" : undefined} className={`study-quiz shell ${submittedAttempt ? "pb-28 sm:pb-0" : ""}`}>
       <div ref={questionTopRef} />
       {completionNotice?<p role="status" className="mb-3 rounded border p-3">{completionNotice}</p>:null}
-      {process.env.NEXT_PUBLIC_EXAM_RENDERER_ENABLED==='true'&&session.settings?.mode==='simulation'&&!session.completedAt&&!session.examSessionSync?<button className="mb-3 inline-block underline" onClick={()=>switchExamPresentation(true)}>切換仿國考介面</button>:null}
       <header className="mb-5 border-b border-slate-200/80 pb-3">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <Link href="/" className="text-sm font-semibold text-slate-600 transition hover:text-brand-700">

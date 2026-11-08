@@ -7,4 +7,4 @@ export function readExamEntry(storage:Pick<Storage,'getItem'>,key:string):{start
 export function saveExamEntry(storage:Pick<Storage,'setItem'>,key:string,score:ExamDisplayPreference,allScore:ExamDisplayPreference='hide'){
  try{if(!['show','hide'].includes(score)||!['show','hide'].includes(allScore))return false;storage.setItem(key,JSON.stringify({v:2,started:true,score,allScore}));return true;}catch{return false;}
 }
-export function isMobileExamClient(width:number,ua:string,platform:string,touch:number,coarse=false){return (width<768&&coarse)||/Android|iPhone|iPad|iPod|Mobile/i.test(ua)||(platform==='MacIntel'&&touch>1);}
+export function isMobileExamClient(width:number,ua:string,platform:string,touch:number,coarse=false){return width<768||/Android|iPhone|iPad|iPod|Mobile/i.test(ua)||(platform==='MacIntel'&&touch>1);}

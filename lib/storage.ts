@@ -1,3 +1,4 @@
+import {normalizedExamFlags,mergeExamFlags} from "./examQuestionFlags";
 import {acceptCanonicalCompletion,isAcceptedCompletion,mergeCanonicalAnswerEdits,materializeAnswerEdits,syncAnswerEditGrades} from "./quizAnswerEdits";
 import { materializeExamSession, mergeExamSessionCopies } from "./examSessionSync";
 import {
@@ -96,6 +97,30 @@ export type CompletedQuestionHistoryEntry = {
 
 const isBrowser = () => typeof window !== "undefined";
 
+/** Preserve undecodable source bytes before replacing any history cache/queue.
+ * Reads are side-effect free; recovery archives are never a result or upload source.
+ */
+function isCompletedArrayKey(key:string) {
+ return [COMPLETED_SESSIONS_KEY,CLOUD_COMPLETED_SESSIONS_KEY,PENDING_COMPLETED_SESSION_UPLOADS_KEY,RECENT_COMPLETED_SESSION_HANDOFF_KEY].some(base=>key===base||key.startsWith(base+":")) && !key.includes(":unparsed-recovery");
+}
+function hasInvalidSessionRows(raw:string) {
+ try {const rows=JSON.parse(raw);return !Array.isArray(rows)||rows.some(row=>{try{normalizeSessionChecked(row);return false}catch{return true}})}catch{return true}
+}
+function archiveInvalidSessionBytes(storage:Storage,key:string,raw:string|null) {
+ if(!raw||!isCompletedArrayKey(key)||!hasInvalidSessionRows(raw))return true;
+ const archiveKey=key+":unparsed-recovery";
+ try {
+  const old=storage.getItem(archiveKey);const snapshots:string[]=old?JSON.parse(old):[];
+  if(!Array.isArray(snapshots)||snapshots.some(x=>typeof x!=="string"))return false;
+  if(!snapshots.includes(raw)){snapshots.push(raw);const next=JSON.stringify(snapshots);storage.setItem(archiveKey,next);if(storage.getItem(archiveKey)!==next)return false;}
+  return true;
+ }catch{return false}
+}
+function preserveIncomingSessionRows(key:string,rows:QuizSession[]) {
+ if(!isBrowser())return false;
+ try {const raw=JSON.stringify(rows);return archiveInvalidSessionBytes(window.localStorage,key,raw)||archiveInvalidSessionBytes(window.sessionStorage,key,raw)}catch{return false}
+}
+
 function safeLocalStorageGetItem(key: string) {
   if (!isBrowser()) return null;
   try {
@@ -108,6 +133,7 @@ function safeLocalStorageGetItem(key: string) {
 function safeLocalStorageSetItem(key: string, value: string) {
   if (!isBrowser()) return;
   try {
+    if(!archiveInvalidSessionBytes(window.localStorage,key,window.localStorage.getItem(key)))return false;
     window.localStorage.setItem(key, value);
     return true;
   } catch {
@@ -119,6 +145,7 @@ function safeLocalStorageSetItem(key: string, value: string) {
 function safeLocalStorageRemoveItem(key: string) {
   if (!isBrowser()) return;
   try {
+    if(!archiveInvalidSessionBytes(window.localStorage,key,window.localStorage.getItem(key)))return false;
     window.localStorage.removeItem(key);
     return true;
   } catch {
@@ -139,6 +166,7 @@ function safeSessionStorageGetItem(key: string) {
 function safeSessionStorageSetItem(key: string, value: string) {
   if (!isBrowser()) return;
   try {
+    if(!archiveInvalidSessionBytes(window.sessionStorage,key,window.sessionStorage.getItem(key)))return false;
     window.sessionStorage.setItem(key, value);
     return true;
   } catch {
@@ -149,6 +177,7 @@ function safeSessionStorageSetItem(key: string, value: string) {
 function safeSessionStorageRemoveItem(key: string) {
   if (!isBrowser()) return;
   try {
+    if(!archiveInvalidSessionBytes(window.sessionStorage,key,window.sessionStorage.getItem(key)))return false;
     window.sessionStorage.removeItem(key);
     return true;
   } catch {
@@ -225,7 +254,8 @@ function getCompletedHistoryBroadcastPayload(entries: CompletedQuestionHistoryEn
 function applyExternalCompletedStoragePayload(change: CompletedStorageSyncChange) {
   if (!change.userId) return;
 
-  const incomingSessions = normalizeCompletedSessionList(change.completedSessions ?? []);
+  if(!preserveIncomingSessionRows(getCloudCompletedSessionsScopedKeyForUser(change.userId),change.completedSessions??[]))return;
+  const incomingSessions = normalizeCompletedSessionList(change.completedSessions ?? [],change.userId);
   if (incomingSessions.length > 0) {
     const existingSessions = loadCompletedSessionsForUser(change.userId);
     const mergedSessions = normalizeCompletedSessionList([
@@ -1005,6 +1035,7 @@ function normalizeSession(session: QuizSession): QuizSession {
       .map(normalizeStoredQuestion)
       .filter((question): question is Question => Boolean(question)),
     optionEliminationMap: normalizeOptionEliminationMap(session.optionEliminationMap),
+    examQuestionFlags: session.examQuestionFlags ? normalizedExamFlags(session) : undefined,
     simulationElapsedSeconds:
       typeof session.simulationElapsedSeconds === "number" &&
       Number.isFinite(session.simulationElapsedSeconds) &&
@@ -1026,8 +1057,13 @@ function normalizeSession(session: QuizSession): QuizSession {
   return acceptedBefore?acceptCanonicalCompletion(normalized):normalized;
 }
 
+function normalizeSessionChecked(value:unknown):QuizSession {
+ if(!value||typeof value!=="object"||Array.isArray(value)||typeof (value as QuizSession).id!=="string"||!(value as QuizSession).id.trim())throw Error("INVALID_SESSION_ROW");
+ return normalizeSession(value as QuizSession);
+}
 export function normalizeSessions(sessions: QuizSession[]) {
-  return sessions.map(normalizeSession);
+ if(!Array.isArray(sessions))return [];
+ return sessions.flatMap(session=>{try{return [normalizeSessionChecked(session)]}catch{return []}});
 }
 
 function mergeSessionQuestionIds(
@@ -1219,6 +1255,7 @@ function mergeDuplicateSessions(primary: QuizSession, secondary: QuizSession) {
     questionOrder: questionOrder.length > 0 ? questionOrder : undefined,
     generatedQuestions:
       generatedQuestions.length > 0 ? generatedQuestions : undefined,
+    examQuestionFlags: primary.id===secondary.id && (primary.examQuestionFlags||secondary.examQuestionFlags)?mergeExamFlags(primary,secondary):primary.examQuestionFlags,
     optionEliminationMap: mergeSessionOptionEliminationMaps(
       primary.optionEliminationMap,
       secondary.optionEliminationMap
@@ -1258,8 +1295,10 @@ export function mergeQuizSessionCopies(
     const accepted=isAcceptedCompletion(primary)?primary:isAcceptedCompletion(secondary)?secondary:null;
     if(accepted){const regraded=syncAnswerEditGrades(regradeSessionForCurrentAnswerKey(accepted));return acceptCanonicalCompletion(regraded);}
   }
+  const acceptedFlags=isAcceptedCompletion(primary)?primary:isAcceptedCompletion(secondary)?secondary:null;
+  const flags=acceptedFlags?normalizedExamFlags(acceptedFlags):primary.id===secondary.id && (primary.examQuestionFlags||secondary.examQuestionFlags)?mergeExamFlags(primary,secondary):undefined;
   const answerMerged=mergeCanonicalAnswerEdits(primary,secondary);
-  if(answerMerged){const accepted=isAcceptedCompletion(answerMerged);const regraded=syncAnswerEditGrades(regradeSessionForCurrentAnswerKey(answerMerged));return accepted?acceptCanonicalCompletion(regraded):regraded;}
+  if(answerMerged){const accepted=isAcceptedCompletion(answerMerged);const regraded=syncAnswerEditGrades(regradeSessionForCurrentAnswerKey(flags?{...answerMerged,examQuestionFlags:flags}:answerMerged));return accepted?acceptCanonicalCompletion(regraded):regraded;}
   if (primary.examSessionSync !== undefined || secondary.examSessionSync !== undefined) {
     return mergeExamSessionCopies(primary, secondary);
   }
@@ -1742,6 +1781,7 @@ export function saveCompletedSessionsForUser(userId: string, sessions: QuizSessi
   if (!isBrowser()) return;
   const activeUser = userId || GUEST_USER_ID;
   const scopedKey = getScopedKeyForUser(COMPLETED_SESSIONS_KEY, activeUser);
+  if(!preserveIncomingSessionRows(scopedKey,sessions))return false;
   const incoming = normalizeCompletedSessionList(sessions,activeUser);
   if(sessions.length>0&&incoming.length===0)return true; // Rejected ingress is not an explicit clear request.
   const normalized =
@@ -1857,7 +1897,9 @@ export function saveRecentCompletedSessionHandoffForUser(
   sessions: QuizSession | QuizSession[]
 ) {
   if (!isBrowser()) return false;
-  const incoming = (Array.isArray(sessions) ? sessions : [sessions]).map(s=>applyReconciliationFence(s,userId));
+  const rows=Array.isArray(sessions)?sessions:[sessions];
+  if(!preserveIncomingSessionRows(getRecentCompletedSessionHandoffScopedKeyForUser(userId),rows))return false;
+  const incoming = normalizeSessions(rows).map(s=>applyReconciliationFence(s,userId));
   const normalized = normalizeCompletedSessionList([
     ...loadRecentCompletedSessionHandoffForUser(userId),
     ...incoming
@@ -1884,8 +1926,9 @@ export function saveCloudCompletedSessionsForUser(
   options: CompletedSessionStorageMutationOptions = {}
 ) {
   if (!isBrowser()) return false;
-  const normalized = normalizeCompletedSessionList(sessions,userId);
   const scopedKey = getCloudCompletedSessionsScopedKeyForUser(userId);
+  if(!preserveIncomingSessionRows(scopedKey,sessions))return false;
+  const normalized = normalizeCompletedSessionList(sessions,userId);
   const fullPayload = JSON.stringify(normalized.map(compactSessionForStorage));
   let didPersist = safeLocalStorageSetItem(scopedKey, fullPayload);
 
@@ -1995,7 +2038,9 @@ function savePendingCompletedSessionUploadsForUser(
 
 export function queuePendingCompletedSessionUploadForUser(userId: string, sessions: QuizSession | QuizSession[]) {
   if (!isBrowser()) return false;
-  const incoming = (Array.isArray(sessions) ? sessions : [sessions]).map(s=>applyReconciliationFence(s,userId));
+  const rows=Array.isArray(sessions)?sessions:[sessions];
+  if(!preserveIncomingSessionRows(getPendingCompletedSessionUploadsScopedKeyForUser(userId),rows))return false;
+  const incoming = normalizeSessions(rows).map(s=>applyReconciliationFence(s,userId));
   const nextSessions = normalizeCompletedSessionList([
     ...loadPendingCompletedSessionUploadsForUser(userId),
     ...incoming
@@ -2022,9 +2067,9 @@ export function commitUploadedCompletedSessionsForUser(
   pendingSourceUserIds: string[] = [userId]
 ) {
   if (!isBrowser()) return false;
-  const incoming = normalizeCompletedSessionList(
-    Array.isArray(sessions) ? sessions : [sessions]
-  );
+  const rows=Array.isArray(sessions)?sessions:[sessions];
+  if(!preserveIncomingSessionRows(getCloudCompletedSessionsScopedKeyForUser(userId),rows))return false;
+  const incoming = normalizeCompletedSessionList(rows,userId);
   if (incoming.length === 0) return false;
 
   const didPersist = saveCloudCompletedSessionsForUser(

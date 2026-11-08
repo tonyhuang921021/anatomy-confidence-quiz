@@ -137,6 +137,7 @@ function buildSessionPayloadForCloud(
     settings: compacted.settings,
     questionOrder: compacted.questionOrder,
     optionEliminationMap: compacted.optionEliminationMap,
+    examQuestionFlags: compacted.examQuestionFlags,
     examSessionSync: compacted.examSessionSync,
     answerEdits: compacted.answerEdits,
     simulationElapsedSeconds: compacted.simulationElapsedSeconds,

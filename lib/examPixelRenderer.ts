@@ -24,6 +24,8 @@ async function imageData(raw:string,cache:PixelAssetCache):Promise<string>{
 }
 export async function paintExamPixels(input:{source:HTMLElement;viewport:HTMLElement;canvas:HTMLCanvasElement;width:number;height:number;styles:PixelStyleCache;assets:PixelAssetCache;current:()=>boolean}){
  const {source,viewport,canvas,width,height,styles,assets,current}=input;
+ const viewWidth=viewport.clientWidth,viewHeight=viewport.clientHeight,scrollLeft=viewport.scrollLeft,scrollTop=viewport.scrollTop;
+ const unchanged=()=>current()&&viewport.clientWidth===viewWidth&&viewport.clientHeight===viewHeight&&viewport.scrollLeft===scrollLeft&&viewport.scrollTop===scrollTop;
  const viewRect=viewport.getBoundingClientRect();const originals=[source,...Array.from(source.querySelectorAll('*'))];if(originals.length>3000)throw Error('complex_view');
  const clone=source.cloneNode(true) as HTMLElement,copies=[clone,...Array.from(clone.querySelectorAll('*'))],tasks:Promise<void>[]=[];let assetBytes=0;
  for(let i=0;i<originals.length;i++){
@@ -36,10 +38,18 @@ export async function paintExamPixels(input:{source:HTMLElement;viewport:HTMLEle
   if(el instanceof HTMLImageElement){const r=el.getBoundingClientRect();if(!r.width||!r.height||r.bottom<viewRect.top||r.top>viewRect.bottom||el.closest('details:not([open])')){copy.removeAttribute('src');copy.removeAttribute('srcset');copy.style.visibility='hidden';}else tasks.push(imageData(el.currentSrc||el.src,assets).then(data=>{assetBytes+=data.length*2;if(assetBytes>MAX_CACHE)throw Error('complex_view');copy.setAttribute('src',data);copy.removeAttribute('srcset');copy.removeAttribute('loading');}));}
   for(const [pseudo,position] of [['::before','afterbegin'],['::after','beforeend']] as const){const text=pseudoText(el,pseudo);if(text){const span=document.createElement('span');span.textContent=text;span.style.cssText='display:inline;white-space:pre;';copy.insertAdjacentElement(position,span);}}
  }
- await Promise.all(tasks);if(!current())return false;
- const host=document.createElement('div');host.setAttribute('xmlns','http://www.w3.org/1999/xhtml');host.style.cssText=`width:${viewport.clientWidth}px;height:${viewport.clientHeight}px;overflow:hidden;background:#fff;position:relative;`;
- clone.style.margin='0';clone.style.width=`${viewport.clientWidth}px`;clone.style.transform=`translate(${-viewport.scrollLeft}px,${-viewport.scrollTop}px)`;clone.style.transformOrigin='0 0';host.append(clone);
- const xml=new XMLSerializer().serializeToString(host),svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" preserveAspectRatio="none" viewBox="0 0 ${viewport.clientWidth} ${viewport.clientHeight}"><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
- const image=new Image();await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(Error('raster_unavailable'));image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);});if(!current())return false;
+ // SVG foreignObject does not retain DOM scroll offsets. Keep the inner reading
+ // region at the same position as its live, accessible DOM counterpart.
+ for(let i=originals.length-1;i>=0;i--){
+  const original=originals[i] as HTMLElement,copy=copies[i] as HTMLElement;
+  if(!original.matches('.question-body,.review-area,.entry-panel')||(!original.scrollTop&&!original.scrollLeft))continue;
+  const inner=document.createElement('div');inner.style.cssText=`transform:translate(${-original.scrollLeft}px,${-original.scrollTop}px);width:100%;`;
+  while(copy.firstChild)inner.append(copy.firstChild);copy.append(inner);copy.style.overflow='hidden';
+ }
+ await Promise.all(tasks);if(!unchanged())return false;
+ const host=document.createElement('div');host.setAttribute('xmlns','http://www.w3.org/1999/xhtml');host.style.cssText=`width:${viewWidth}px;height:${viewHeight}px;overflow:hidden;background:#fff;position:relative;`;
+ clone.style.margin='0';clone.style.width=`${viewWidth}px`;clone.style.transform=`translate(${-scrollLeft}px,${-scrollTop}px)`;clone.style.transformOrigin='0 0';host.append(clone);
+ const xml=new XMLSerializer().serializeToString(host),svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" preserveAspectRatio="none" viewBox="0 0 ${viewWidth} ${viewHeight}"><foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
+ const image=new Image();await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(Error('raster_unavailable'));image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);});if(!unchanged())return false;
  const context=canvas.getContext('2d',{alpha:false});if(!context)throw Error('raster_unavailable');canvas.width=width;canvas.height=height;context.fillStyle='#fff';context.fillRect(0,0,width,height);context.drawImage(image,0,0,width,height);return true;
 }

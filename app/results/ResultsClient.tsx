@@ -1,4 +1,6 @@
 "use client";
+import {examFlagValue} from "@/lib/examQuestionFlags";
+import {ExamQuestionFlagBadge} from "@/components/ExamQuestionFlagBadge";
 import {requestExplanation} from "@/lib/explanationRequestClient";
 
 import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
@@ -2310,6 +2312,7 @@ function ResultsPageContent() {
         <span className="min-w-0 flex-1 overflow-hidden">
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-1">
             {shouldShowPrefix ? <span className="shrink-0">{prefix}</span> : null}
+            <ExamQuestionFlagBadge value={examFlagValue(activeSession,question.id)}/>
             {shouldShowLeadingSlash ? <span className="shrink-0 text-slate-400">/</span> : null}
             {!primaryTag || !primaryTagIncludesSubject(primaryTag, question.subject) ? (
               <span className="shrink-0">{question.subject}</span>
@@ -2954,6 +2957,7 @@ function ResultsPageContent() {
         {activeReviewFilter === "low-confidence" ? (
           <p className="mt-3 text-sm text-slate-500">答對但信心為 1–3 的題目；答錯的題目列在「錯題」。</p>
         ) : null}
+        {activeReviewFilter === "all" && activeSession?.questionOrder?.filter(id=>examFlagValue(activeSession,id)&&!activeSession.attempts.some(a=>a.questionId===id)).map(id=>{const q=questionMap.get(id)??getResultQuestionSources(activeSession).find(question=>question.id===id);return q?<details key={id} className="mt-2 rounded border border-slate-200 px-3 py-2 text-sm"><summary className="cursor-pointer">第 {(activeSession.questionOrder?.indexOf(id)??0)+1} 題 · 未作答 <ExamQuestionFlagBadge value={examFlagValue(activeSession,id)}/></summary><QuestionStemBlock question={q}/></details>:null})}
         <div ref={fullscreenMobile ? fullscreenListRef : reviewListRef} className="study-result-list mt-4 grid gap-2">
           {visibleReviewItems.length === 0 ? (
             <p className="rounded-xl bg-slate-50 px-4 py-6 text-sm text-slate-600">

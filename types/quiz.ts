@@ -114,7 +114,9 @@ export type QuestionOrderMode = "recent" | "unseen";
 export type SimulationFeedbackMode = "full" | "answer_only" | "none";
 export type SimulationPaperMode = "random_set" | "past_paper" | "ai_paper" | "random_past_paper";
 
-export type QuizSettings = {
+export interface QuizSettings {
+  /** Presentation selected before starting; not an exam or scoring mode. Missing means website. */
+  simulationPresentation?: "website" | "exam";
   mode: QuizMode;
   questionCount: number;
   sessionName?: string;
@@ -148,6 +150,7 @@ export type QuizSettings = {
 };
 
 export type QuizSession = {
+  examQuestionFlags?: Record<string, {value: "" | "triangle" | "circle" | "square"; counter:number; actor:string}>;
   /** Local cache of a server-accepted exact completion, never server authorization. */
   completionReceipt?: string;
   answerEdits?: import("../lib/quizAnswerEdits").QuizAnswerEdits;

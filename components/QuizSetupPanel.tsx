@@ -1,5 +1,6 @@
 "use client";
 
+import {isMobileExamClient} from "@/lib/examEntryPolicy";
 import { getOfficialPaperKeyFromQuestionId } from "@/lib/officialPaperIdentity";
 
 import { formatRocYear } from "@/lib/rocDate";
@@ -148,6 +149,11 @@ export function QuizSetupPanel({
   description
 }: QuizSetupPanelProps) {
   const router = useRouter();
+  const [examMobile, setExamMobile] = useState(false);
+  useEffect(() => {
+    const update = () => setExamMobile(isMobileExamClient(innerWidth,navigator.userAgent,navigator.platform,navigator.maxTouchPoints,matchMedia('(pointer:coarse)').matches));
+    update(); window.addEventListener('resize',update); return () => window.removeEventListener('resize',update);
+  }, []);
   const { user, syncStatus, syncVersion } = useAuth();
   useCloudHistoryHydration();
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
@@ -240,7 +246,7 @@ export function QuizSetupPanel({
       (completedPaperSummaries[selectedPaper.key]?.hasAnswered || isAdminEmail(user?.email))
   );
   const isSelectablePaperMode = activePaperMode === "past_paper" || activePaperMode === "ai_paper";
-  const canStart = !isSelectablePaperMode || Boolean(settings.selectedPaperKey && visiblePaper);
+  const canStart = (!isSelectablePaperMode || Boolean(settings.selectedPaperKey && visiblePaper)) && !(settings.mode === "simulation" && settings.simulationPresentation === "exam" && examMobile);
   const currentPaperKey = currentSession?.settings?.mode === "simulation" && !currentSession.completedAt
     ? currentSession.settings.selectedPaperKey ?? inferPastPaperKeyFromQuestionIds(currentSession.questionOrder ?? [])
     : undefined;
@@ -335,6 +341,7 @@ export function QuizSetupPanel({
   }
 
   function handleStart() {
+    if (!canStart) return;
     const simulationSubject: SubjectFilter =
       settings.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）";
     const nextSettings =
@@ -342,6 +349,7 @@ export function QuizSetupPanel({
         ? {
             ...settings,
             sessionName: undefined,
+            simulationPresentation: settings.simulationPresentation === "exam" ? "exam" as const : "website" as const,
             questionCount: selectedCount,
             subjectFilter: simulationSubject,
             enableConfidenceCalibration: simulationConfidenceCalibration,
@@ -573,6 +581,17 @@ export function QuizSetupPanel({
                 <p className="mt-1 text-sm leading-6 text-slate-500">{paperModeDescriptions[activePaperMode]}</p>
               </div>
             )}
+
+            {process.env.NEXT_PUBLIC_EXAM_RENDERER_ENABLED === "true" ? <fieldset className="space-y-3">
+              <legend className="text-sm font-semibold text-ink">作答介面</legend>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {([['website', '網站原介面'], ['exam', '仿國考介面']] as const).map(([value, label]) => <label key={value} className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-300 px-4 py-3 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50">
+                  <input type="radio" name="simulation-presentation" value={value} checked={(settings.simulationPresentation ?? 'website') === value} onChange={() => updateSettings({simulationPresentation:value})}/>{label}
+                </label>)}
+              </div>
+              {examMobile && settings.simulationPresentation === "exam" ? <p role="status" className="text-sm text-amber-800">仿國考介面需使用電腦。請選網站原介面後開始。</p> : null}
+              <p className="text-xs leading-5 text-slate-600">開始後，整份考卷會維持所選介面。仿國考介面需使用電腦，手機請選網站原介面。</p>
+            </fieldset> : null}
 
             <div className="flex flex-col gap-3 border-y border-slate-200 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0" aria-live="polite">
