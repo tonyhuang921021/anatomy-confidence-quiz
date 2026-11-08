@@ -22,7 +22,17 @@ export async function POST(request:NextRequest){
    if(error)throw error;
    const unplanned=await db.from('question_explanation_overrides').select('question_id').in('figure_status',['awaiting_image_plan','awaiting_image']).limit(20);
    if(unplanned.error)throw unplanned.error;
-   return reply({ok:true,jobs:data,catalog:CATALOG,unplanned:unplanned.data});
+   // A bounded saved-text pilot may add a fresh plan without regenerating text
+   // or reopening any previous attempted job. No general catalog expansion.
+   const target=boundedImageTarget(process.env);
+   const available=[...(unplanned.data||[])];
+   if(target){
+    const old=await db.from('figure_queue_jobs').select('request_id').eq('question_id',target.questionId).limit(1);
+    const saved=await db.from('question_explanation_overrides').select('question_id,explanation,figure_status').eq('question_id',target.questionId).maybeSingle();
+    if(old.error||saved.error)throw Error('target lookup failed');
+    if(!old.data?.length&&saved.data?.figure_status&&saved.data.explanation&&buildNeeds(saved.data.explanation,[])?.explanationHash===target.textHash&&!available.some(x=>x.question_id===target.questionId))available.push({question_id:target.questionId});
+   }
+   return reply({ok:true,operatorId:u.id,jobs:data,catalog:CATALOG,unplanned:available});
   }
   if(['run_one','retry_image','plan_saved'].includes(body.action) && (!imageWindowOpen(process.env)||process.env.NEW_EXPLANATION_FIGURES_CAPTURE!=='1'||!await figureCaptureAllowed(db)))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='plan_saved'){
