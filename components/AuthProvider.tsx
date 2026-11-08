@@ -28,6 +28,11 @@ import {
 } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
+export type CloudRefreshResult =
+  | { status: "completed"; userId: string; historyHydrated: boolean; historyMode?: "simulation" }
+  | { status: "failed"; userId?: string; retryAt: number }
+  | { status: "skipped"; reason: string; retryAt?: number; pending?: Promise<CloudRefreshResult> };
+
 export type AuthSyncStatus = "idle" | "syncing" | "ready" | "error";
 
 type AuthContextValue = {
@@ -42,7 +47,7 @@ type AuthContextValue = {
   pendingCompletedUploadCount: number;
   applyAuthSession: (nextSession: Session | null) => void;
   finishPasswordRecovery: () => void;
-  refreshCloudData: (options?: RefreshCloudDataOptions) => Promise<void>;
+  refreshCloudData: (options?: RefreshCloudDataOptions) => Promise<CloudRefreshResult>;
   signOut: () => Promise<void>;
 };
 
@@ -106,7 +111,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
   });
 }
 
-function hasInFlightSync(syncRef: { current: Promise<void> | null }) {
+function hasInFlightSync(syncRef: { current: Promise<CloudRefreshResult> | null }) {
   return syncRef.current !== null;
 }
 
@@ -322,7 +327,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncVersion, setSyncVersion] = useState(0);
   const [syncError, setSyncError] = useState("");
   const [pendingCompletedUploadCount, setPendingCompletedUploadCount] = useState(0);
-  const syncInFlightRef = useRef<Promise<void> | null>(null);
+  const syncInFlightRef = useRef<Promise<CloudRefreshResult> | null>(null);
   const sessionRef = useRef<Session | null>(null);
   const resumeRefreshAtRef = useRef(0);
   const automaticSyncTimerRef = useRef<
@@ -403,11 +408,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     targetUserIdOrOptions?: string | RefreshCloudDataOptions,
     targetUser?: User | null,
     options: RefreshCloudDataOptions = {}
-  ) => {
+  ): Promise<CloudRefreshResult> => {
     if (recoveryMode) {
       setSyncStatus("ready");
       setSyncError(RECOVERY_MODE_MESSAGE);
-      return;
+      return { status: "skipped", reason: "recovery" };
     }
 
     const explicitOptions =
@@ -418,7 +423,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       typeof targetUserIdOrOptions === "string" ? targetUserIdOrOptions : undefined;
     const userId = targetUserId || user?.id;
     const effectiveUser = targetUser ?? user;
-    if (!configured || !userId || !effectiveUser) return;
+    if (!configured || !userId || !effectiveUser) return { status: "skipped", reason: "unavailable" };
 
     const now = Date.now();
     const isHistoryHydration = explicitOptions.historyHydration === true;
@@ -431,11 +436,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (syncInFlightRef.current) {
       setSyncStatus("syncing");
       setSyncError("");
-      if (!forceSync) return;
+      if (!forceSync) return { status: "skipped", reason: "in-flight", pending: syncInFlightRef.current };
 
       const previousSyncTask = syncInFlightRef.current;
       await previousSyncTask.catch(() => undefined);
-      if (hasInFlightSync(syncInFlightRef)) return;
+      if (hasInFlightSync(syncInFlightRef)) return { status: "skipped", reason: "in-flight", pending: syncInFlightRef.current! };
     }
 
     if (
@@ -446,7 +451,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ) {
       setSyncStatus("ready");
       setSyncError("");
-      return;
+      return { status: "skipped", reason: "history-cooldown", retryAt: readHistoryCloudSyncMarker(userId) + HISTORY_CLOUD_SYNC_COOLDOWN_MS };
     }
 
     if (
@@ -456,7 +461,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       shouldSkipRecentHistoryCloudSyncAttempt(userId, now)
     ) {
       setSyncStatus("ready");
-      return;
+      return { status: "skipped", reason: "attempt-cooldown", retryAt: readHistoryCloudSyncAttemptMarker(userId) + HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS };
     }
 
     if (
@@ -467,7 +472,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ) {
       setSyncStatus("ready");
       setSyncError("");
-      return;
+      return { status: "skipped", reason: "automatic-cooldown", retryAt: readAutomaticCloudSyncMarker(userId) + AUTOMATIC_CLOUD_SYNC_COOLDOWN_MS };
     }
 
     if (explicitOptions.automatic) {
@@ -483,8 +488,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const uploadAllPending = explicitOptions.uploadAllPending === true;
     const hydrateRemoteHistory = explicitOptions.hydrateRemoteHistory ?? !uploadAllPending;
 
-    let syncTask: Promise<void> | null = null;
-    syncTask = (async () => {
+    let syncTask: Promise<CloudRefreshResult> | null = null;
+    syncTask = (async (): Promise<CloudRefreshResult> => {
       try {
         const completedSessions = await syncLocalCompletedSessionsForCurrentUser(userId, {
           hydrateRemoteHistory,
@@ -504,11 +509,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           writeHistoryCloudSyncMarker(userId);
           clearHistoryCloudSyncAttemptMarker(userId);
         }
-        setSyncError("");
-        setSyncStatus("ready");
-        setSyncVersion((value) => value + 1);
+        if (sessionRef.current?.user.id === userId) {
+          setSyncError("");
+          setSyncStatus("ready");
+          setSyncVersion((value) => value + 1);
+        }
+        return { status: "completed", userId, historyHydrated: hydrateRemoteHistory, historyMode: explicitOptions.historyMode };
       } catch (error) {
-        markLocalSyncFallback(error);
+        if (sessionRef.current?.user.id === userId) markLocalSyncFallback(error);
+        return { status: "failed", userId, retryAt: Date.now() + HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS };
       } finally {
         if (syncTask && syncInFlightRef.current === syncTask) {
           syncInFlightRef.current = null;
@@ -518,16 +527,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     syncInFlightRef.current = syncTask;
     try {
-      await withTimeout(
+      return await withTimeout(
         syncTask,
         backgroundNoticeMs,
         "雲端同步仍在背景整理，可先使用本機紀錄。"
       );
     } catch (error) {
-      if (syncInFlightRef.current === syncTask) {
+      if (syncInFlightRef.current === syncTask && sessionRef.current?.user.id === userId) {
         setSyncStatus("syncing");
         setSyncError(getErrorMessage(error));
       }
+      return { status: "skipped", reason: "background", pending: syncTask };
     }
   }, [configured, recoveryMode, user?.id]);
 
