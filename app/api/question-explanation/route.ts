@@ -1,3 +1,4 @@
+import {createFinalFigureReviewer} from "@/lib/finalFigureRuntime.cjs";
 import {authorizationWindow} from "@/lib/authorizationWindow.cjs";
 import {figureCaptureAllowed} from "@/lib/figureCaptureGate.cjs";
 import {backgroundExplanationResponse} from "@/lib/explanationBackgroundResponse";
@@ -913,7 +914,7 @@ export async function POST(request: NextRequest) {
         const row = Array.isArray(data) ? data[0] : data;
         if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
         // Text is already durably saved. Image failure never retries paid generation.
-        if(row.status==='inserted'&&captureNow){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)waitUntil(processSavedImages({db,question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)}));}
+        if(row.status==='inserted'&&captureNow){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)waitUntil(processSavedImages({db,finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)}));}
         // RPC signature stays compatible with existing queue wrappers. Read the committed marker,
         // never accept a provider/client-supplied format. Failed read is unknown, not a new generation.
         const confirmed=await db.from("question_explanation_overrides").select("question_id,explanation,option_analysis,memory_tip,model,updated_at,reading_format").eq("question_id",id).maybeSingle();
@@ -940,7 +941,7 @@ export async function POST(request: NextRequest) {
       actor_busy:"此帳號已有請求進行中。", cooldown:"請稍後再試。", rate:"目前使用次數已達限制，請稍後再試。"
     };
     if (outcome.status === 200 && outcome.value) {
-      if(replacing){const trusted=resolveTrustedExplanationQuestion(body.question?.id);if(trusted.ok)dispatchReplacementImages({enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&process.env.NEW_EXPLANATION_FIGURES_CAPTURE==='1'&&imageWindowOpen(process.env),outcome,operationId:body.operationId,question:trusted.question,schedule:waitUntil,processImages:({question,requestId,explanationHash}:any)=>processSavedImages({db,question,actor:actorId,search:async(q:string)=>{if(!imageWindowOpen(process.env))throw Error("image window ended");return commonsSearch(q)},loadImage:async(url:string)=>{if(!imageWindowOpen(process.env))throw Error("image window ended");return readBoundedImage(url)},enabled:true,requestId,explanationHash})});}
+      if(replacing){const trusted=resolveTrustedExplanationQuestion(body.question?.id);if(trusted.ok)dispatchReplacementImages({enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&process.env.NEW_EXPLANATION_FIGURES_CAPTURE==='1'&&imageWindowOpen(process.env),outcome,operationId:body.operationId,question:trusted.question,schedule:waitUntil,processImages:({question,requestId,explanationHash}:any)=>processSavedImages({db,finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),question,actor:actorId,search:async(q:string)=>{if(!imageWindowOpen(process.env))throw Error("image window ended");return commonsSearch(q)},loadImage:async(url:string)=>{if(!imageWindowOpen(process.env))throw Error("image window ended");return readBoundedImage(url)},enabled:true,requestId,explanationHash})});}
 
       // Final success is emitted only after usage settlement and durable text commit.
       // Images continue independently via waitUntil above.

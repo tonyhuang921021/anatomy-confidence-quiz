@@ -1,3 +1,5 @@
+import {resolveTrustedExplanationQuestion} from "@/lib/trustedQuestionLoader";
+import {createFinalFigureReviewer} from "@/lib/finalFigureRuntime.cjs";
 import {figureCaptureAllowed,guardFigureTraffic} from "@/lib/figureCaptureGate.cjs";
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
@@ -38,10 +40,11 @@ export async function POST(request:NextRequest){
   if(['run_one','retry_image','plan_saved'].includes(body.action)&&!imageWindowOpen(process.env))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='run_one'){
    if(process.env.NEW_EXPLANATION_FIGURES_WORKER!=='1')return reply({ok:false,code:'worker_disabled'},503);
-   return reply({ok:true,...await runOne({store:createStore(db),search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),enabled:true})});
+   return reply({ok:true,...await runOne({finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),store:createStore(db),search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),enabled:true})});
   }
   if(typeof body.id!=='string'||! /^[0-9a-f-]{36}$/i.test(body.id))return reply({ok:false},400);
-  if(body.action==='retry_image'){const r=await db.rpc('figure_image_retry',{p_id:body.id});return reply({ok:!r.error&&r.data==='pending',status:r.data});}
+  if(body.action==='model_status'){const result=await db.rpc('figure_model_candidate_status',{p_candidate:body.id});return result.error?reply({ok:false,code:'unavailable'},503):reply({ok:true,review:result.data});}
+  if(body.action==='retry_image')return reply({ok:false,code:'prior_attempt_requires_review'},409);
   const found=await db.from('figure_queue_jobs').select('figure_needs,question_id').eq('request_id',body.id).maybeSingle();
   if(found.error||!found.data)return reply({ok:false},404);
   if(body.action==='inspect'){

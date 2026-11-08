@@ -1,7 +1,7 @@
 export function buildNeeds(text:string,hints:unknown):any;
 export function approveConcepts(needs:any,choices:any):any;
 export function runOne(args:any):Promise<any>;
-export function createStore(db:any):any;
+export function createStore(db:any,options?:any):any;
 export const CATALOG:Record<string,{query:string;revision:string}>;
 export const IMAGE_PROMPT:string;
 
