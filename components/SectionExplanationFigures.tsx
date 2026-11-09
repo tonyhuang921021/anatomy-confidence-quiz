@@ -2,8 +2,10 @@
 import {createContext,useContext,useEffect,useState,type ReactNode} from 'react';
 import {safeApprovedMeta} from '@/lib/approvedFigureSecurity';
 import {Figure} from './VerifiedExplanationFigures';
+import {userProvidedExplanationFigure,type UserProvidedFigure} from '@/lib/userProvidedExplanationFigure.cjs';
+import {UserProvidedExplanationFigure} from './UserProvidedExplanationFigure';
 
-type Delivery={sectionFigures:any[];sections:{sectionTitle:string;sectionHash:string}[];imageStatus:string|null;refresh?:()=>void};
+type Delivery={sectionFigures:any[];sections:{sectionTitle:string;sectionHash:string}[];imageStatus:string|null;userProvidedFigure?:UserProvidedFigure|null;refresh?:()=>void};
 const Context=createContext<Delivery|null>(null);
 const PreviewContext=createContext<Delivery|null>(null);
 export function LocalFigurePreviewProvider({value,children}:{value:Delivery;children:ReactNode}) {return <PreviewContext.Provider value={process.env.NODE_ENV === "development" ? value : null}>{children}</PreviewContext.Provider>;}
@@ -20,8 +22,10 @@ export function SectionFiguresProvider({questionId,text,children}:{questionId?:s
    if(!response.ok)throw Error('unavailable');const data=await response.json();
    if(cancelled||data.explanationHash!==hash)return;
    const figures=(Array.isArray(data.sectionFigures)?data.sectionFigures:[]).filter(safeApprovedMeta).slice(0,3);
-   setDelivery({sectionFigures:figures,sections:(Array.isArray(data.sections)?data.sections:[]).filter((x:any)=>typeof x.sectionTitle==='string').slice(0,3),imageStatus:typeof data.imageStatus==='string'?data.imageStatus:null,refresh:()=>void read(false)});
-   if(loop&&figures.length===0&&data.imageStatus&&++reads<60)timer=setTimeout(()=>void read(),reads<12?5000:15000);
+   const supplied=userProvidedExplanationFigure(questionId,hash,data.replacementRevision);
+   const userProvidedFigure=supplied&&data.userProvidedFigureId===supplied.id?supplied:null;
+   setDelivery({sectionFigures:figures,userProvidedFigure,sections:(Array.isArray(data.sections)?data.sections:[]).filter((x:any)=>typeof x.sectionTitle==='string').slice(0,3),imageStatus:typeof data.imageStatus==='string'?data.imageStatus:null,refresh:()=>void read(false)});
+   if(loop&&figures.length===0&&!userProvidedFigure&&data.imageStatus&&++reads<60)timer=setTimeout(()=>void read(),reads<12?5000:15000);
   }catch{if(!cancelled)setDelivery({sectionFigures:[],sections:[],imageStatus:'unavailable',refresh:()=>void read(false)})}};
   const focus=()=>{if(document.visibilityState==='visible')void read(false)};
   void read();window.addEventListener('focus',focus);document.addEventListener('visibilitychange',focus);
@@ -31,6 +35,7 @@ export function SectionFiguresProvider({questionId,text,children}:{questionId?:s
 }
 export function SectionFigures({title}:{title?:string}){
  const delivery=useContext(Context);if(!delivery)return null;
+ if(delivery.userProvidedFigure&&delivery.userProvidedFigure.sectionTitle===title)return <UserProvidedExplanationFigure figure={delivery.userProvidedFigure}/>;
  const figures=title?delivery.sectionFigures.filter(x=>x.section_heading===title):[];
  if(figures.length)return <>{figures.map(x=><Figure key={x.id} figure={{asset:typeof x.asset==='string' && ['/terra-trial/carotid-sheath.png','/terra-trial/common-carotid.jpg','/terra-trial/brain-sinuses.jpg'].includes(x.asset) ? x.asset : process.env.NODE_ENV === "development" && typeof x.previewAsset === "string" && x.previewAsset.startsWith("data:image/png;base64,") ? x.previewAsset : `/api/approved-figures/${x.id}`,alt:x.section_title,caption:x.section_title,sourceUrl:x.source_url,licenseUrl:x.license_url,license:x.license,attribution:x.attribution}}/>)}</>;
  return null;

@@ -3,6 +3,7 @@ import {createClient} from '@supabase/supabase-js';
 import {createHash} from 'node:crypto';
 import {publishedTrialFigure} from '@/lib/publishedTrialFigures';
 import {safeApprovedMeta} from '@/lib/approvedFigureSecurity';
+import {userProvidedExplanationFigure} from '@/lib/userProvidedExplanationFigure.cjs';
 export async function GET(request:NextRequest){
  const headers={'Cache-Control':'no-store'};if(process.env.FIGURE_REVIEW_ENABLED!=='1')return NextResponse.json({figures:[]},{headers});
  const id=request.nextUrl.searchParams.get('questionId');if(!id||!/^[A-Za-z0-9_-]{1,200}$/.test(id))return NextResponse.json({figures:[]},{status:400,headers});
@@ -20,6 +21,8 @@ export async function GET(request:NextRequest){
   const versioned=Boolean(saved.data.replacement_revision);
   if(process.env.NEW_EXPLANATION_FIGURES_RENDER!=='1')return NextResponse.json({figures:versioned?[]:figures},{headers});
   const hash=createHash('sha256').update(saved.data.explanation).digest('hex');
+  const userProvided=userProvidedExplanationFigure(id,hash,saved.data.replacement_revision);
+  if(userProvided)return NextResponse.json({figures:[],sectionFigures:[],explanationHash:hash,replacementRevision:saved.data.replacement_revision,userProvidedFigureId:userProvided.id,imageStatus:'user_provided',sections:[{sectionTitle:userProvided.sectionTitle}]},{headers});
   const published=publishedTrialFigure(id,hash);
   if(published)return NextResponse.json({figures:[],sectionFigures:[published],explanationHash:hash,imageStatus:'approved',sections:[{sectionTitle:published.section_heading}]},{headers});
   const jobs=await db.from('figure_queue_jobs').select('figure_needs,image_status').eq('question_id',id).eq('explanation_sha256',hash).maybeSingle();
