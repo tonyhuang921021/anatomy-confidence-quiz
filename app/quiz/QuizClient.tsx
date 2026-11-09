@@ -2854,7 +2854,7 @@ function OwnerQuizPage() {
                 <div className="space-y-3 p-4 text-sm leading-7 text-slate-700 sm:p-5">
                   {shouldShowExplanation ? (
                     <>
-                      <ExplanationGenerationStatus key={currentQuestion.id} questionId={currentQuestion.id} loading={currentExplanationLoading} error={currentExplanationError} resultVersion={currentExplanationOverride?.updatedAt} />
+                      <ExplanationGenerationStatus recoveryKind="generation" key={currentQuestion.id} questionId={currentQuestion.id} loading={currentExplanationLoading} error={currentExplanationError} resultVersion={currentExplanationOverride?.updatedAt} />
                       <QuestionAiMetadataBadges
                         question={currentQuestion}
                         className="mb-3"
@@ -2881,20 +2881,7 @@ function OwnerQuizPage() {
                                 <span className="px-3 py-1 text-xs font-semibold text-slate-500">
                                   已替換詳解・{currentExplanationOverride.model ?? "gpt-5.4-mini"}
                                 </span>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    void handleGenerateQuestionExplanation(
-                                      currentQuestion,
-                                      submittedAttempt,
-                                      currentExplanationOverride
-                                    )
-                                  }
-                                  disabled={currentExplanationLoading}
-                                  className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
-                                >
-                                  {currentExplanationLoading ? "讀取中..." : "重新讀取詳解"}
-                                </button>
+
                               </>
                             ) : !hasReviewedExplanation(currentQuestion.id) ? (
                               <button
@@ -2918,7 +2905,7 @@ function OwnerQuizPage() {
                         )}
                       />
 
-                      
+
                     </>
                   ) : null}
                   {specialScoringNote ? (

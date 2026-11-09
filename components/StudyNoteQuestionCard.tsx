@@ -178,22 +178,10 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
             compact
             className="ml-2 mt-4 align-middle"
           />
-          {!hasReviewedExplanation(question.id) ? <button
-            type="button"
-            onClick={() => void handleGenerateExplanation()}
-            disabled={explanationLoading}
-            className="secondary-pill ml-2 mt-4 px-4 py-2 text-sm disabled:opacity-60"
-          >
-            {explanationLoading
-              ? explanationOverride
-                ? "讀取中..."
-                : "AI 生成中..."
-              : explanationOverride
-                ? "重新讀取詳解"
-                : "產生圖文詳解"}
-          </button> : null}
-          <ExplanationGenerationStatus key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={explanationOverride?.updatedAt} />
-          <div className="mt-2"><ExplanationReplacementControls questionId={question.id}/></div>
+
+          {!hasReviewedExplanation(question.id)&&!explanationOverride?<button type="button" onClick={()=>void handleGenerateExplanation()} disabled={explanationLoading} className="secondary-pill ml-2 mt-4 px-4 py-2 text-sm disabled:opacity-60">{explanationLoading?"AI 生成中...":"產生圖文詳解"}</button>:null}
+          <ExplanationGenerationStatus recoveryKind="generation" key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={explanationOverride?.updatedAt} />
+          <div className="mt-2"><ExplanationReplacementControls questionId={question.id} onStart={()=>setShowAnswer(true)}/></div>
           {explanationError ? (
             <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">
               {explanationError}

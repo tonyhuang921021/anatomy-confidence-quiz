@@ -3,7 +3,7 @@ function fixture(fetch,{storageFailure=false}={}){
  const values=new Map(),cache={};
  const context={fetch,Response,Headers,TextDecoder,Date,Map,Error,JSON,crypto,window:{dispatchEvent(){}},CustomEvent:class{},localStorage:{getItem:k=>values.get(k)??null,setItem:(k,v)=>{if(storageFailure)throw Error('quota');values.set(k,v)},removeItem:k=>values.delete(k)}};
  function load(name){if(name==='@/lib/storage')return {applyConfirmedExplanationVersion(){},saveQuestionExplanationOverride(){}};if(name==='@/lib/cloudSync')return {clearQuestionExplanationBackgroundCache(){}};const file=name.replace('./','');if(cache[file])return cache[file];const m={exports:{}};cache[file]=m.exports;vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/'+file+'.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{...context,module:m,exports:m.exports,require:load});return m.exports}
- return {client:load('explanationRequestClient'),pending:load('generationRequestClient'),values};
+ return {client:load('explanationRequestClient'),pending:load('generationRequestClient'),replacement:load('explanationReplacementClient'),values};
 }
 const init={method:'POST',body:JSON.stringify({question:{id:'Q'},accessToken:'token'})};
 test('stable operation is persisted before initial request and rapid double click sends once',async()=>{let count=0,release,seen;const f=fixture(async(url,request)=>{count++;seen=JSON.parse(request.body);await new Promise(r=>release=r);return Response.json({ok:true,explanation:'complete'})});const a=f.client.requestExplanation('/api/question-explanation',init),b=f.client.requestExplanation('/api/question-explanation',init);assert.equal(count,1);assert.equal(f.pending.pendingGeneration('Q').operationId,seen.operationId);release();await a;await b;assert.equal(f.pending.pendingGeneration('Q'),null)});
@@ -27,3 +27,5 @@ test('reservation errors and unknown duplicate operations remain held after a mi
   await f.client.requestExplanation('/api/question-explanation',init);const id=f.pending.pendingGeneration('Q').operationId;await f.client.requestExplanation('/api/question-explanation',init);assert.equal(requests,1);assert.equal(f.pending.pendingGeneration('Q').operationId,id,code);
  }
 });
+
+test('confirmed replacement identity survives navigation until exact version is published',async()=>{const f=fixture(async()=>Response.json({ok:true,explanation:'complete',replacementRevision:'revision'}));await f.client.requestExplanation('/api/question-explanation',{method:'POST',body:JSON.stringify({question:{id:'Q'},action:'replace',operationId:'operation',baseVersion:'base',accessToken:'token'})});assert.equal(f.replacement.pendingReplacement('Q').operationId,'operation');f.replacement.publishReplacement('Q',{explanation:'complete'});assert.equal(f.replacement.pendingReplacement('Q'),null)});

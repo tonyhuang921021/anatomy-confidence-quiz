@@ -94,9 +94,10 @@ export function QuestionExplanationTabs({question, compact = false, className = 
     {reactionError?<p role="alert" className="mb-2 text-sm text-rose-700">{reactionError}</p>:null}
     <div {...morePresence.attributes} id={moreId} role="group" aria-label="更多操作" hidden={!morePresence.present}
       className="mb-3 ml-auto w-full rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:w-64">
-      <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg"><ExplanationReplacementControls questionId={question.id}/>{moreActionsContent}</div>
+      <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg">{moreActionsContent}</div>
     </div>
     <div id={panelId} className="min-w-0 max-w-full">
+      <div className="mb-3"><ExplanationReplacementControls questionId={question.id} onStart={()=>{setSelection({questionId:question.id,source:null});setIsMoreActionsOpen(false);}}/></div>
       {/* Keep the original reader mounted: preserve 簡解／詳解 and image state. */}
       <div hidden={activeTab!==null} role="region" aria-label="原詳解" className="min-w-0 space-y-3">
         {mainExplanationContent || <p className="text-sm text-slate-500">此題尚無原詳解。</p>}

@@ -15,7 +15,7 @@ import { createHash } from "node:crypto";
 import { captureEnabled } from "@/lib/figureQueueRuntime.cjs";
 import reviewedIndex from "@/data/reviewedExplanationIndex.json";
 import { handleExplanation, formatAcceptedAnswer } from "@/lib/explanation-orchestrator.cjs";
-import { appendTeachingContext, MATH_FORMAT_RULE, INTEGRATED_TEACHING_RULE, PRIVATE_SOURCE_RULE, safeTeachingDraft, validPublicTeaching } from '@/lib/teachingContext';
+import { appendTeachingContext, MATH_FORMAT_RULE, INTEGRATED_TEACHING_RULE, TRANSFER_SELF_CHECK_RULE, PRIVATE_SOURCE_RULE, safeTeachingDraft, validPublicTeaching } from '@/lib/teachingContext';
 import { resolveTrustedExplanationQuestion, resolveTrustedRelatedQuestions } from "@/lib/trustedQuestionLoader";
 import { formatRocDate } from "@/lib/rocDate";
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
@@ -116,7 +116,7 @@ const MAX_SYNC_OVERRIDES_PER_REQUEST = 50;
 const GPT_5_MINI_MAX_OUTPUT_TOKENS = 2400;
 const QUESTION_EXPLANATION_MODEL = getOpenAIModel(process.env.QUESTION_EXPLANATION_MODEL);
 const QUESTION_EXPLANATION_PROMPT_PREFIX = [
-  "用自然、清楚的臺灣繁體中文，幫學習者理解這道國考題。",
+  "用自然、清楚的臺灣繁體中文和必要的英文，幫學習者理解這道國考題。以臺灣繁體中文說明為主，重要醫學專有名詞首次出現時附英文；保留題目中的必要英文、通用縮寫與標準符號。使用臺灣慣用醫學譯名，避免簡體字與中國慣用語，不為翻譯改變醫學意義。",
   "先說明正解及關鍵判斷，再依題目需要解釋機轉、相近概念與選項差異；篇幅和小標按內容需要安排，不設字數下限或固定延伸數量。",
   "各選項的判斷與能區分的原因放在 optionAnalysis，每個實際存在的選項都要說明。",
   "題庫標籤可能不準，以可信題幹、原始選項、官方答案與判分方式為準。若有一律給分或多個可接受答案，應依實際判分說明。",
@@ -124,10 +124,11 @@ const QUESTION_EXPLANATION_PROMPT_PREFIX = [
   "直接說明知識與機轉，不評論模型、提示詞、寫作過程或稿件；不要根據任何單一使用者的作答情況改變內容。",
   INTEGRATED_TEACHING_RULE,
   PRIVATE_SOURCE_RULE,
+  TRANSFER_SELF_CHECK_RULE,
   MATH_FORMAT_RULE,
   "若附有經核對的相關題資料，將共通機制、易混鑑別、延伸概念及可能變化整合到本題教學，不要只列相關題，也不要提年份、卷別或出題次數；仍補足相關題未提到但理解需要的內容。相關題中的可能原因或部分情況不可泛化成所有病例。",
   "圖片由網站根據已核對的資料提供；內部背景僅供教學整合，不輸出題目連結、題號、年份、圖片、引用或網址。",
-  "依內容需要使用段落、粗體、條列或 Markdown 表格；只有比較多個機轉、條件或選項確實更清楚時才用表格，不要求每題有表格、延伸段落或圖片，不為湊格式切碎論述。",
+  "依內容需要使用段落、粗體、條列或 Markdown 表格；只有比較多個機轉、條件或選項確實更清楚時才用表格，不要求固定段落數，也不要求每題有表格或圖片，不為湊格式切碎論述。",
   "只輸出 JSON，不要輸出 HTML、code block 或 JSON 外文字。explanation 為文字；optionAnalysis 僅包含實際存在的 A、B、C、D、E 選項鍵；memoryTip 沒有則留空字串。",
   '{"explanation":"整題詳解","optionAnalysis":{"A":"A 選項解析","B":"B 選項解析"},"memoryTip":""}'
 ].join("\n");

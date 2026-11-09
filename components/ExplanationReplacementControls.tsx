@@ -1,71 +1,66 @@
 "use client";
 import {useEffect,useRef,useState} from "react";
 import {useAuth} from "@/components/AuthProvider";
-import {requestExplanation} from "@/lib/explanationRequestClient";
 import {pendingExplanation} from "@/lib/explanationRequestClient";
-import {pendingReplacement,publishReplacement,recoverReplacement,replacementAction,setPendingReplacement} from "@/lib/explanationReplacementClient";
+import {pendingGeneration} from "@/lib/generationRequestClient";
+import {pendingReplacement,publishReplacement,replacementAction,setPendingReplacement} from "@/lib/explanationReplacementClient";
+import {replaceExplanationInline} from "@/lib/inlineExplanationReplacement";
 import {ExplanationGenerationStatus} from "@/components/ExplanationGenerationStatus";
 
-export function ExplanationReplacementControls({questionId}:{questionId:string}){
+type Activity="replace"|"recover"|"restore"|"inspect"|null;
+export function ExplanationReplacementControls({questionId,onStart}:{questionId:string;onStart?:()=>void}){
  const {session}=useAuth();
- const [open,setOpen]=useState(false),[busy,setBusy]=useState(false),[message,setMessage]=useState("");
+ const [activity,setActivity]=useState<Activity>(null),[message,setMessage]=useState(""),[error,setError]=useState<string|null>(null);
  const [ready,setReady]=useState<{baseVersion:string;revision?:string;canRestore:boolean}|null>(null);
  const [pending,setPending]=useState(false),[resultVersion,setResultVersion]=useState<string|undefined>();
- const context=useRef(0),button=useRef<HTMLButtonElement>(null),dialog=useRef<HTMLDialogElement>(null),actionLock=useRef(false);
- useEffect(()=>{const d=dialog.current;if(!open||!d)return;d.showModal();const overflow=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{d.close();document.body.style.overflow=overflow;button.current?.focus({preventScroll:true});};},[open]);
- useEffect(()=>{context.current++;setOpen(false);setReady(null);setMessage("");setBusy(false);setPending(Boolean(pendingReplacement(questionId)));setResultVersion(undefined);actionLock.current=false;return()=>{context.current++;};},[questionId,session?.access_token]);
+ const context=useRef(0),actionLock=useRef(false);
+ const busy=activity!==null;
+ useEffect(()=>{context.current++;setReady(null);setMessage("");setError(null);setActivity(null);setPending(Boolean(pendingReplacement(questionId)));setResultVersion(undefined);actionLock.current=false;return()=>{context.current++;};},[questionId,session?.access_token]);
+ async function replace(){
+  if(actionLock.current)return;
+  onStart?.();setMessage("");setError(null);setResultVersion(undefined);
+  if(!session?.access_token){setMessage("請先登入，才能替換詳解。");return;}
+  actionLock.current=true;setActivity("replace");setReady(null);const epoch=context.current;
+  try{
+   const result=await replaceExplanationInline({questionId,accessToken:session.access_token,isCurrent:()=>context.current===epoch,onRecovering:()=>{if(context.current===epoch)setActivity("recover");}});
+   if(context.current!==epoch||result.kind==='stale')return;
+   setMessage(result.message);if(result.kind==='replaced')setResultVersion(result.version);
+  }catch(error){if(context.current===epoch){const text=error instanceof Error?error.message:"操作結果尚未確認，不會自動重送。";setMessage(text);setError(text);}}
+  finally{if(context.current===epoch){actionLock.current=false;setActivity(null);setPending(Boolean(pendingReplacement(questionId)));}}
+ }
  async function inspect(){
-  setOpen(true);setMessage("");if(!session?.access_token){setMessage("請先登入，才能替換詳解。");return;}
-  if(actionLock.current)return;actionLock.current=true;setBusy(true);const epoch=context.current;
+  if(actionLock.current)return;
+  if(!session?.access_token){setMessage("請先登入，才能查看可還原的版本。");return;}
+  actionLock.current=true;setActivity("inspect");const epoch=context.current;
+  try{const status=await replacementAction(questionId,session.access_token,"status");if(context.current===epoch){setReady(status.status==='ready'?status:null);setMessage(status.canRestore?'可還原自己最近一次替換前的詳解。':'目前沒有可還原的替換版本。');}}
+  catch{if(context.current===epoch)setMessage("無法確認還原狀態，原詳解保持不變。");}
+  finally{if(context.current===epoch){actionLock.current=false;setActivity(null);}}
+ }
+ async function restore(){
+  if(actionLock.current||!ready?.canRestore||!ready.revision||!session?.access_token)return;
+  if(pendingReplacement(questionId)||pendingGeneration(questionId)||pendingExplanation(questionId)){setMessage("先前請求仍在確認中，尚未開始還原。");return;}
+  const epoch=context.current;actionLock.current=true;setActivity("restore");setMessage("");setError(null);setResultVersion(undefined);onStart?.();
   try{
-   if(pendingReplacement(questionId)){
-    const recovered=await recoverReplacement(questionId,session.access_token);
-    if(context.current!==epoch)return;
-    setPending(!recovered);if(!recovered){setMessage("先前操作仍在確認中，不會再送生成請求。原詳解可繼續閱讀。");return;}
-   }
-   const status=await replacementAction(questionId,session.access_token,"status");
+   setPendingReplacement(questionId,{kind:'restore',operationId:ready.revision,startedAt:Date.now()});
+   const restored=await replacementAction(questionId,session.access_token,"restore",ready.revision,ready.baseVersion);
    if(context.current!==epoch)return;
-   if(status.status!=="ready")throw Error("替換功能暫時不可用，原詳解仍可閱讀。");
-   setReady(status);
-  }catch(error){if(context.current===epoch)setMessage(error instanceof Error?error.message:"無法確認替換狀態。");}
-  finally{if(context.current===epoch){actionLock.current=false;setBusy(false);}}
- }
- async function perform(kind:"replace"|"restore"){
-  if(actionLock.current||!ready||!session?.access_token||pendingReplacement(questionId))return;
-  if(pendingExplanation(questionId)){setMessage("這題已有請求正在確認，請先等候原請求完成。");return;}
-  const epoch=context.current;actionLock.current=true;setBusy(true);setMessage("");
-  try{
-   if(kind==="restore"){
-    if(!ready.canRestore||!ready.revision)return;
-    setPendingReplacement(questionId,{kind,operationId:ready.revision,startedAt:Date.now()});
-    const restored=await replacementAction(questionId,session.access_token,"restore",ready.revision,ready.baseVersion);
-    if(restored.status!=="restored"){
-     if(["replacement_version_changed","not_found","pending","unavailable"].includes(restored.status))setPendingReplacement(questionId,null);
-     throw Error(restored.status==="replacement_version_changed"?"詳解已有較新版本，未還原。請重新確認。":"目前不能還原，原文保持不變。");
-    }
-    publishReplacement(questionId,restored.value);
-   }else{
-    const response=await requestExplanation("/api/question-explanation",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"replace",operationId:crypto.randomUUID(),baseVersion:ready.baseVersion,accessToken:session.access_token,question:{id:questionId}})});
-    const value=await response.json();if(!response.ok||!value.ok||!value.explanation||!value.replacementRevision)throw Error(value.message||"替換尚未完成，原詳解仍可閱讀。");
-    publishReplacement(questionId,{...value,updatedAt:value.updatedAt||new Date().toISOString()});
+   if(restored.status!=="restored"){
+    if(["replacement_version_changed","not_found","pending","unavailable"].includes(restored.status))setPendingReplacement(questionId,null);
+    throw Error(restored.status==="replacement_version_changed"?"詳解已有較新版本，未還原。請重新確認。":"目前不能還原，原文保持不變。");
    }
-   if(context.current===epoch){setReady(null);setMessage(kind==="restore"?"已還原先前詳解與對應配圖。":"已保存新的詳解，原版已保留。");setResultVersion(new Date().toISOString());}
-  }catch(error){if(context.current===epoch)setMessage(error instanceof Error?error.message:"操作結果尚未確認，不會自動重送。");}
-  finally{if(context.current===epoch){actionLock.current=false;setBusy(false);setPending(Boolean(pendingReplacement(questionId)));}}
+   publishReplacement(questionId,restored.value);setReady(null);setMessage("已還原先前詳解與對應配圖。");setResultVersion(new Date().toISOString());
+  }catch(error){if(context.current===epoch){const text=error instanceof Error?error.message:"還原結果尚未確認，不會自動重送。";setMessage(text);setError(text);}}
+  finally{if(context.current===epoch){actionLock.current=false;setActivity(null);setPending(Boolean(pendingReplacement(questionId)));}}
  }
- return <div className="min-w-0 w-full">
-  <button ref={button} type="button" onClick={()=>void inspect()} disabled={busy} className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60">{pending?"確認先前替換結果":"替換詳解"}</button>
-  {open?<dialog ref={dialog} className="m-auto w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 text-sm leading-6 shadow-xl" style={{width:"min(92vw,28rem)"}} aria-label="替換詳解確認" onCancel={e=>{e.preventDefault();e.stopPropagation();setOpen(false);}}><h2 className="mb-3 text-lg font-bold text-brand-900">替換詳解</h2>
-   <p>重新生成後會更新這題的共享詳解，使用目前的詳解額度。原版會保留；你可以還原自己最近一次替換。</p>
-   <p className="mt-1 text-xs text-slate-500">新文字保存前仍可讀原版。原配圖依文字版本保留，不會套到不相符的新段落。</p>
-   {ready&&!pending?<div className="mt-3 flex flex-wrap gap-2">
-    <button type="button" disabled={busy} onClick={()=>void perform("replace")} className="min-h-11 rounded-lg bg-brand-800 px-3 py-2 font-semibold text-white disabled:opacity-60">確認替換</button>
-    {ready.canRestore?<button type="button" disabled={busy} onClick={()=>void perform("restore")} className="min-h-11 rounded-lg border border-slate-300 px-3 py-2 disabled:opacity-60">還原上次替換前的詳解</button>:null}
-   </div>:null}
-   {message?<p role="status" className="mt-2 text-sm text-slate-700">{message}</p>:null}
-   {pending&&!busy?<button type="button" onClick={()=>void inspect()} className="mt-2 min-h-11 rounded-lg border px-3">只查詢處理結果</button>:null}
-   <ExplanationGenerationStatus questionId={questionId} loading={busy&&Boolean(pendingReplacement(questionId))} error={null} resultVersion={resultVersion}/>
-   <button type="button" onClick={()=>{setOpen(false);button.current?.focus();}} className="mt-2 min-h-10 px-2 text-slate-600">關閉</button>
-  </dialog>:null}
+ return <div className="min-w-0 w-full space-y-2" aria-label="替換詳解與進度">
+  <div className="flex flex-wrap items-center gap-2">
+   <button type="button" onClick={()=>void replace()} disabled={busy} className="inline-flex min-h-10 items-center rounded-lg bg-brand-800 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-900 disabled:opacity-60">{busy?(activity==='recover'?"確認先前結果中…":activity==='replace'?"替換詳解中…":"處理中…"):pending?"確認先前替換結果":"替換詳解"}</button>
+   <details className="text-xs text-slate-500"><summary className="cursor-pointer px-2 py-2">版本選項</summary><div className="mt-1 flex flex-wrap gap-2">
+    <button type="button" disabled={busy} onClick={()=>void inspect()} className="min-h-10 rounded-lg border px-3 py-2 disabled:opacity-60">查看可還原版本</button>
+    {ready?.canRestore?<button type="button" disabled={busy} onClick={()=>void restore()} className="min-h-10 rounded-lg border px-3 py-2 disabled:opacity-60">還原上次替換前的詳解</button>:null}
+   </div></details>
+  </div>
+  <ExplanationGenerationStatus questionId={questionId} loading={busy&&activity!=="inspect"} error={error} resultVersion={resultVersion} recoveryKind="replacement" activityLabel={activity==='recover'?"正在確認先前請求":activity==='restore'?"正在還原詳解":"詳解替換中"}/>
+  {message?<p role="status" className="text-sm text-slate-600">{message}</p>:null}
  </div>;
 }

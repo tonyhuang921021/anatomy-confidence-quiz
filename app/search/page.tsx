@@ -1260,7 +1260,7 @@ function SearchPageContent() {
                   )
                 ) : null}
 
-                <ExplanationGenerationStatus key={renderedQuestion.id} questionId={renderedQuestion.id} loading={loading} error={error} resultVersion={override?.updatedAt} />
+                <ExplanationGenerationStatus recoveryKind="generation" key={renderedQuestion.id} questionId={renderedQuestion.id} loading={loading} error={error} resultVersion={override?.updatedAt} />
                 {shouldShowAnswer ? (
                 <div className="search-result-action-dock">
                   <QuestionExplanationTabs mainExplanationContent={<>
@@ -1308,14 +1308,7 @@ function SearchPageContent() {
                             <span className="px-3 py-1 text-xs font-semibold text-slate-500">
                               已替換詳解・{override.model ?? "gpt-5.4-mini"}
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => void handleGenerateQuestionExplanation(renderedQuestion, override)}
-                              disabled={loading}
-                              className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
-                            >
-                              {loading ? "讀取中..." : "重新讀取詳解"}
-                            </button>
+
                           </>
                         ) : !hasReviewedExplanation(renderedQuestion.id) ? (
                           <button
@@ -1342,7 +1335,7 @@ function SearchPageContent() {
                 </div>
                 ) : null}
 
-                
+
               </div>
               ) : (
                 <span id={detailsId} hidden />

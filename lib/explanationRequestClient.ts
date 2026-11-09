@@ -45,7 +45,7 @@ export async function requestExplanation(_url:string,init:RequestInit):Promise<R
     const confirmed=final as {status:number;data:any};response=Response.json(confirmed.data,{status:confirmed.status});
    }
    const data=await response.clone().json();
-   if(data.ok&&data.explanation){if(replacing)setPendingReplacement(id,null);else setPendingGeneration(id,null);remove(key(id));put(metricKey(id),JSON.stringify({startedAt:started,firstTextMs:firstTextMs??Date.now()-started,textMs:Date.now()-started,model:data.model,delivery:data.delivery||null}));}
+   if(data.ok&&data.explanation){/* Replacement identity stays durable until publishReplacement applies the confirmed version, including after navigation. */if(!replacing)setPendingGeneration(id,null);remove(key(id));put(metricKey(id),JSON.stringify({startedAt:started,firstTextMs:firstTextMs??Date.now()-started,textMs:Date.now()-started,model:data.model,delivery:data.delivery||null}));}
    else if(response.status===401||['unavailable','sitewide_admission_unavailable','question_busy','review_snapshot_unavailable','reviewed_protected','busy','actor_busy','rate','cooldown','account_banned','guard_unavailable','run_window_expired','budget','safe_configuration_missing','reviewed_explanation_protected','untrusted_question','authentication_required','trusted_context_missing','source_image_not_supported','invalid_replacement','replacement_version_changed','trusted_question_incomplete','incomplete_explanation','replacement_not_written','generation_journal_required','generation_not_written'].includes(data.code)){remove(key(id));if(replacing)setPendingReplacement(id,null);else setPendingGeneration(id,null);}
    return response;
   }catch{throw Error('request outcome unconfirmed')}

@@ -1755,14 +1755,7 @@ export default function SubjectNotesPage() {
                             <span className="secondary-pill px-4 py-2 text-sm text-slate-600">
                               已替換詳解・{override.model ?? "gpt-5.4-mini"}
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => void handleGenerateQuestionExplanation(question, override)}
-                              disabled={explanationLoading}
-                              className="secondary-pill px-4 py-2 text-sm disabled:cursor-wait disabled:opacity-60"
-                            >
-                              {explanationLoading ? "讀取中..." : "重新讀取詳解"}
-                            </button>
+
                           </>
                         ) : !hasReviewedExplanation(question.id) ? (
                           <button
@@ -1775,7 +1768,7 @@ export default function SubjectNotesPage() {
                           </button>
                         ) : null}
                       </div>
-                      <ExplanationGenerationStatus key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={override?.updatedAt} />
+                      <ExplanationGenerationStatus recoveryKind="generation" key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={override?.updatedAt} />
                       <div className="mt-2"><ExplanationReplacementControls questionId={question.id}/></div>
                       {explanationError ? (
                         <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">

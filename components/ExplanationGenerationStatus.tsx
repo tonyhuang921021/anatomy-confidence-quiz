@@ -13,7 +13,7 @@ import {
 import {StructuredExplanationText} from "./StructuredExplanationText";
 import styles from "./ExplanationGenerationStatus.module.css";
 
-export function ExplanationGenerationStatus({ questionId, loading, error, resultVersion }: GenerationSignal) {
+export function ExplanationGenerationStatus({ questionId, loading, error, resultVersion, recoveryKind="all", activityLabel }: GenerationSignal & {recoveryKind?:"all"|"generation"|"replacement";activityLabel?:string}) {
   const {session}=useAuth();
   const [preview,setPreview]=useState({id:questionId,text:""});
   const draft=useDeferredValue(preview.id===questionId?preview.text:"");
@@ -23,7 +23,7 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
   const timingCaption=timing?.source==='recovered'?"已讀取背景完成的詳解":timing?`開始顯示 ${(Number(timing.firstTextMs??timing.textMs)/1000).toFixed(1)} 秒 · 全文 ${(Number(timing.textMs)/1000).toFixed(1)} 秒`:"";
   const [state, setState] = useState(INITIAL_GENERATION_STATUS);
   const [recovering,setRecovering]=useState(false);const [elapsed,setElapsed]=useState(0);
-  useEffect(()=>{const hasOperation=pendingReplacement(questionId)||pendingGeneration(questionId);if(loading||(resultVersion&&!hasOperation)||(!pendingExplanation(questionId)&&!hasOperation)){setRecovering(false);return}let cancelled=false,timer:ReturnType<typeof setTimeout>;let checks=0;setRecovering(true);const check=async()=>{try{if(await recoverPendingExplanation(questionId,session?.access_token)){if(!cancelled)setRecovering(false);return}}catch{}if(cancelled)return;if(++checks<24)timer=setTimeout(check,5000);else setRecovering(false)};void check();return()=>{cancelled=true;clearTimeout(timer)}},[questionId,loading,resultVersion,session?.access_token]);
+  useEffect(()=>{const replacement=pendingReplacement(questionId);if((recoveryKind==="generation"&&replacement)||(recoveryKind==="replacement"&&!replacement)){setRecovering(false);return}const hasOperation=replacement||pendingGeneration(questionId);if(loading||(resultVersion&&!hasOperation)||(!pendingExplanation(questionId)&&!hasOperation)){setRecovering(false);return}let cancelled=false,timer:ReturnType<typeof setTimeout>;let checks=0;setRecovering(true);const check=async()=>{try{if(await recoverPendingExplanation(questionId,session?.access_token)){if(!cancelled)setRecovering(false);return}}catch{}if(cancelled)return;if(++checks<24)timer=setTimeout(check,5000);else setRecovering(false)};void check();return()=>{cancelled=true;clearTimeout(timer)}},[questionId,loading,resultVersion,session?.access_token,recoveryKind]);
   useEffect(()=>{if(!loading&&!recovering)return;const start=pendingExplanation(questionId)||Date.now();const tick=()=>setElapsed(Math.max(0,Math.floor((Date.now()-start)/1000)));tick();const timer=setInterval(tick,1000);return()=>clearInterval(timer)},[questionId,loading,recovering]);
   const activeLoading=loading||(recovering&&!resultVersion);
   const visibleError = recovering ? null : error;
@@ -66,7 +66,7 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
         {complete && <path className={styles.sparkle} d="m96 20 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z" fill="#dfb758" />}
       </svg>
       <div className={styles.copy}>
-        <span className={styles.label}>{complete ? "詳解完成" : recovering ? "正在確認既有請求" : "詳解生成中"}</span>
+        <span className={styles.label}>{complete ? "詳解完成" : recovering ? "正在確認既有請求" : activityLabel || "詳解生成中"}</span>
         <span className={styles.caption}>{complete ? timingCaption || "可開始閱讀" : `${elapsed} 秒 · ${elapsed>=60?"仍在處理，可離開後返回查看":draft?"文字持續補上中，可先閱讀":"正在準備詳解"}`}</span>
       </div>
     </div>

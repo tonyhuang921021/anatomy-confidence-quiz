@@ -617,8 +617,8 @@ function renderQuestionReview(
       </div>
       <QuestionAiMetadataBadges question={renderedQuestion} />
       {questionTools}
-      
-      
+
+
     </div>
   );
 }
@@ -1302,15 +1302,6 @@ export function ReviewNotebook({
             >
               {loading ? "AI 生成中..." : "產生圖文詳解"}
             </button>
-          ) : !hasReviewedExplanation(question.id) ? (
-            <button
-              type="button"
-              onClick={() => void handleGenerateQuestionExplanation(question, override)}
-              disabled={loading}
-              className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
-            >
-              {loading ? "讀取中..." : "重新讀取詳解"}
-            </button>
           ) : null}
           <QuestionReportButton
             question={question}
@@ -1540,7 +1531,7 @@ export function ReviewNotebook({
                           : null;
                         return (
                           <>
-                            <ExplanationGenerationStatus key={renderedQuestion.id} questionId={renderedQuestion.id} loading={explanationLoadingMap[renderedQuestion.id]} error={explanationErrorMap[renderedQuestion.id]} resultVersion={explanationOverrides[renderedQuestion.id]?.updatedAt} />
+                            <ExplanationGenerationStatus recoveryKind="generation" key={renderedQuestion.id} questionId={renderedQuestion.id} loading={explanationLoadingMap[renderedQuestion.id]} error={explanationErrorMap[renderedQuestion.id]} resultVersion={explanationOverrides[renderedQuestion.id]?.updatedAt} />
                             <div className="space-y-3">
                               {manualEditingEnabled && isManualEditMode ? (
                                 <div className="flex justify-end">
