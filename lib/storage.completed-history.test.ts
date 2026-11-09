@@ -17,6 +17,7 @@ import {
   loadQuestionExplanationOverride,
   loadCurrentSession,
   loadCurrentSessionForUser,
+  loadCurrentSessionReadResultForUser,
   mergeCompletedQuestionHistoryEntries,
   mergeQuestionExplanationOverrides,
   queuePendingCompletedSessionUploadForUser,
@@ -1014,4 +1015,49 @@ test("明確跨頁清除只移除指定帳號的完整雲端記憶快取", async
     assert.equal(loadCloudCompletedSessionsForUser(owner).length, 0);
     assert.equal(loadCloudCompletedSessionsForUser(other).length, 60);
   } finally { sender.close(); }
+});
+
+
+test("缺id的目前回合不會卡住讀取，且損壞原文不會被刪除", () => {
+  const { localStorage, sessionStorage } = installBrowserStorage();
+  const owner = "fixture-bad-current", key = `anatomy-confidence-current-session:${owner}`;
+  for (const raw of ["{}", "[]", "null", '{"id":17}', '{"id":""}', "{invalid"]) {
+    localStorage.setItem(key, raw);
+    assert.deepEqual(loadCurrentSessionReadResultForUser(owner), { session: null, hasUnreadableCopies: true });
+    assert.equal(loadCurrentSessionForUser(owner), null);
+    assert.equal(localStorage.getItem(key), raw);
+  }
+  const valid = { ...makeSession("valid-current", ["fixture-q"]), completedAt: undefined };
+  sessionStorage.setItem(key, JSON.stringify(valid));
+  const read = loadCurrentSessionReadResultForUser(owner);
+  assert.equal(read.session?.id, "valid-current");
+  assert.equal(read.session?.attempts.length, 1);
+  assert.equal(read.hasUnreadableCopies, true);
+  assert.equal(localStorage.getItem(key), "{invalid");
+  assert.equal(sessionStorage.getItem(key), JSON.stringify(valid));
+});
+
+
+test("開始新回合覆寫損壞舊副本前會保留原文，無法保留時不覆寫", () => {
+  const { localStorage } = installBrowserStorage();
+  const owner="fixture-archive-current",key=`anatomy-confidence-current-session:${owner}`;
+  localStorage.setItem(key,"{}");
+  const next={...makeSession("new-current",["q"]),completedAt:undefined};
+  assert.equal(saveCurrentSession(next,owner),true);
+  assert.deepEqual(JSON.parse(localStorage.getItem(key+":unparsed-recovery")!),["{}"]);
+  assert.equal(loadCurrentSessionForUser(owner)?.id,"new-current");
+  localStorage.setItem(key,"{}");
+  localStorage.setItem(key+":unparsed-recovery","{unreadable archive");
+  // The fallback can succeed without replacing the protected original copy.
+  saveCurrentSession(next,owner);
+  assert.equal(localStorage.getItem(key),"{}");
+});
+
+test("兩份同版本但答案衝突的有效回合不會被任選或刪除",()=>{
+ const {localStorage,sessionStorage}=installBrowserStorage();const owner="fixture-conflicting-current",key=`anatomy-confidence-current-session:${owner}`;
+ const base={...makeSession("conflicting-round",["q"]),completedAt:undefined};
+ const copy=(answer:"A"|"B")=>({...base,answerEdits:{schema:1 as const,baseline:base.attempts,entries:{q:{counter:1,actor:"fixture",value:{...base.attempts[0],selectedAnswer:answer}}}}});
+ const a=JSON.stringify(copy("A")),b=JSON.stringify(copy("B"));localStorage.setItem(key,a);sessionStorage.setItem(key,b);
+ assert.throws(()=>loadCurrentSessionReadResultForUser(owner),/ANSWER_EDIT_COLLISION/);
+ assert.equal(localStorage.getItem(key),a);assert.equal(sessionStorage.getItem(key),b);
 });

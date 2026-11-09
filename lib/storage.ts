@@ -111,7 +111,12 @@ function hasInvalidSessionRows(raw:string) {
  try {const rows=JSON.parse(raw);return !Array.isArray(rows)||rows.some(row=>{try{normalizeSessionChecked(row);return false}catch{return true}})}catch{return true}
 }
 function archiveInvalidSessionBytes(storage:Storage,key:string,raw:string|null) {
- if(!raw||!isCompletedArrayKey(key)||!hasInvalidSessionRows(raw))return true;
+ if(!raw)return true;
+ const isCurrentKey=(key===CURRENT_SESSION_KEY||key.startsWith(CURRENT_SESSION_KEY+":"))&&!key.includes(":unparsed-recovery");
+ let invalid=false;
+ if(isCurrentKey){try{normalizeSessionChecked(JSON.parse(raw))}catch{invalid=true}}
+ else if(isCompletedArrayKey(key))invalid=hasInvalidSessionRows(raw);
+ if(!invalid)return true;
  const archiveKey=key+":unparsed-recovery";
  try {
   const old=storage.getItem(archiveKey);const snapshots:string[]=old?JSON.parse(old):[];
@@ -1652,7 +1657,11 @@ export function loadCurrentSession(): QuizSession | null {
 }
 
 export function loadCurrentSessionForUser(userId: string): QuizSession | null {
-  if (!isBrowser()) return null;
+  return loadCurrentSessionReadResultForUser(userId).session;
+}
+
+export function loadCurrentSessionReadResultForUser(userId: string): { session: QuizSession | null; hasUnreadableCopies: boolean } {
+  if (!isBrowser()) return { session: null, hasUnreadableCopies: false };
   const scopedKey = getScopedKeyForUser(CURRENT_SESSION_KEY, userId);
   const rawCandidates = [
     safeSessionStorageGetItem(scopedKey),
@@ -1661,15 +1670,17 @@ export function loadCurrentSessionForUser(userId: string): QuizSession | null {
   ].filter((raw): raw is string => Boolean(raw));
 
   const candidates: QuizSession[] = [];
+  let hasUnreadableCopies = false;
   for (const raw of Array.from(new Set(rawCandidates))) {
     try {
-      const session = normalizeSession(JSON.parse(raw) as QuizSession);
+      const session = normalizeSessionChecked(JSON.parse(raw));
       if (session && !session.completedAt && isCurrentSessionDiscarded(session.id, userId)) {
         continue;
       }
       candidates.push(session);
     } catch {
-      // A malformed fallback must not hide a valid copy in the other storage.
+      // Preserve every raw copy; a malformed one must not hide another valid copy.
+      hasUnreadableCopies = true;
     }
   }
 
@@ -1678,12 +1689,7 @@ export function loadCurrentSessionForUser(userId: string): QuizSession | null {
       getSessionLatestActivity(right).localeCompare(getSessionLatestActivity(left))
     )[0] ?? null;
 
-  if (!selected && rawCandidates.length > 0) {
-    safeLocalStorageRemoveItem(scopedKey);
-    safeSessionStorageRemoveItem(scopedKey);
-  }
-
-  return selected;
+  return { session: selected, hasUnreadableCopies };
 }
 
 export function clearCurrentSession() {

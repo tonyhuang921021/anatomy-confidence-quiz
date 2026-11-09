@@ -1224,9 +1224,9 @@ function OwnerQuizPage() {
       } catch {
         if (cancelled) return;
         initializedSessionRef.current = false;
-        clearCurrentSession();
+        // A read/merge error is not permission to delete either saved copy.
         setSession(null);
-        setLoadIssue("題目載入時遇到本機狀態錯誤，請重新開始測驗。");
+        setLoadIssue("題目載入時遇到本機紀錄錯誤，原始作答進度仍保留。請回到練習設定重新讀取。");
         resetQuestionUI();
       } finally {
         if (!cancelled) {

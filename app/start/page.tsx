@@ -30,7 +30,7 @@ import {
   loadPracticeStopAfterReview,
   loadPracticeYearRange,
   loadCompletedHistorySessionsForUser,
-  loadCurrentSessionForUser,
+  loadCurrentSessionReadResultForUser,
   savePracticeQuestionCount,
   saveKeyboardQuestionNavigation,
   savePracticeFastAnswerMode,
@@ -112,6 +112,9 @@ export default function StartPage() {
   const [setupStep, setSetupStep] = useState<"subjects" | "settings">("subjects");
   const stepSurfaceRef = useSurfaceTransition(setupStep);
   const [attemptedQuestionIds, setAttemptedQuestionIds] = useState<Set<string>>(() => new Set());
+  const [localHistoryReadError, setLocalHistoryReadError] = useState(false);
+  const [historyReadRetry, setHistoryReadRetry] = useState(0);
+  const [localHistoryReadWarning, setLocalHistoryReadWarning] = useState(false);
   const [historyOwnerKey, setHistoryOwnerKey] = useState<string | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const excludeAiGenerated = true;
@@ -121,17 +124,24 @@ export default function StartPage() {
 
   useEffect(() => {
     const refreshAttemptedQuestionIds = () => {
-      const completedAttempts = loadCompletedHistorySessionsForUser(user?.id)
-        .flatMap((session) => session.attempts ?? []);
-      const currentSession = loadCurrentSessionForUser(activeHistoryOwnerKey);
-      const currentAttempts = currentSession?.completedAt ? [] : currentSession?.attempts ?? [];
-      setAttemptedQuestionIds(
-        new Set(
-          [...completedAttempts, ...currentAttempts]
-            .map((attempt) => attempt.questionId)
-        )
-      );
-      setHistoryOwnerKey(activeHistoryOwnerKey);
+      const questionIds = new Set<string>();
+      let partial = false, failed = false;
+      try {
+        for (const saved of loadCompletedHistorySessionsForUser(user?.id)) {
+          for (const attempt of saved.attempts ?? []) questionIds.add(attempt.questionId);
+        }
+      } catch { failed = true; }
+      try {
+        const current = loadCurrentSessionReadResultForUser(activeHistoryOwnerKey);
+        partial ||= current.hasUnreadableCopies;
+        if (!current.session?.completedAt) {
+          for (const attempt of current.session?.attempts ?? []) questionIds.add(attempt.questionId);
+        }
+      } catch { failed = true; }
+      setAttemptedQuestionIds(questionIds);
+      setLocalHistoryReadWarning(partial);
+      setLocalHistoryReadError(failed);
+      setHistoryOwnerKey(failed ? null : activeHistoryOwnerKey);
     };
 
     refreshAttemptedQuestionIds();
@@ -145,7 +155,7 @@ export default function StartPage() {
       window.removeEventListener("current-session-change", refreshAttemptedQuestionIds);
       window.removeEventListener("storage", refreshAttemptedQuestionIds);
     };
-  }, [activeHistoryOwnerKey, syncVersion, user?.id]);
+  }, [activeHistoryOwnerKey, syncVersion, user?.id, historyReadRetry]);
 
   useEffect(() => {
     const accountRange = user
@@ -830,6 +840,12 @@ export default function StartPage() {
               </div>
             </section>
 
+            {practiceHistoryReady && localHistoryReadWarning ? (
+              <p className="rounded-lg bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900" role="status">
+                部分本機紀錄無法讀取，原始資料仍保留。可以先開始練習，但已做題判斷可能不完整。
+              </p>
+            ) : null}
+
             {practiceHistoryReady && usingLocalHistory ? (
               <p className="rounded-lg bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-600" role="status">
                 雲端紀錄尚未更新完成，可以先依這台裝置的紀錄開始。其他裝置剛完成的題目可能尚未計入。
@@ -838,7 +854,12 @@ export default function StartPage() {
 
             {!practiceHistoryReady ? (
               <div className="workspace-empty-state" aria-live="polite">
-                正在讀取這台裝置的作答紀錄…
+                {localHistoryReadError ? (
+                  <>
+                    <p>本機紀錄暫時無法讀取，原始資料仍保留，沒有清除作答進度。</p>
+                    <button type="button" className="mt-3 rounded-lg border px-4 py-2" onClick={() => setHistoryReadRetry(value => value + 1)}>重新讀取本機紀錄</button>
+                  </>
+                ) : "正在讀取這台裝置的作答紀錄…"}
               </div>
             ) : (
               <FreePracticeSetup
@@ -862,7 +883,7 @@ export default function StartPage() {
               />
             )}
 
-            {practiceHistoryReady && !usingLocalHistory && willFillWithSeenQuestions ? (
+            {practiceHistoryReady && !usingLocalHistory && !localHistoryReadWarning && willFillWithSeenQuestions ? (
               <p className="rounded-lg bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-800" aria-live="polite">
                 {unattemptedAvailableQuestionCount === 0
                   ? "這個範圍的未做題已清空，接著會複習最久沒做的題。"
