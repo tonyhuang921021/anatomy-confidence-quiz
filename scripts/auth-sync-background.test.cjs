@@ -1,17 +1,18 @@
 const fs = require('node:fs');
 const vm = require('node:vm');
+const ts = require('typescript');
 const assert = require('node:assert/strict');
 const source = fs.readFileSync('components/AuthProvider.tsx', 'utf8');
-const begin = source.indexOf('    syncTask = (async () => {');
+const begin = source.indexOf('    syncTask = (async (): Promise<CloudRefreshResult> => {');
 const end = source.indexOf('\n    syncInFlightRef.current = syncTask;', begin);
 assert(begin >= 0 && end > begin, 'background sync task must be found');
-const task = source.slice(begin, end);
+const task = ts.transpileModule(source.slice(begin, end), {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 async function runTest(fail) {
   const state = { error: '雲端同步仍在背景整理，可先使用本機紀錄。', status: 'syncing', version: 0 };
   const ctx = {
-    syncTask: null, syncInFlightRef: {current: null}, userId:'test-user', effectiveUser:{},
+    syncTask: null, syncInFlightRef: {current: null}, sessionRef:{current:{user:{id:'test-user'}}}, userId:'test-user', effectiveUser:{},
     hydrateRemoteHistory:true, uploadAllPending:false, readRemoteOnly:false,
-    explicitOptions:{automatic:false}, isHistoryHydration:false,
+    explicitOptions:{automatic:false}, isHistoryHydration:false, HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS:90000,
     syncLocalCompletedSessionsForCurrentUser: async () => { if (fail) throw Error('read failed'); return []; },
     syncLeaderboardProfileForCurrentUser: async () => {}, syncCurrentSessionForCurrentUser: async () => {},
     setSyncError: x => {state.error=x}, setSyncStatus:x=>{state.status=x},

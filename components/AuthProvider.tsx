@@ -27,6 +27,7 @@ import {
   isSupabaseConfigured
 } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import { AUTH_RELOGIN_MESSAGE, authReauthenticationError, isTerminalAuthError, isUsableAuthSession } from "@/lib/authSessionRecovery";
 
 export type CloudRefreshResult =
   | { status: "completed"; userId: string; historyHydrated: boolean; historyMode?: "simulation" }
@@ -86,6 +87,7 @@ const HISTORY_CLOUD_SYNC_MARKER_PREFIX = "medQuizHistoryCloudSync:";
 const HISTORY_CLOUD_SYNC_ATTEMPT_MARKER_PREFIX = "medQuizHistoryCloudSyncAttempt:";
 
 function getErrorMessage(error: unknown) {
+  if (isTerminalAuthError(error)) return AUTH_RELOGIN_MESSAGE;
   if (error instanceof Error) return error.message;
   if (error && typeof error === "object") {
     const maybeMessage =
@@ -225,8 +227,7 @@ function shouldSkipRecentHistoryCloudSyncAttempt(userId: string, now = Date.now(
 }
 
 function isAuthSessionExpiring(session: Session | null, leewayMs = 30_000) {
-  if (!session?.expires_at) return false;
-  return session.expires_at * 1000 <= Date.now() + leewayMs;
+  return !isUsableAuthSession(session, leewayMs);
 }
 
 function loadAuthSessionSnapshot(options: { allowExpiring?: boolean } = {}): Session | null {
@@ -259,18 +260,22 @@ async function refreshAuthSessionIfNeeded(
 
   try {
     const { data, error } = await withTimeout(
-      supabase.auth.refreshSession(candidateSession),
+      // Let the SDK use its current, locked session. A saved snapshot can hold
+      // a rotated refresh token and must never overwrite the SDK's newer token.
+      supabase.auth.refreshSession(),
       AUTH_SESSION_REFRESH_TIMEOUT_MS,
       AUTH_REFRESH_FALLBACK_MESSAGE
     );
 
-    if (error || !data.session) {
-      return candidateSession;
-    }
-
+    if (error) throw error;
+    if (!isUsableAuthSession(data.session)) throw authReauthenticationError();
     return data.session;
-  } catch {
-    return candidateSession;
+  } catch (error) {
+    if (isTerminalAuthError(error)) throw authReauthenticationError();
+    // A transient network error may retain an unexpired session, never an
+    // expired one. Local quiz storage is not changed by this decision.
+    if (isUsableAuthSession(candidateSession)) return candidateSession;
+    throw error;
   }
 }
 
@@ -281,16 +286,18 @@ async function resolveBrowserAuthSession(
 ) {
   try {
     const {
-      data: { session: storedSession }
+      data: { session: storedSession }, error
     } = await withTimeout(supabase.auth.getSession(), timeoutMs, timeoutMessage);
 
-    const candidateSession = storedSession ?? loadAuthSessionSnapshot({ allowExpiring: true });
-    return refreshAuthSessionIfNeeded(supabase, candidateSession);
+    if (error) throw error;
+    // A completed SDK lookup returning no session is authoritative. Do not
+    // resurrect a snapshot after sign-out or refresh-token rejection.
+    if (!storedSession) return null;
+    return refreshAuthSessionIfNeeded(supabase, storedSession);
   } catch (error) {
-    const recoveredSession = loadAuthSessionSnapshot({ allowExpiring: true });
-    if (recoveredSession) {
-      return refreshAuthSessionIfNeeded(supabase, recoveredSession);
-    }
+    if (isTerminalAuthError(error)) throw authReauthenticationError();
+    const recoveredSession = loadAuthSessionSnapshot();
+    if (recoveredSession) return recoveredSession;
     throw error;
   }
 }
@@ -424,6 +431,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userId = targetUserId || user?.id;
     const effectiveUser = targetUser ?? user;
     if (!configured || !userId || !effectiveUser) return { status: "skipped", reason: "unavailable" };
+    if (sessionRef.current?.user.id === userId && !isUsableAuthSession(sessionRef.current)) {
+      setSyncStatus("ready");
+      setSyncError(AUTH_RELOGIN_MESSAGE);
+      return { status: "failed", userId, retryAt: Date.now() + HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS };
+    }
 
     const now = Date.now();
     const isHistoryHydration = explicitOptions.historyHydration === true;
@@ -449,8 +461,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isHistoryHydration &&
       shouldSkipHistoryCloudSync(userId, now)
     ) {
-      setSyncStatus("ready");
-      setSyncError("");
       return { status: "skipped", reason: "history-cooldown", retryAt: readHistoryCloudSyncMarker(userId) + HISTORY_CLOUD_SYNC_COOLDOWN_MS };
     }
 
@@ -460,7 +470,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isHistoryHydration &&
       shouldSkipRecentHistoryCloudSyncAttempt(userId, now)
     ) {
-      setSyncStatus("ready");
       return { status: "skipped", reason: "attempt-cooldown", retryAt: readHistoryCloudSyncAttemptMarker(userId) + HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS };
     }
 
@@ -470,8 +479,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       !isHistoryHydration &&
       shouldSkipAutomaticCloudSync(userId, now)
     ) {
-      setSyncStatus("ready");
-      setSyncError("");
       return { status: "skipped", reason: "automatic-cooldown", retryAt: readAutomaticCloudSyncMarker(userId) + AUTOMATIC_CLOUD_SYNC_COOLDOWN_MS };
     }
 
@@ -647,7 +654,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         if (cancelled) return;
-        const recoveredSession = loadAuthSessionSnapshot();
+        const recoveredSession = isTerminalAuthError(error) ? null : loadAuthSessionSnapshot();
         setSession(recoveredSession);
         setUser(recoveredSession?.user ?? null);
         setPasswordRecovery(false);
@@ -696,7 +703,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           AUTH_SESSION_REFRESH_TIMEOUT_MS,
           AUTH_REFRESH_FALLBACK_MESSAGE
         );
-        if (cancelled || !refreshedSession?.user?.id) return;
+        if (cancelled) return;
+        if (!refreshedSession?.user?.id) {
+          if (sessionRef.current?.user) {
+            setSyncStatus("ready");
+            setSyncError(AUTH_RELOGIN_MESSAGE);
+          }
+          return;
+        }
 
         const currentSession = sessionRef.current;
         if (

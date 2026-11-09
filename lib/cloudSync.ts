@@ -1,6 +1,7 @@
 import {acceptCanonicalCompletion,isAcceptedCompletion} from "./quizAnswerEdits";
 import { assertLegacyCloudSyncAllowed } from "./examSessionSync";
 import type { User } from "@supabase/supabase-js";
+import { authReauthenticationError, isTerminalAuthError, isUsableAuthSession } from "./authSessionRecovery";
 import { getOfficialPaperKeyFromQuestionId } from "./officialPaperIdentity";
 import type {
   Attempt,
@@ -1063,8 +1064,13 @@ async function fetchExistingAttemptSignatureMap(
 
 async function getCloudSessionSyncAccessToken() {
   const supabase = getSupabaseBrowserClient();
-  const { data } = await supabase.auth.getSession();
-  return data.session?.access_token ?? null;
+  const { data, error } = await withClientTimeout(
+    supabase.auth.getSession(), FEEDBACK_AUTH_REFRESH_TIMEOUT_MS,
+    "登入狀態讀取逾時，先保留本機紀錄。"
+  );
+  if (error) throw isTerminalAuthError(error) ? authReauthenticationError() : error;
+  if (!isUsableAuthSession(data.session)) throw authReauthenticationError();
+  return data.session!.access_token;
 }
 
 async function refreshCloudSessionSyncAccessToken() {
@@ -1074,8 +1080,8 @@ async function refreshCloudSessionSyncAccessToken() {
       FEEDBACK_AUTH_REFRESH_TIMEOUT_MS,
       "登入狀態刷新逾時"
     );
-    if (error) return null;
-    return data.session?.access_token ?? null;
+    if (error || !isUsableAuthSession(data.session)) return null;
+    return data.session!.access_token;
   } catch {
     return null;
   }
