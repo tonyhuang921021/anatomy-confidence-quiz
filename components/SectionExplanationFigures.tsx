@@ -8,7 +8,7 @@ import {imageActivityCopy,type ImageActivity} from '@/lib/explanationImageActivi
 import statusStyles from './ExplanationGenerationStatus.module.css';
 import {UserProvidedExplanationFigure} from './UserProvidedExplanationFigure';
 
-type Delivery={imageActivity?:ImageActivity|null;activityReceivedAt?:number;sectionFigures:any[];sections:{sectionTitle:string;sectionHash:string}[];imageStatus:string|null;userProvidedFigure?:UserProvidedFigure|null;refresh?:()=>void};
+type Delivery={readState?:'checking'|'unavailable';imageActivity?:ImageActivity|null;activityReceivedAt?:number;sectionFigures:any[];sections:{sectionTitle:string;sectionHash:string}[];imageStatus:string|null;userProvidedFigure?:UserProvidedFigure|null;refresh?:()=>void};
 const Context=createContext<Delivery|null>(null);
 const PreviewContext=createContext<Delivery|null>(null);
 export function LocalFigurePreviewProvider({value,children}:{value:Delivery;children:ReactNode}) {return <PreviewContext.Provider value={process.env.NODE_ENV === "development" ? value : null}>{children}</PreviewContext.Provider>;}
@@ -16,23 +16,35 @@ export function SectionFiguresProvider({questionId,text,children}:{questionId?:s
  const preview=useContext(PreviewContext);
  const [delivery,setDelivery]=useState<Delivery|null>(null);
  useEffect(()=>{
-  setDelivery(null);let cancelled=false;
-  if(!questionId||process.env.NEXT_PUBLIC_NEW_EXPLANATION_FIGURES_RENDER!=='1')return;
-  let timer:ReturnType<typeof setTimeout>;let reads=0;
-  const read=async(loop=true)=>{try{
-   const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)))).map(x=>x.toString(16).padStart(2,'0')).join('');
-   const response=await fetch(`/api/approved-figures?questionId=${encodeURIComponent(questionId)}`,{cache:'no-store'});
-   if(!response.ok)throw Error('unavailable');const data=await response.json();
-   if(cancelled||data.explanationHash!==hash)return;
-   const figures=(Array.isArray(data.sectionFigures)?data.sectionFigures:[]).filter(safeApprovedMeta).slice(0,3);
-   const supplied=userProvidedExplanationFigure(questionId,hash,data.replacementRevision);
-   const userProvidedFigure=supplied&&data.userProvidedFigureId===supplied.id?supplied:null;
-   setDelivery({imageActivity:data.imageActivity??null,activityReceivedAt:Date.now(),sectionFigures:figures,userProvidedFigure,sections:(Array.isArray(data.sections)?data.sections:[]).filter((x:any)=>typeof x.sectionTitle==='string').slice(0,3),imageStatus:typeof data.imageStatus==='string'?data.imageStatus:null,refresh:()=>void read(false)});
-   if(loop&&!userProvidedFigure&&(figures.length===0||['searching','reviewing'].includes(data.imageActivity?.phase))&&data.imageStatus&&++reads<60)timer=setTimeout(()=>void read(),reads<12?5000:15000);
-  }catch{if(!cancelled)setDelivery({sectionFigures:[],sections:[],imageStatus:'unavailable',refresh:()=>void read(false)})}};
-  const focus=()=>{if(document.visibilityState==='visible')void read(false)};
-  void read();window.addEventListener('focus',focus);document.addEventListener('visibilitychange',focus);
-  return()=>{cancelled=true;clearTimeout(timer);window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',focus)};
+  let cancelled=false;
+  if(!questionId||process.env.NEXT_PUBLIC_NEW_EXPLANATION_FIGURES_RENDER!=='1'){setDelivery(null);return;}
+  setDelivery({sectionFigures:[],sections:[],imageStatus:null,readState:'checking'});
+  let timer:ReturnType<typeof setTimeout>|undefined;let reads=0;let inFlight=false;
+  const schedule=()=>{if(cancelled)return;if(reads<60){clearTimeout(timer);timer=setTimeout(()=>void read(),reads<12?5000:15000)}else{setDelivery(previous=>previous?.readState==='checking'?{...previous,readState:'unavailable',refresh:()=>void read()}:previous)}};
+  const read=async()=>{
+   if(cancelled||inFlight)return;
+   inFlight=true;reads++;let again=true;
+   try{
+    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+    const response=await fetch(`/api/approved-figures?questionId=${encodeURIComponent(questionId)}`,{cache:'no-store',signal:AbortSignal.timeout(10000)});
+    if(!response.ok)throw Error('unavailable');const data=await response.json();
+    // A saved result and its read replica can become visible at different
+    // moments. Never attach another version, but keep bounded GET-only checks.
+    if(cancelled)return;
+    if(data.explanationHash!==hash){setDelivery(previous=>({...previous,sectionFigures:previous?.sectionFigures??[],sections:previous?.sections??[],imageStatus:previous?.imageStatus??null,imageActivity:null,readState:'checking',refresh:()=>void read()}));return;}
+    const figures=(Array.isArray(data.sectionFigures)?data.sectionFigures:[]).filter(safeApprovedMeta).slice(0,3);
+    const supplied=userProvidedExplanationFigure(questionId,hash,data.replacementRevision);
+    const userProvidedFigure=supplied&&data.userProvidedFigureId===supplied.id?supplied:null;
+    setDelivery({imageActivity:data.imageActivity??null,activityReceivedAt:Date.now(),sectionFigures:figures,userProvidedFigure,sections:(Array.isArray(data.sections)?data.sections:[]).filter((x:any)=>typeof x.sectionTitle==='string').slice(0,3),imageStatus:typeof data.imageStatus==='string'?data.imageStatus:null,refresh:()=>void read()});
+    again=!userProvidedFigure&&(figures.length===0||['searching','reviewing'].includes(data.imageActivity?.phase))&&Boolean(data.imageStatus);
+   }catch{
+    if(!cancelled)setDelivery(previous=>({...previous,sectionFigures:previous?.sectionFigures??[],sections:previous?.sections??[],imageStatus:previous?.imageStatus??'unavailable',imageActivity:null,readState:'unavailable',refresh:()=>void read()}));
+   }finally{inFlight=false;if(again)schedule()}
+  };
+  const focus=()=>{if(document.visibilityState==='visible')void read()};
+  const updated=(event:Event)=>{const detail=(event as CustomEvent).detail;if(!detail?.id||detail.id===questionId)void read()};
+  void read();window.addEventListener('focus',focus);document.addEventListener('visibilitychange',focus);window.addEventListener('explanation-version-changed',updated);window.addEventListener('explanation-recovered',updated);
+  return()=>{cancelled=true;clearTimeout(timer);window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',focus);window.removeEventListener('explanation-version-changed',updated);window.removeEventListener('explanation-recovered',updated)};
  },[questionId,text]);
  return <Context.Provider value={preview || delivery}><ExplanationImageActivity delivery={preview || delivery}/>{children}</Context.Provider>;
 }
@@ -48,7 +60,9 @@ function ExplanationImageActivity({delivery}:{delivery:Delivery|null}) {
  const [now,setNow]=useState(Date.now());
  const activity=delivery?.imageActivity,receivedAt=delivery?.activityReceivedAt??0;
  useEffect(()=>{setNow(Date.now());if(!activity||!['searching','reviewing'].includes(activity.phase))return;const timer=setTimeout(()=>setNow(Date.now()),Math.max(0,Math.min(15_000,activity.ttlMs)-(Date.now()-receivedAt))+20);return()=>clearTimeout(timer)},[activity,receivedAt]);
- const copy=imageActivityCopy(activity,receivedAt,now);if(!copy)return null;
+ const copy=imageActivityCopy(activity,receivedAt,now);
+ if(delivery?.readState)return <p className="my-2 text-xs leading-6 text-slate-600" role="status">{delivery.readState==='checking'?'詳解已完成，正在確認配圖狀態。':'暫時無法讀取配圖狀態，詳解不受影響。'}{delivery.refresh?<button type="button" className="ml-2 underline" onClick={delivery.refresh}>重新查看配圖狀態</button>:null}</p>;
+ if(!copy)return null;
  if(!copy.active)return <p className="my-2 text-xs leading-6 text-slate-600" role="status">{copy.label}。{copy.caption}</p>;
  return <div className={statusStyles.status} data-phase="loading" role="status" aria-live="polite" aria-busy="true"><ExplanationProgressCat/><div className={statusStyles.copy}><span className={statusStyles.label}>{copy.label}</span><span className={statusStyles.caption}>{copy.caption}</span></div></div>;
 }

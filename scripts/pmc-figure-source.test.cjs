@@ -29,3 +29,24 @@ test("numeric character references cannot conceal third-party rights",()=>{for(c
 test('explicit canonical CC URL plus article-level grant is accepted without requiring the spelled-out name',()=>{const rights='<permissions><license><ali:license_ref specific-use="textmining">https://creativecommons.org/licenses/by/4.0/</ali:license_ref><license-p>This is an open access article under the terms of the <ext-link xlink:href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</ext-link> License, which permits use, distribution and reproduction in any medium, provided the original work is properly cited.</license-p></license></permissions>';assert.equal(jatsFigures(xmlFor(figure,rights),facts()).length,1);for(const suffix of ['Images are restricted.','Third-party figures require separate permission.','No redistribution is permitted.'])assert.equal(jatsFigures(xmlFor(figure,rights.replace('</license-p>',suffix+'</license-p>')),facts()).length,0)});
 test('unrestricted reuse is not misread as restricted, while real restrictions still fail closed',()=>{const rights=license.replace('This article is distributed under the Creative Commons Attribution license.','This article is distributed under the Creative Commons Attribution License, which permits unrestricted reuse, distribution, and reproduction in any medium.');assert.equal(jatsFigures(xmlFor(figure,rights),facts()).length,1);assert.equal(jatsFigures(xmlFor(figure,rights.replace('unrestricted reuse','restricted reuse')),facts()).length,0)});
 test('excluding known mismatched article figures allows next article without rerequesting cached evidence',async()=>{const first=jatsFigures(xml,facts())[0],h=harness();await h.run();const reader=async(key,load)=>structuredClone(h.cache.get(key)||await load());assert.deepEqual(await discoverPmcFigures('inulin clearance diagram',reader,async()=>{throw Error('no new transport')},{excludedSources:[first.sourceUrl]}),[]);assert.equal(h.requests.length,4)});
+
+test('metadata failures have bounded safe classifications without URLs, bodies or credentials',async()=>{
+ const {metadataFailure}=require('../lib/pmcFigureSource.cjs');
+ for(const [fetcher,code,httpStatus] of [
+  [async()=>{throw Object.assign(Error('https://secret.invalid/?token=private'),{name:'TimeoutError'})},'metadata_timeout'],
+  [async()=>{throw Error('authorization: bearer private')},'metadata_network_failed'],
+  [async()=>new Response('private upstream body',{status:503}),'metadata_http_failed',503],
+  [async()=>new Response('large',{headers:{'content-length':'300000'}}),'metadata_too_large'],
+  [async()=>new Response(new ReadableStream({start(c){c.error(Error('private read error'))}})),'metadata_body_failed'],
+ ]){
+  let calls=0,caught;try{await requestBytes('https://www.ebi.ac.uk/europepmc/webservices/rest/search',async(...args)=>{calls++;return fetcher(...args)},262144)}catch(e){caught=e}
+  assert.equal(calls,1);assert.deepEqual(metadataFailure(caught),{code,...(httpStatus?{httpStatus}:{})});assert.doesNotMatch(JSON.stringify(metadataFailure(caught)),/secret|private|token|bearer/);
+ }
+ assert.deepEqual(metadataFailure(new SyntaxError('private body')),{code:'metadata_parse_failed'});
+});
+test('discovery logs exact metadata stage only once and never retries a failed search',async()=>{
+ const logs=[],warn=console.warn;console.warn=(...args)=>logs.push(args);let reservations=0,http=0;
+ try{await assert.rejects(()=>discoverPmcFigures('medical fixture',async(key,load)=>{reservations++;return load()},async()=>{http++;return new Response('not JSON private payload')}))}finally{console.warn=warn}
+ assert.equal(reservations,1);assert.equal(http,1);assert.equal(logs.length,1);assert.equal(logs[0][0],'pmc_metadata_failed');
+ assert.equal(logs[0][1].kind,'search');assert.equal(logs[0][1].code,'metadata_parse_failed');assert.ok(Number.isFinite(logs[0][1].elapsedMs));assert.doesNotMatch(JSON.stringify(logs),/private|medical fixture|payload|https:/);
+});

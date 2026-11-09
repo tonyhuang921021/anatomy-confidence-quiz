@@ -12,7 +12,7 @@ const selected=ast.statements.filter(n=>ts.isVariableStatement(n)&&n.declaration
 const moduleExports={};vm.runInNewContext(ts.transpileModule(selected+'\nexports.build=buildQuestionExplanationPrompt;exports.prefix=QUESTION_EXPLANATION_PROMPT_PREFIX;',{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:moduleExports,...teaching});
 const {build,prefix}=moduleExports;
 
-test('actual canonical prompt requires transferable judgement without forcing headings or retrieved links',()=>{
+test('actual canonical prompt requires transferable judgement without forcing quantity or retrieved links',()=>{
  assert.ok(prefix.includes(teaching.INTEGRATED_TEACHING_RULE));assert.ok(prefix.includes(teaching.TRANSFER_SELF_CHECK_RULE));
  for(const phrase of ['教會讀者觸類旁通','共同機轉、關鍵差異與何時不能類推','不能只重述正解','沒有可靠背景時','不編造題庫關係或缺失條件'])assert.ok(prefix.includes(phrase),phrase);
  assert.ok(prefix.includes('不要求固定段落數'));assert.ok(prefix.includes('不設字數下限或固定延伸數量'));
@@ -48,3 +48,7 @@ test('new teaching objective does not add a paid retry, title-only runtime gate,
 test('actual prompt uses Taiwan Traditional Chinese with English medical terminology',()=>{
  for(const phrase of ['臺灣繁體中文和必要的英文','重要醫學專有名詞首次出現時附英文','保留題目中的必要英文、通用縮寫與標準符號','臺灣慣用醫學譯名','避免簡體字與中國慣用語','不為翻譯改變醫學意義'])assert.ok(prefix.includes(phrase),phrase);
 });
+
+test('future generation visibly teaches transfer in a named main-explanation section, without another model call',()=>{assert.ok(prefix.includes('## 觸類旁通'));assert.ok(prefix.includes('不能把這段省略、只藏在選項解析'));assert.ok(prefix.includes('完整寫出推導和不能類推的界線'));assert.ok(!prefix.includes('不另加固定標題'));});
+
+test('trusted related questions are actually used internally for joint knowledge teaching but never named publicly',()=>{for(const phrase of ['讀完所附可靠背景的題幹、選項與採計答案','共同知識及重要不同點','有直接教學關聯的背景應實際融入知識解說'])assert.ok(prefix.includes(phrase),phrase);assert.ok(prefix.includes(teaching.PRIVATE_SOURCE_RULE));for(const phrase of ['相關題','MOEX-111100-1301-Q083','其他考題'])assert.equal(teaching.validPublicTeaching({explanation:phrase}),false);});

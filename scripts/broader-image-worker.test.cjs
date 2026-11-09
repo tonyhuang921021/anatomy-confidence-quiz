@@ -35,3 +35,17 @@ test('unconfirmed activity marker prevents new external traffic and preserves un
 test('pause during activity marker prevents the immediately following external search',async()=>{const f=fixture();let open=true;f.store.active=async()=>open;f.store.markActivity=async()=>{open=false;return true};assert.equal((await f.run()).status,'paused_lease_held');assert.equal(f.events.some(x=>x[0]==='commons'),false)});
 test('two committed PMC mismatches can reach second article within the same three-image cap',async()=>{const f=fixture({primary:[],verdicts:['mismatch','mismatch','display']});const first=[pmc,{...pmc,sourceUrl:pmc.sourceUrl.replace('fig-1','fig-2'),previewUrl:pmc.previewUrl.replace('diagram','diagram2')}],second={...pmc,sourceUrl:pmc.sourceUrl.replace('123456','654321'),previewUrl:pmc.previewUrl.replace('123456','654321')};let calls=0;const result=await f.run({discover:async(q,read,fetcher,{excludedSources})=>{calls++;return excludedSources.length?[second]:first}});assert.equal(result.status,'approved');assert.equal(calls,2);assert.equal(f.stats().reviews,3)});
 test('pause during download activity marker prevents download and review',async()=>{const f=fixture();let open=true,n=0;f.store.active=async()=>open;f.store.markActivity=async()=>{if(++n===2)open=false;return true};assert.equal((await f.run()).status,'paused_lease_held');assert.equal(f.events.filter(x=>x[0]==='commons').length,1);assert.equal(f.stats().downloads,0);assert.equal(f.stats().reviews,0)});
+
+test('three figures in the first PMC article cannot consume all checks before the second article',async()=>{
+ const f=fixture({primary:[],verdicts:['mismatch','display']});
+ const first=[1,2,3].map(i=>({...pmc,sourceUrl:pmc.sourceUrl.replace('fig-1','fig-'+i),previewUrl:pmc.previewUrl.replace('diagram','diagram'+i)}));
+ const second={...pmc,sourceUrl:pmc.sourceUrl.replace('123456','654321'),previewUrl:pmc.previewUrl.replace('123456','654321')};
+ const result=await f.run({discover:async(q,read,fetcher,{excludedSources})=>excludedSources.length?[second]:first});
+ assert.equal(result.status,'approved');assert.equal(f.stats().reviews,2);
+ assert.deepEqual(f.events.filter(e=>e[0]==='download').map(e=>e[1]),[first[0].previewUrl,second.previewUrl]);
+});
+test('BER long medical query has one fixed core fallback after a confirmed empty search',async()=>{
+ const f=fixture({verdicts:['display']});f.store.readNeeds=async()=>approveSchemaQueries(buildNeeds(text,[{sectionTitle:'機轉',conceptId:'base-excision-repair',caption:'鹼基切除修復流程',searchScope:'general-medical',medicalDomain:'biochemistry',searchTerm:'base excision repair enzyme sequence'}]));
+ const queries=[];assert.equal((await f.run({search:async q=>{queries.push(q);return queries.length===1?[]:[commons]}})).status,'approved');
+ assert.deepEqual(queries,['base excision repair enzyme sequence','base excision repair mechanism']);assert.equal(f.stats().reviews,1);
+});
