@@ -8,6 +8,7 @@ import { useSurfaceTransition } from "@/components/useSurfaceTransition";
 import { FreePracticeSetup } from "@/components/FreePracticeSetup";
 import { useQuestionOrderMode } from "@/components/QuestionOrderModeControl";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
+import { practiceHistoryReadiness } from "@/lib/practiceHistoryReadiness";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import { getQuestionBankBySubjects, getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
@@ -72,7 +73,7 @@ export default function StartPage() {
   const router = useRouter();
   const { user, syncVersion } = useAuth();
   const { mode: orderMode, setMode: setOrderMode, prioritizeUnseen } = useQuestionOrderMode("unseen");
-  const cloudHistoryHydrating = useCloudHistoryHydration();
+  const cloudHistoryHydrating = useCloudHistoryHydration(true, { readRemoteOnly: true });
   const stepHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
@@ -320,8 +321,11 @@ export default function StartPage() {
     return ids;
   }, [attemptedQuestionIds, availableQuestions]);
   const unattemptedAvailableQuestionCount = unattemptedAvailableQuestionIds.length;
-  const practiceHistoryReady =
-    historyOwnerKey === activeHistoryOwnerKey && !cloudHistoryHydrating;
+  // Completed local reads for the active owner are enough to start practice.
+  // Cloud cooldown/failure must not hide the start controls or imply success.
+  const { ready: practiceHistoryReady, usingLocalHistory } = practiceHistoryReadiness(
+    historyOwnerKey, activeHistoryOwnerKey, cloudHistoryHydrating
+  );
   const effectiveQuestionCount = practiceStopAfterReview
     ? availableQuestionCount
     : Math.min(practiceQuestionCount, availableQuestionCount);
@@ -826,9 +830,15 @@ export default function StartPage() {
               </div>
             </section>
 
+            {practiceHistoryReady && usingLocalHistory ? (
+              <p className="rounded-lg bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-600" role="status">
+                雲端紀錄尚未更新完成，可以先依這台裝置的紀錄開始。其他裝置剛完成的題目可能尚未計入。
+              </p>
+            ) : null}
+
             {!practiceHistoryReady ? (
               <div className="workspace-empty-state" aria-live="polite">
-                正在整理作答紀錄，完成後就能開始。
+                正在讀取這台裝置的作答紀錄…
               </div>
             ) : (
               <FreePracticeSetup
@@ -852,7 +862,7 @@ export default function StartPage() {
               />
             )}
 
-            {practiceHistoryReady && willFillWithSeenQuestions ? (
+            {practiceHistoryReady && !usingLocalHistory && willFillWithSeenQuestions ? (
               <p className="rounded-lg bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-800" aria-live="polite">
                 {unattemptedAvailableQuestionCount === 0
                   ? "這個範圍的未做題已清空，接著會複習最久沒做的題。"
