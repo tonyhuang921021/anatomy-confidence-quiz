@@ -17,7 +17,7 @@ function worker({failSearch=false,failCache=false,cacheAck=true,deny=false,prima
 }
 test('only a confirmed empty search advances once to the saved alternative, with separate cap reservation',async()=>{const f=worker();assert.equal((await f.run()).status,'awaiting_image');assert.deepEqual(f.calls.filter(x=>x[0]==='search').map(x=>x[1]),['inulin clearance diagram','inulin is freely filtered by the glomerulus']);assert.equal(f.calls.filter(x=>x[0]==='reserve').length,2)});
 test('uncertain search or cache acknowledgement never advances to another query',async()=>{for(const opts of [{failSearch:true},{failCache:true},{cacheAck:false},{cacheAck:null}]){const f=worker(opts);await f.run();assert.equal(f.calls.filter(x=>x[0]==='search').length,1)}});
-test('budget denial, unsafe alternative and existing candidate prevent extra query traffic',async()=>{for(const [opts,count] of [[{deny:true},0],[{invalid:true},0],[{primaryNonempty:true},1]]){const f=worker(opts);await f.run();assert.equal(f.calls.filter(x=>x[0]==='search').length,count)}});
+test('budget denial and unsafe alternatives stop; confirmed ineligible results can advance',async()=>{for(const [opts,count] of [[{deny:true},0],[{invalid:true},0],[{primaryNonempty:true},2]]){const f=worker(opts);await f.run();assert.equal(f.calls.filter(x=>x[0]==='search').length,count)}});
 test('schema alternatives cannot contain identifiers, URLs or personal-data terms',()=>{for(const q of ['patient smith','renal 123','https://example.com']){const n=plan();n.items[0].proposedAlternatives=[q];assert.equal(approveSchemaQueries(n),null)}});
 
 const {reviewStagedFigure}=require('../lib/stagedFigureReview.cjs');

@@ -1,3 +1,4 @@
+import {discoverPmcFigures} from '@/lib/pmcFigureSource.cjs';
 import {resolveTrustedExplanationQuestion} from "@/lib/trustedQuestionLoader";
 import {createFinalFigureReviewer} from "@/lib/finalFigureRuntime.cjs";
 import { planRollup, fetchRollupPage, boundRollupDays, nextRollupCursor, type RollupCursor } from "@/lib/statsRollupBatch";
@@ -224,7 +225,7 @@ export async function GET(request: NextRequest) {
   // Existing cron authorization and recovery checks ran above. A disabled
   // figure worker adds no calls; errors cannot alter the rollup response.
   scheduleFigureWorker({env:process.env,db:supabase,waitUntil,report:message=>console.error(message)});
-  scheduleNewImageContinuation({env:process.env,db:supabase,finalReview:createFinalFigureReviewer({db:supabase,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),waitUntil,search:commonsSearch,loadImage:readBoundedImage,report:(message:string)=>console.error(message)});
+  scheduleNewImageContinuation({discover:discoverPmcFigures,env:process.env,db:supabase,finalReview:createFinalFigureReviewer({db:supabase,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),waitUntil,search:commonsSearch,loadImage:readBoundedImage,report:(message:string)=>console.error(message)});
 
   const leaseOwner = randomUUID();
   let leaseAcquired = false;

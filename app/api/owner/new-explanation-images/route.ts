@@ -1,3 +1,4 @@
+import {discoverPmcFigures} from '@/lib/pmcFigureSource.cjs';
 import {runNewImageContinuation} from '@/lib/newExplanationImageContinuation.cjs';
 import {enqueueSavedPlan} from '@/lib/savedExplanationImagePlan.cjs';
 import {continueFigure,createContinuationRepository} from '@/lib/figureContinuation.cjs';
@@ -98,8 +99,8 @@ export async function POST(request:NextRequest){
   if(['run_one','retry_image','plan_saved'].includes(body.action)&&!imageWindowOpen(process.env))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='run_one'){
    if(process.env.NEW_EXPLANATION_FIGURES_WORKER!=='1')return reply({ok:false,code:'worker_disabled'},503);
-   if(process.env.EXPLANATION_SITEWIDE_ENABLED==='1')return reply({ok:true,...await runNewImageContinuation({env:process.env,db,search:commonsSearch,loadImage:readBoundedImage,finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}})})});
-   return reply({ok:true,...await runOne({finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),store:createStore(db),search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),enabled:true})});
+   if(process.env.EXPLANATION_SITEWIDE_ENABLED==='1')return reply({ok:true,...await runNewImageContinuation({discover:discoverPmcFigures,env:process.env,db,search:commonsSearch,loadImage:readBoundedImage,finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}})})});
+   return reply({ok:true,...await runOne({discover:discoverPmcFigures,trafficAllowed:()=>imageWindowOpen(process.env),finalReview:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const result=resolveTrustedExplanationQuestion(id);return result.ok?result.question:null}}),store:createStore(db),search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),enabled:true})});
   }
   if(typeof body.id!=='string'||! /^[0-9a-f-]{36}$/i.test(body.id))return reply({ok:false},400);
   if(body.action==='review_staged'){
