@@ -1,3 +1,4 @@
+import {hydrateQuestionExplanationPending} from './explanationPendingStore';
 import {pendingExplanation,recoverPendingExplanation,requestExplanation} from './explanationRequestClient';
 import {pendingGeneration} from './generationRequestClient';
 import {pendingReplacement,publishReplacement,replacementAction} from './explanationReplacementClient';
@@ -8,6 +9,8 @@ import {pendingReplacement,publishReplacement,replacementAction} from './explana
 export async function replaceExplanationInline({questionId,accessToken,isCurrent,onRecovering}: {
  questionId:string;accessToken:string;isCurrent:()=>boolean;onRecovering?:()=>void;
 }) {
+ await hydrateQuestionExplanationPending(questionId);
+ if(!isCurrent())return {kind:'stale' as const};
  if(pendingReplacement(questionId)||pendingGeneration(questionId)||pendingExplanation(questionId)) {
   onRecovering?.();
   const saved=await recoverPendingExplanation(questionId,accessToken);
@@ -18,10 +21,12 @@ export async function replaceExplanationInline({questionId,accessToken,isCurrent
  const status=await replacementAction(questionId,accessToken,'status');
  if(!isCurrent())return {kind:'stale' as const};
  if(status.status!=='ready'||typeof status.baseVersion!=='string')throw Error('替換功能暫時不可用，原詳解仍可閱讀。');
- const response=await requestExplanation('/api/question-explanation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'replace',operationId:crypto.randomUUID(),baseVersion:status.baseVersion,accessToken,question:{id:questionId}})});
+ const operationId=crypto.randomUUID();
+ const response=await requestExplanation('/api/question-explanation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'replace',operationId,baseVersion:status.baseVersion,accessToken,question:{id:questionId}})},isCurrent);
  const value=await response.json();
  if(!isCurrent())return {kind:'stale' as const};
  if(!response.ok||!value.ok||!value.explanation||!value.replacementRevision)throw Error(value.message||'替換尚未完成，原詳解仍可閱讀。');
- publishReplacement(questionId,{...value,updatedAt:value.updatedAt||new Date().toISOString()});
+ const applied=await publishReplacement(questionId,{...value,updatedAt:value.updatedAt||new Date().toISOString()},value.clientRequestIdentity);
+ if(applied?.stale)return {kind:'stale' as const};
  return {kind:'replaced' as const,message:'已保存新的詳解，原版已保留。',version:value.updatedAt||new Date().toISOString()};
 }

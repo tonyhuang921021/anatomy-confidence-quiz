@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState} from "react";
 import {createPortal} from "react-dom";
 import {useAuth} from "@/components/AuthProvider";
+import {hydrateQuestionExplanationPending,explanationPendingIdentity} from "@/lib/explanationPendingStore";
 import {pendingExplanation} from "@/lib/explanationRequestClient";
 import {pendingGeneration} from "@/lib/generationRequestClient";
 import {pendingReplacement,publishReplacement,replacementAction,setPendingReplacement} from "@/lib/explanationReplacementClient";
@@ -18,7 +19,7 @@ export function ExplanationReplacementControls({questionId,onStart,onReplacingCh
  const context=useRef(0),actionLock=useRef(false);
  const busy=activity!==null;
  useEffect(()=>{context.current++;setReady(null);setMessage("");setError(null);setActivity(null);setPending(Boolean(pendingReplacement(questionId)));setResultVersion(undefined);setShowOriginal(false);actionLock.current=false;return()=>{context.current++;};},[questionId,session?.access_token]);
- useEffect(()=>{const update=()=>setPending(Boolean(pendingReplacement(questionId)));window.addEventListener("explanation-version-changed",update);window.addEventListener("explanation-recovered",update);window.addEventListener("explanation-replacement-pending-changed",update);return()=>{window.removeEventListener("explanation-version-changed",update);window.removeEventListener("explanation-recovered",update);window.removeEventListener("explanation-replacement-pending-changed",update);};},[questionId]);
+ useEffect(()=>{const update=()=>setPending(Boolean(pendingReplacement(questionId)));void hydrateQuestionExplanationPending(questionId).then(update).catch(()=>{});window.addEventListener("explanation-pending-hydrated",update);window.addEventListener("explanation-version-changed",update);window.addEventListener("explanation-recovered",update);window.addEventListener("explanation-replacement-pending-changed",update);return()=>{window.removeEventListener("explanation-pending-hydrated",update);window.removeEventListener("explanation-version-changed",update);window.removeEventListener("explanation-recovered",update);window.removeEventListener("explanation-replacement-pending-changed",update);};},[questionId]);
  const replacing=!showOriginal&&((busy&&activity!=="inspect")||pending);
  useEffect(()=>{onReplacingChange?.(replacing);},[replacing,onReplacingChange]);
  async function replace(){
@@ -29,7 +30,7 @@ export function ExplanationReplacementControls({questionId,onStart,onReplacingCh
   try{
    const result=await replaceExplanationInline({questionId,accessToken:session.access_token,isCurrent:()=>context.current===epoch,onRecovering:()=>{if(context.current===epoch)setActivity("recover");}});
    if(context.current!==epoch||result.kind==='stale')return;
-   setMessage(result.message);if(result.kind==='replaced')setResultVersion(result.version);
+   setMessage(result.message);if(result.kind==='replaced'||result.kind==='recovered'){setShowOriginal(true);if(result.kind==='replaced')setResultVersion(result.version);}
   }catch(error){if(context.current===epoch){const text=error instanceof Error?error.message:"操作結果尚未確認，不會自動重送。";setMessage(text);setError(text);}}
   finally{if(context.current===epoch){const stillPending=Boolean(pendingReplacement(questionId));actionLock.current=false;setActivity(null);setPending(stillPending);onReplacingChange?.(stillPending);}}
  }
@@ -43,17 +44,22 @@ export function ExplanationReplacementControls({questionId,onStart,onReplacingCh
  }
  async function restore(){
   if(actionLock.current||!ready?.canRestore||!ready.revision||!session?.access_token)return;
-  if(pendingReplacement(questionId)||pendingGeneration(questionId)||pendingExplanation(questionId)){setMessage("先前請求仍在確認中，尚未開始還原。");return;}
   const epoch=context.current;actionLock.current=true;setActivity("restore");setMessage("");setError(null);setResultVersion(undefined);onStart?.();
+  const prepared={kind:"restore" as const,operationId:ready.revision,startedAt:Date.now(),clientNonce:crypto.randomUUID()};
+  const expectedIdentity=explanationPendingIdentity(prepared);
   try{
-   setPendingReplacement(questionId,{kind:'restore',operationId:ready.revision,startedAt:Date.now()});
+   await hydrateQuestionExplanationPending(questionId);
+   if(context.current!==epoch)return;
+   if(pendingReplacement(questionId)||pendingGeneration(questionId)||pendingExplanation(questionId))throw Error("先前請求仍在確認中，尚未開始還原。");
+   if(await setPendingReplacement(questionId,prepared)===false)throw Error("這題已有其他請求，尚未開始還原。");
+   if(context.current!==epoch){try{await setPendingReplacement(questionId,null,expectedIdentity)}catch{}return;}
    const restored=await replacementAction(questionId,session.access_token,"restore",ready.revision,ready.baseVersion);
    if(context.current!==epoch)return;
    if(restored.status!=="restored"){
-    if(["replacement_version_changed","not_found","pending","unavailable"].includes(restored.status))setPendingReplacement(questionId,null);
+    if(["replacement_version_changed","not_found","pending","unavailable"].includes(restored.status))await setPendingReplacement(questionId,null,expectedIdentity);
     throw Error(restored.status==="replacement_version_changed"?"詳解已有較新版本，未還原。請重新確認。":"目前不能還原，原文保持不變。");
    }
-   publishReplacement(questionId,restored.value);setReady(null);setMessage("已還原先前詳解與對應配圖。");setResultVersion(new Date().toISOString());
+   const applied=await publishReplacement(questionId,restored.value,expectedIdentity);if(applied.stale)return;setShowOriginal(true);setReady(null);setMessage("已還原先前詳解與對應配圖。");setResultVersion(new Date().toISOString());
   }catch(error){if(context.current===epoch){const text=error instanceof Error?error.message:"還原結果尚未確認，不會自動重送。";setMessage(text);setError(text);}}
   finally{if(context.current===epoch){const stillPending=Boolean(pendingReplacement(questionId));actionLock.current=false;setActivity(null);setPending(stillPending);onReplacingChange?.(stillPending);}}
  }
