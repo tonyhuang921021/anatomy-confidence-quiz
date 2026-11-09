@@ -27,11 +27,11 @@ import {
   isSupabaseConfigured
 } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
-import { AUTH_RELOGIN_MESSAGE, authReauthenticationError, isTerminalAuthError, isUsableAuthSession } from "@/lib/authSessionRecovery";
+import { AUTH_RELOGIN_MESSAGE, authReauthenticationError, isTerminalAuthError, isUsableAuthSession, resolveLiveAuthSessionForOwner } from "@/lib/authSessionRecovery";
 
 export type CloudRefreshResult =
   | { status: "completed"; userId: string; historyHydrated: boolean; historyMode?: "simulation" }
-  | { status: "failed"; userId?: string; retryAt: number }
+  | { status: "failed"; userId?: string; retryAt: number; message?: string }
   | { status: "skipped"; reason: string; retryAt?: number; pending?: Promise<CloudRefreshResult> };
 
 export type AuthSyncStatus = "idle" | "syncing" | "ready" | "error";
@@ -335,15 +335,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncError, setSyncError] = useState("");
   const [pendingCompletedUploadCount, setPendingCompletedUploadCount] = useState(0);
   const syncInFlightRef = useRef<Promise<CloudRefreshResult> | null>(null);
+  const historyReadInFlightRef = useRef<Promise<CloudRefreshResult> | null>(null);
   const sessionRef = useRef<Session | null>(null);
   const resumeRefreshAtRef = useRef(0);
   const automaticSyncTimerRef = useRef<
     { kind: "idle" | "timeout"; id: number } | null
   >(null);
-
-  useEffect(() => {
-    sessionRef.current = session;
-  }, [session]);
 
   useEffect(() => {
     const updatePendingCount = () => {
@@ -431,28 +428,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userId = targetUserId || user?.id;
     const effectiveUser = targetUser ?? user;
     if (!configured || !userId || !effectiveUser) return { status: "skipped", reason: "unavailable" };
-    if (sessionRef.current?.user.id === userId && !isUsableAuthSession(sessionRef.current)) {
-      setSyncStatus("ready");
-      setSyncError(AUTH_RELOGIN_MESSAGE);
-      return { status: "failed", userId, retryAt: Date.now() + HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS };
-    }
 
     const now = Date.now();
     const isHistoryHydration = explicitOptions.historyHydration === true;
     const forceSync = explicitOptions.force === true;
     const readRemoteOnly = explicitOptions.readRemoteOnly === true;
+    // A stalled/unknown write must stay locked, but must not prevent a separate
+    // read-only history recovery. Reads never clear or replay the write task.
+    const activeSyncRef = readRemoteOnly ? historyReadInFlightRef : syncInFlightRef;
     const backgroundNoticeMs = explicitOptions.uploadAllPending || isHistoryHydration
       ? CLOUD_MANUAL_RESUME_BACKGROUND_NOTICE_MS
       : CLOUD_RESUME_BACKGROUND_NOTICE_MS;
 
-    if (syncInFlightRef.current) {
-      setSyncStatus("syncing");
-      setSyncError("");
-      if (!forceSync) return { status: "skipped", reason: "in-flight", pending: syncInFlightRef.current };
+    if (activeSyncRef.current) {
+      if (!readRemoteOnly) { setSyncStatus("syncing"); setSyncError(""); }
+      if (readRemoteOnly || !forceSync) return { status: "skipped", reason: "in-flight", pending: activeSyncRef.current };
 
-      const previousSyncTask = syncInFlightRef.current;
+      const previousSyncTask = activeSyncRef.current;
       await previousSyncTask.catch(() => undefined);
-      if (hasInFlightSync(syncInFlightRef)) return { status: "skipped", reason: "in-flight", pending: syncInFlightRef.current! };
+      if (hasInFlightSync(activeSyncRef)) return { status: "skipped", reason: "in-flight", pending: activeSyncRef.current! };
     }
 
     if (
@@ -489,8 +483,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    setSyncStatus("syncing");
-    setSyncError("");
+    if (!readRemoteOnly) { setSyncStatus("syncing"); setSyncError(""); }
 
     const uploadAllPending = explicitOptions.uploadAllPending === true;
     const hydrateRemoteHistory = explicitOptions.hydrateRemoteHistory ?? !uploadAllPending;
@@ -498,6 +491,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let syncTask: Promise<CloudRefreshResult> | null = null;
     syncTask = (async (): Promise<CloudRefreshResult> => {
       try {
+        const liveSession = await resolveLiveAuthSessionForOwner(getSupabaseBrowserClient(), userId);
+        // A sign-out/account switch during the SDK wait must not start work for
+        // the old owner or restore that old account into React/local storage.
+        if (sessionRef.current?.user.id !== userId) {
+          return { status: "skipped", reason: "owner-changed" };
+        }
+        sessionRef.current = liveSession;
+        setSession(liveSession);
+        setUser(liveSession.user);
+        saveAuthSessionSnapshot(liveSession);
         const completedSessions = await syncLocalCompletedSessionsForCurrentUser(userId, {
           hydrateRemoteHistory,
           uploadAllPending,
@@ -505,6 +508,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           historyMode: explicitOptions.historyMode
         });
 
+        if (sessionRef.current?.user.id !== userId) return { status: "skipped", reason: "owner-changed" };
         if (!readRemoteOnly) {
           void syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).catch((error) => {
             console.error("Leaderboard sync skipped:", error);
@@ -517,22 +521,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           clearHistoryCloudSyncAttemptMarker(userId);
         }
         if (sessionRef.current?.user.id === userId) {
-          setSyncError("");
-          setSyncStatus("ready");
+          if (!readRemoteOnly) { setSyncError(""); setSyncStatus("ready"); }
           setSyncVersion((value) => value + 1);
         }
         return { status: "completed", userId, historyHydrated: hydrateRemoteHistory, historyMode: explicitOptions.historyMode };
       } catch (error) {
-        if (sessionRef.current?.user.id === userId) markLocalSyncFallback(error);
-        return { status: "failed", userId, retryAt: Date.now() + HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS };
+        if (sessionRef.current?.user.id === userId) {
+          if (readRemoteOnly) setSyncVersion((value) => value + 1);
+          else markLocalSyncFallback(error);
+        }
+        return { status: "failed", userId, retryAt: Date.now() + HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS, message: getErrorMessage(error) };
       } finally {
-        if (syncTask && syncInFlightRef.current === syncTask) {
-          syncInFlightRef.current = null;
+        if (syncTask && activeSyncRef.current === syncTask) {
+          activeSyncRef.current = null;
         }
       }
     })();
 
-    syncInFlightRef.current = syncTask;
+    activeSyncRef.current = syncTask;
     try {
       return await withTimeout(
         syncTask,
@@ -540,7 +546,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         "雲端同步仍在背景整理，可先使用本機紀錄。"
       );
     } catch (error) {
-      if (syncInFlightRef.current === syncTask && sessionRef.current?.user.id === userId) {
+      if (!readRemoteOnly && activeSyncRef.current === syncTask && sessionRef.current?.user.id === userId) {
         setSyncStatus("syncing");
         setSyncError(getErrorMessage(error));
       }
@@ -548,13 +554,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [configured, recoveryMode, user?.id]);
 
-  const applyAuthSession = useCallback((nextSession: Session | null) => {
+  const applyAuthSession = useCallback((nextSession: Session | null, options: { automaticSync?: boolean } = {}) => {
+    sessionRef.current = nextSession;
     setSession(nextSession);
     setUser(nextSession?.user ?? null);
     setActiveStorageUser(nextSession?.user?.id);
     saveAuthSessionSnapshot(nextSession);
 
     if (nextSession?.user) {
+      // Renewing this account's token is not a request to upload its queue.
+      // Keep an ongoing write's status/error intact during read-only recovery.
+      if (options.automaticSync === false) return;
       setSyncStatus("ready");
       setSyncError("");
       if (shouldDeferAutomaticCloudSync()) {
@@ -582,6 +592,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const handleSignOut = useCallback(async () => {
     if (!configured) return;
 
+    sessionRef.current = null;
     setSession(null);
     setUser(null);
     setActiveStorageUser();
@@ -610,6 +621,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!configured || recoveryMode) {
       setActiveStorageUser();
+      sessionRef.current = null;
       setSession(null);
       setUser(null);
       setPasswordRecovery(false);
@@ -632,6 +644,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (cancelled) return;
 
+        sessionRef.current = recoveredSession;
         setSession(recoveredSession);
         setUser(recoveredSession?.user ?? null);
         setPasswordRecovery(Boolean(recoveredSession?.user && isPasswordRecoveryRoute()));
@@ -655,6 +668,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         if (cancelled) return;
         const recoveredSession = isTerminalAuthError(error) ? null : loadAuthSessionSnapshot();
+        sessionRef.current = recoveredSession;
         setSession(recoveredSession);
         setUser(recoveredSession?.user ?? null);
         setPasswordRecovery(false);
@@ -688,7 +702,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === "SIGNED_OUT") {
         saveAuthSessionSnapshot(null);
       }
-      applyAuthSession(nextSession);
+      const sameOwnerRefresh = event === "TOKEN_REFRESHED" &&
+        nextSession?.user?.id === sessionRef.current?.user.id;
+      applyAuthSession(nextSession, { automaticSync: !sameOwnerRefresh });
     });
 
     async function refreshSessionAfterResume() {
@@ -717,7 +733,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           currentSession?.access_token !== refreshedSession.access_token ||
           currentSession?.user?.id !== refreshedSession.user.id
         ) {
-          applyAuthSession(refreshedSession);
+          applyAuthSession(refreshedSession, { automaticSync: false });
         } else {
           saveAuthSessionSnapshot(refreshedSession);
         }

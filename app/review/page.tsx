@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { WrongQuestionPdfExport } from "@/components/WrongQuestionPdfExport";
 import { ReviewYearRangeFilter } from "@/components/ReviewYearRangeFilter";
-import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
+import { CloudHistoryReadStatus } from "@/components/CloudHistoryReadStatus";
 import {
   MANUAL_REVIEW_STATE_CHANGE_EVENT,
   ReviewNotebook,
@@ -159,7 +159,6 @@ export default function ReviewPage() {
     readManualReviewStateForScope("practice-review", "guest")
   );
   const { user, syncVersion } = useAuth();
-  useCloudHistoryHydration();
   const reviewCompletionThreshold = useReviewCompletionThreshold();
   const pageScrollYRef = useRef(0);
   const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
@@ -330,6 +329,7 @@ export default function ReviewPage() {
 
   return (
     <main id="main-content" className="shell workspace-page">
+      <CloudHistoryReadStatus />
       <section className="surface-card workspace-page-panel workspace-page-header p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>

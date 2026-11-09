@@ -21,17 +21,19 @@ test('normal successful reads preserve their result',async()=>{
 test('real failures before the deadline preserve their error',async()=>{
  const result=await observe(call(async()=>{throw Error('network failed')}));assert.deepEqual(result,{status:'rejected',message:'network failed'});
 });
-test('actual provider background task releases its read lock and shows failure after deadline',async()=>{
+test('actual provider background task releases its read lock and returns read failure without changing write sync state',async()=>{
  const auth=fs.readFileSync(ROOT+'/components/AuthProvider.tsx','utf8');
  const begin=auth.indexOf('    syncTask = (async (): Promise<CloudRefreshResult> => {');
- const end=auth.indexOf('\n    syncInFlightRef.current = syncTask;',begin);
+ const end=auth.indexOf('\n    activeSyncRef.current = syncTask;',begin);
  assert(begin>=0&&end>begin);
  const state={status:'syncing',error:'',version:0};let writes=0;
- const box={syncTask:null,syncInFlightRef:{current:null},sessionRef:{current:{user:{id:'fixture-user'}}},userId:'fixture-user',effectiveUser:{},hydrateRemoteHistory:true,uploadAllPending:false,readRemoteOnly:true,explicitOptions:{automatic:false},isHistoryHydration:true,HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS:90000,
+ const box={syncTask:null,activeSyncRef:{current:null},sessionRef:{current:{user:{id:'fixture-user'}}},userId:'fixture-user',effectiveUser:{},hydrateRemoteHistory:true,uploadAllPending:false,readRemoteOnly:true,explicitOptions:{automatic:false},isHistoryHydration:true,HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS:90000,
+    resolveLiveAuthSessionForOwner:async()=>({user:{id:'fixture-user'}}),getSupabaseBrowserClient:()=>({}),
+    setSession:()=>{},setUser:()=>{},saveAuthSessionSnapshot:()=>{},getErrorMessage:e=>e.message,
   syncLocalCompletedSessionsForCurrentUser:()=>call(()=>new Promise(()=>{})),syncLeaderboardProfileForCurrentUser:async()=>{writes++},syncCurrentSessionForCurrentUser:async()=>{writes++},
   setSyncError:v=>state.error=v,setSyncStatus:v=>state.status=v,setSyncVersion:fn=>state.version=fn(state.version),markLocalSyncFallback:e=>{state.error=e.message;state.status='ready'},console};
  vm.createContext(box);vm.runInContext(ts.transpileModule(auth.slice(begin,end),{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,box);
- box.syncInFlightRef.current=box.syncTask;
+ box.activeSyncRef.current=box.syncTask;
  const result=await box.syncTask;
- assert.equal(result.status,'failed');assert.equal(box.syncInFlightRef.current,null);assert.equal(state.status,'ready');assert.equal(state.error,'TEST_HISTORY_TIMEOUT');assert.equal(writes,0);
+ assert.equal(result.status,'failed');assert.equal(box.activeSyncRef.current,null);assert.equal(result.message,'TEST_HISTORY_TIMEOUT');assert.equal(state.status,'syncing');assert.equal(state.error,'');assert.equal(writes,0);
 });

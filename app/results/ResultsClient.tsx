@@ -17,7 +17,7 @@ import { createPortal } from "react-dom";
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
-import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
+import { CloudHistoryReadStatus } from "@/components/CloudHistoryReadStatus";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionAiMetadataBadges } from "@/components/QuestionAiMetadataBadges";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
@@ -904,11 +904,7 @@ function ResultsPageContent() {
   const searchParams = useSearchParams();
   const { user, syncVersion, session } = useAuth();
   const forceSimulationHistoryHydration = searchParams.get("scope") === "simulation";
-  useCloudHistoryHydration(true, {
-    force: forceSimulationHistoryHydration,
-    readRemoteOnly: forceSimulationHistoryHydration,
-    historyMode: forceSimulationHistoryHydration ? "simulation" : undefined
-  });
+
   const [mounted, setMounted] = useState(false);
   const [requestedSessionId, setRequestedSessionId] = useState<string | null>(null);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
@@ -2048,6 +2044,7 @@ function ResultsPageContent() {
   if (!requestedSessionId) {
     return (
       <main id="main-content" className="shell workspace-page">
+        <CloudHistoryReadStatus historyMode={forceSimulationHistoryHydration ? "simulation" : undefined} />
         <section className="workspace-section results-history-shell">
           <div className="workspace-section-header">
             <div>
@@ -2157,6 +2154,7 @@ function ResultsPageContent() {
   if (!state.session || !state.summary) {
     return (
       <main id="main-content" className="shell workspace-page">
+        <CloudHistoryReadStatus historyMode={forceSimulationHistoryHydration ? "simulation" : undefined} />
         <section className="workspace-section results-history-shell text-center">
           <h1 className="text-2xl font-semibold text-ink">找不到這次作答紀錄</h1>
           <p className="mt-3 text-slate-500" role={resultRecordNotice ? "alert" : undefined}>
@@ -3000,6 +2998,7 @@ function ResultsPageContent() {
 
   return (
     <main id="main-content" className="shell workspace-page">
+        <CloudHistoryReadStatus historyMode={forceSimulationHistoryHydration ? "simulation" : undefined} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="workspace-page-kicker">作答結果</p>

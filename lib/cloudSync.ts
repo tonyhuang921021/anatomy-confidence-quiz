@@ -2869,7 +2869,11 @@ export async function syncLocalCompletedSessionsForCurrentUser(
         "完整雲端紀錄讀取逾時，已保留這台裝置的紀錄與待補傳佇列。"
       );
       fetchedRemoteSessions = resolved.sessions;
-      hasVerifiedRemoteSessions = true;
+      hasVerifiedRemoteSessions = resolved.unresolvedCompletedSessionIds.length === 0;
+      if (!hasVerifiedRemoteSessions) {
+        shouldUploadLocalSessions = false;
+        remoteHistoryReadError = new Error(`部分雲端紀錄尚未完整讀取（${resolved.unresolvedCompletedSessionIds.length} 回），目前先顯示可用紀錄。請稍後重新讀取。`);
+      }
     } catch (error) {
       shouldUploadLocalSessions = false;
       remoteHistoryReadError = error;

@@ -4,15 +4,17 @@ const ts = require('typescript');
 const assert = require('node:assert/strict');
 const source = fs.readFileSync('components/AuthProvider.tsx', 'utf8');
 const begin = source.indexOf('    syncTask = (async (): Promise<CloudRefreshResult> => {');
-const end = source.indexOf('\n    syncInFlightRef.current = syncTask;', begin);
+const end = source.indexOf('\n    activeSyncRef.current = syncTask;', begin);
 assert(begin >= 0 && end > begin, 'background sync task must be found');
 const task = ts.transpileModule(source.slice(begin, end), {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 async function runTest(fail) {
   const state = { error: '雲端同步仍在背景整理，可先使用本機紀錄。', status: 'syncing', version: 0 };
   const ctx = {
-    syncTask: null, syncInFlightRef: {current: null}, sessionRef:{current:{user:{id:'test-user'}}}, userId:'test-user', effectiveUser:{},
+    syncTask: null, activeSyncRef: {current: null}, sessionRef:{current:{user:{id:'test-user'}}}, userId:'test-user', effectiveUser:{},
     hydrateRemoteHistory:true, uploadAllPending:false, readRemoteOnly:false,
     explicitOptions:{automatic:false}, isHistoryHydration:false, HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS:90000,
+    resolveLiveAuthSessionForOwner:async()=>({user:{id:'test-user'}}),getSupabaseBrowserClient:()=>({}),
+    setSession:()=>{},setUser:()=>{},saveAuthSessionSnapshot:()=>{},getErrorMessage:e=>e.message,
     syncLocalCompletedSessionsForCurrentUser: async () => { if (fail) throw Error('read failed'); return []; },
     syncLeaderboardProfileForCurrentUser: async () => {}, syncCurrentSessionForCurrentUser: async () => {},
     setSyncError: x => {state.error=x}, setSyncStatus:x=>{state.status=x},
