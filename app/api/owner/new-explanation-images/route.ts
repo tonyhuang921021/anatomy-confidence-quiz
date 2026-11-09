@@ -7,7 +7,7 @@ import {reviewStagedFigure} from "@/lib/stagedFigureReview.cjs";
 import {figureCaptureAllowed,guardFigureTraffic} from "@/lib/figureCaptureGate.cjs";
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {boundedImageTargets,boundedImageTarget,imageWindowOpen,buildNeeds,approveConcepts,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
+import {boundedImageTargets,boundedImageTarget,imageWindowOpen,buildNeeds,approveConcepts,automaticQuery,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 const reply=(x:any,status=200)=>NextResponse.json(x,{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(request:NextRequest){
@@ -26,22 +26,25 @@ export async function POST(request:NextRequest){
   if(process.env.EXPLANATION_SITEWIDE_ENABLED!=='1'&&process.env.NEW_EXPLANATION_IMAGES_SINGLE_BATCH&&!pilotTargets.length)return reply({ok:false,code:'invalid_pilot'},503);
   if(pilotTargets.length>1&&(!process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID||u.id!==process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID))return reply({ok:false,code:'pilot_operator'},403);
   if(['continuation_open','continuation_run','continuation_status'].includes(body.action)){
-   if(!pilotTargets.length||u.id!==process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID)return reply({ok:false,code:'pilot_operator'},403);
+   if(!sitewide&&(!pilotTargets.length||u.id!==process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID))return reply({ok:false,code:'pilot_operator'},403);
    if(typeof body.id!=='string'||! /^[0-9a-f-]{36}$/i.test(body.id))return reply({ok:false,code:'invalid_operation'},400);
    if(body.action==='continuation_status'){const r=await db.rpc('figure_continuation_status',{p_id:body.id,p_actor:u.id});return r.error?reply({ok:false,code:'continuation_unavailable'},503):reply({ok:true,value:r.data?{operation:r.data.operation,steps:(r.data.steps||[]).map((x:any)=>({kind:x.kind,key:x.key,state:x.state}))}:null});}
    if(process.env.NEW_EXPLANATION_FIGURES_WORKER!=='1'||!imageWindowOpen(process.env)||!await figureCaptureAllowed(db))return reply({ok:false,code:'worker_disabled'},503);
    if(body.action==='continuation_open'){
     const parent=await db.from('figure_queue_jobs').select('question_id,explanation_sha256,figure_needs,state').eq('request_id',body.parentId).maybeSingle();
     const parentRow=parent.data;
-    if(parent.error||!parentRow||!pilotTargets.some(t=>t.questionId===parentRow.question_id&&t.textHash===parentRow.explanation_sha256))return reply({ok:false,code:'outside_batch'},403);
+    if(parent.error||!parentRow||(!sitewide&&!pilotTargets.some(t=>t.questionId===parentRow.question_id&&t.textHash===parentRow.explanation_sha256)))return reply({ok:false,code:'outside_batch'},403);
+    if(sitewide){const allowed=await db.rpc('explanation_sitewide_request_allowed',{p_id:body.parentId,p_actor:u.id});if(allowed.error||allowed.data!==true)return reply({ok:false,code:'outside_batch'},403);}
     const item=parentRow.figure_needs?.items?.find((x:any)=>x.sectionAnchor===body.sectionAnchor);
     if(!item||typeof body.query!=='string'||! /^[A-Za-z][A-Za-z0-9 -]{2,99}$/.test(body.query))return reply({ok:false,code:'invalid_query'},400);
+    if(sitewide&&!automaticQuery({...item,proposedQuery:body.query}))return reply({ok:false,code:'invalid_query'},400);
     const r=await db.rpc('figure_continuation_open',{p_id:body.id,p_actor:u.id,p_parent:body.parentId,p_text_sha:parentRow.explanation_sha256,p_item:{...item,query:body.query,proposedQuery:body.query,catalogRevision:'reviewed-query-v1'}});
     return r.error?reply({ok:false,code:'continuation_unavailable'},503):reply({ok:true,...r.data});
    }
    const repository=createContinuationRepository(db,u.id);
    const snapshot=await repository.read(body.id);
-   if(!snapshot?.operation||!pilotTargets.some(t=>t.questionId===snapshot.operation.question_id&&t.textHash===snapshot.operation.text_sha))return reply({ok:false,code:'outside_batch'},403);
+   if(!snapshot?.operation||(!sitewide&&!pilotTargets.some(t=>t.questionId===snapshot.operation.question_id&&t.textHash===snapshot.operation.text_sha)))return reply({ok:false,code:'outside_batch'},403);
+   if(sitewide){const allowed=await db.rpc('explanation_sitewide_request_allowed',{p_id:snapshot.operation.parent_request,p_actor:u.id});if(allowed.error||allowed.data!==true)return reply({ok:false,code:'outside_batch'},403);}
    return reply({ok:true,...await continueFigure({id:body.id,repository,readText:async(id:string)=>{const r=await db.from('question_explanation_overrides').select('explanation').eq('question_id',id).maybeSingle();if(r.error)throw Error('read unavailable');return r.data?.explanation},search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),review:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const r=resolveTrustedExplanationQuestion(id);return r.ok?r.question:null}})})});
   }
   if(body.action==='list'){
