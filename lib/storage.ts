@@ -41,6 +41,9 @@ const SIMULATION_OPTION_ELIMINATION_KEY = "anatomy-confidence-simulation-option-
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 const completedSessionsMemoryCache = new Map<string, QuizSession[]>();
+// Full cloud reads may exceed browser storage. Bounded cross-tab freshness hints
+// must not evict this owner-scoped source when they invalidate derived caches.
+const fullCloudCompletedSessionsMemory = new Map<string, QuizSession[]>();
 const completedSessionIdMemoryCache = new Map<string, Set<string>>();
 const completedQuestionHistoryMemoryCache = new Map<string, CompletedQuestionHistoryEntry[]>();
 const COMPLETED_SESSIONS_HEAVY_READ_LIMIT = 160_000;
@@ -64,6 +67,7 @@ type CompletedStorageSyncChange = {
   current?: boolean;
   completedSessions?: QuizSession[];
   historyEntries?: CompletedQuestionHistoryEntry[];
+  resetHistory?: boolean;
 };
 
 type CompletedSessionStorageMutationOptions = {
@@ -301,6 +305,7 @@ function dispatchCompletedStorageChange(change: Omit<CompletedStorageSyncChange,
 
 function handleExternalCompletedStorageChange(change: CompletedStorageSyncChange) {
   if (!isBrowser() || change.sourceId === COMPLETED_STORAGE_SYNC_SOURCE_ID) return;
+  if (change.resetHistory && change.userId) fullCloudCompletedSessionsMemory.delete(change.userId);
   // Pending queue updates must not evict memory-only completed sessions. This is
   // especially important in Safari when localStorage is full and the latest
   // cloud snapshot can only live in memory for the current tab.
@@ -1872,6 +1877,7 @@ export function loadCloudCompletedSessionsForUser(userId = getActiveStorageUser(
   if (!isBrowser()) return [] as QuizSession[];
   const scopedKey = getCloudCompletedSessionsScopedKeyForUser(userId);
   return normalizeCompletedSessionList([
+    ...(fullCloudCompletedSessionsMemory.get(userId) ?? []),
     ...parseCompletedSessionsRaw(safeLocalStorageGetItem(scopedKey)),
     ...parseCompletedSessionsRaw(safeSessionStorageGetItem(scopedKey))
   ],userId);
@@ -1928,7 +1934,11 @@ export function saveCloudCompletedSessionsForUser(
   if (!isBrowser()) return false;
   const scopedKey = getCloudCompletedSessionsScopedKeyForUser(userId);
   if(!preserveIncomingSessionRows(scopedKey,sessions))return false;
-  const normalized = normalizeCompletedSessionList(sessions,userId);
+  const normalized = normalizeCompletedSessionList([
+    ...(fullCloudCompletedSessionsMemory.get(userId) ?? []),
+    ...sessions
+  ],userId);
+  fullCloudCompletedSessionsMemory.set(userId, normalized);
   const fullPayload = JSON.stringify(normalized.map(compactSessionForStorage));
   let didPersist = safeLocalStorageSetItem(scopedKey, fullPayload);
 
@@ -2201,6 +2211,7 @@ export function loadCompletedSessionsAcrossUserScopes(
 export function clearHistory() {
   if (!isBrowser()) return;
   const activeUser = getActiveStorageUser();
+  fullCloudCompletedSessionsMemory.delete(activeUser);
   completedSessionsMemoryCache.delete(activeUser);
   completedSessionIdMemoryCache.delete(activeUser);
   completedQuestionHistoryMemoryCache.delete(activeUser);
@@ -2219,6 +2230,7 @@ export function clearHistory() {
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_DISCARDS_KEY));
   broadcastCompletedStorageChange({
     userId: activeUser,
+    resetHistory: true,
     sessions: true,
     history: true,
     current: true

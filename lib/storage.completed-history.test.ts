@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   buildCompletedQuestionHistoryEntriesFromSessions,
   clearCurrentSession,
+  clearHistory,
   commitUploadedCompletedSessionsForUser,
   discardCurrentSession,
   getPendingQuestionExplanationOverrideSync,
@@ -29,6 +30,7 @@ import {
   saveCurrentSession,
   setActiveStorageUser
 } from "./storage";
+import { acceptCanonicalCompletion } from "./quizAnswerEdits";
 import type { Attempt, QuizSession } from "../types/quiz";
 
 function createStorageMock(options: { failWrites?: boolean; maxBytes?: number } = {}): Storage {
@@ -927,4 +929,89 @@ test("目前測驗儲存出現不同 session 時，仍以最後真正活動的�
   sessionStorage.setItem(storageKey, JSON.stringify(newerSession));
 
   assert.equal(loadCurrentSessionForUser(userId)?.id, "newer-session");
+});
+
+
+test("非待補傳跨頁提示不會淘汰無法持久保存的完整雲端歷史", () => {
+  installBrowserStorage({ maxLocalBytes: 4_000, failSessionWrites: true });
+  const owner = "fixture-full-cloud-history";
+  setActiveStorageUser(owner);
+  const sessions = Array.from({ length: 60 }, (_, i) => makeSession(`cloud-round-${i}`, [`cloud-question-${i}`]));
+  assert.equal(saveCloudCompletedSessionsForUser(owner, sessions), false);
+  assert.equal(loadCompletedSessionsForUser(owner, { includeFullLocalHistory: true }).length, 60);
+  window.dispatchEvent({ type: "storage", key: `anatomy-confidence-cloud-completed-sessions:${owner}` } as unknown as Event);
+  assert.equal(loadCompletedSessionsForUser(owner, { includeFullLocalHistory: true }).length, 60);
+  assert.equal(loadCloudCompletedSessionsForUser(owner).length, 60);
+  assert.equal(loadCompletedSessionsForUser("different-owner", { includeFullLocalHistory: true }).length, 0);
+});
+
+test("明確清除本帳號歷史仍會移除記憶中的雲端快取", () => {
+  installBrowserStorage({ maxLocalBytes: 4_000, failSessionWrites: true });
+  const owner = "fixture-clear-cloud-history";
+  setActiveStorageUser(owner);
+  const sessions = Array.from({ length: 60 }, (_, i) => makeSession(`clear-round-${i}`, [`clear-question-${i}`]));
+  saveCloudCompletedSessionsForUser(owner, sessions);
+  clearHistory();
+  assert.equal(loadCompletedSessionsForUser(owner, { includeFullLocalHistory: true }).length, 0);
+  assert.equal(loadCloudCompletedSessionsForUser(owner).length, 0);
+});
+
+
+test("最新32回的跨分頁廣播不會把完整雲端紀錄縮成32回", async () => {
+  installBrowserStorage({ maxLocalBytes: 4_000, failSessionWrites: true });
+  const owner = "fixture-bounded-cloud-broadcast";
+  setActiveStorageUser(owner);
+  const sessions = Array.from({ length: 60 }, (_, i) => makeSession(`broadcast-round-${i}`, [`broadcast-question-${i}`]));
+  assert.equal(saveCloudCompletedSessionsForUser(owner, sessions), false);
+  const sender = new BroadcastChannel("anatomy-confidence-completed-storage-sync");
+  const received = new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => { window.removeEventListener("completed-sessions-change", handler); reject(new Error("broadcast not received")); }, 2000);
+    const handler = () => { clearTimeout(timer); window.removeEventListener("completed-sessions-change", handler); resolve(); };
+    window.addEventListener("completed-sessions-change", handler);
+  });
+  try {
+    sender.postMessage({ sourceId: "fixture-other-tab", userId: owner, sessions: true, history: true, completedSessions: sessions.slice(-32) });
+    await received;
+    assert.equal(loadCompletedSessionsForUser(owner, { includeFullLocalHistory: true }).length, 60);
+    assert.equal(loadCloudCompletedSessionsForUser(owner).length, 60);
+  } finally { sender.close(); }
+});
+
+
+test("完整雲端記憶快取仍受同帳號的有效回合版本限制", () => {
+  const { localStorage } = installBrowserStorage();
+  const owner = "fixture-cloud-memory-fence", q = "fixture-fenced-question";
+  setActiveStorageUser(owner);
+  const source = makeSession(`user-${owner}:round`, [q]);
+  const proposed = { ...source, answerEdits: { schema: 1 as const, baseline: source.attempts, entries: { [q]: { counter: 0, actor: "fixture", value: source.attempts[0] } } } };
+  saveCloudCompletedSessionsForUser(owner, [proposed]);
+  const active = { ...proposed, completedAt: undefined, attempts: [], answerEdits: { ...proposed.answerEdits, entries: { [q]: { counter: 1, actor: "fixture", value: null } } } };
+  const key = `quiz-reconciliation-fence:${owner}:${source.id}`;
+  localStorage.setItem(key, JSON.stringify(active));
+  assert.equal(loadCloudCompletedSessionsForUser(owner).length, 0);
+  const accepted = acceptCanonicalCompletion(proposed);
+  localStorage.setItem(key + ":accepted", JSON.stringify(accepted));
+  assert.equal(loadCloudCompletedSessionsForUser(owner).length, 1);
+  assert.equal(loadCloudCompletedSessionsForUser(owner)[0].attempts.length, 1);
+});
+
+test("明確跨頁清除只移除指定帳號的完整雲端記憶快取", async () => {
+  installBrowserStorage({ maxLocalBytes: 4_000, failSessionWrites: true });
+  const owner = "fixture-reset-cloud-memory", other = "fixture-preserve-other-memory";
+  setActiveStorageUser(owner);
+  const sessions = Array.from({ length: 60 }, (_, i) => makeSession(`reset-round-${i}`, [`reset-question-${i}`]));
+  saveCloudCompletedSessionsForUser(owner, sessions);
+  saveCloudCompletedSessionsForUser(other, sessions);
+  const sender = new BroadcastChannel("anatomy-confidence-completed-storage-sync");
+  const received = new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => { window.removeEventListener("completed-sessions-change", handler); reject(new Error("reset not received")); }, 2000);
+    const handler = () => { clearTimeout(timer); window.removeEventListener("completed-sessions-change", handler); resolve(); };
+    window.addEventListener("completed-sessions-change", handler);
+  });
+  try {
+    sender.postMessage({ sourceId: "fixture-reset-tab", userId: owner, sessions: true, history: true, resetHistory: true });
+    await received;
+    assert.equal(loadCloudCompletedSessionsForUser(owner).length, 0);
+    assert.equal(loadCloudCompletedSessionsForUser(other).length, 60);
+  } finally { sender.close(); }
 });
