@@ -6,7 +6,7 @@ import { ExplanationReplacementControls } from "@/components/ExplanationReplacem
 
 import { getQuestionAnswerLabel } from "@/lib/answerScoring";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { FormattedQuestionText } from "@/components/FormattedQuestionText";
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
@@ -34,6 +34,8 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
   const { session } = useAuth();
   const [showQuestion, setShowQuestion] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [replacementView,setReplacementView]=useState({questionId:question?.id,replacing:false});
+  const handleReplacingChange=useCallback((replacing:boolean)=>setReplacementView({questionId:question?.id,replacing}),[question?.id]);
   const [explanationOverride, setExplanationOverride] = useState<QuestionExplanationOverride | null>(() =>
     question ? loadQuestionExplanationOverride(question.id) ?? null : null
   );
@@ -181,14 +183,14 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
 
           {!hasReviewedExplanation(question.id)&&!explanationOverride?<button type="button" onClick={()=>void handleGenerateExplanation()} disabled={explanationLoading} className="secondary-pill ml-2 mt-4 px-4 py-2 text-sm disabled:opacity-60">{explanationLoading?"AI 生成中...":"產生圖文詳解"}</button>:null}
           <ExplanationGenerationStatus recoveryKind="generation" key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={explanationOverride?.updatedAt} />
-          <div className="mt-2"><ExplanationReplacementControls questionId={question.id} onStart={()=>setShowAnswer(true)}/></div>
+          <div className="mt-2"><ExplanationReplacementControls questionId={question.id} onReplacingChange={handleReplacingChange} onStart={()=>setShowAnswer(true)}/></div>
           {explanationError ? (
             <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">
               {explanationError}
             </p>
           ) : null}
           {showAnswer ? (
-            <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
+            <div hidden={replacementView.questionId===question.id&&replacementView.replacing} className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
               <p className="font-bold">答案：{getQuestionAnswerLabel(question)}</p>
               <StructuredExplanationText
                 text={explanation}

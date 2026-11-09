@@ -908,6 +908,7 @@ function ResultsPageContent() {
   const [mounted, setMounted] = useState(false);
   const [requestedSessionId, setRequestedSessionId] = useState<string | null>(null);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
+  useEffect(()=>{const change=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail||{};if(typeof id!=="string")return;setExplanationOverrides(current=>{const next={...current};if(saved)next[id]=saved;else delete next[id];return next;});};window.addEventListener("explanation-version-changed",change);return()=>window.removeEventListener("explanation-version-changed",change);},[]);
   useEffect(()=>{const recover=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;const override={...saved,updatedAt:new Date().toISOString()};saveQuestionExplanationOverride(id,override);setExplanationOverrides(current=>({...current,[id]:override}));setExplanationErrorMap(current=>({...current,[id]:''}));};window.addEventListener('explanation-recovered',recover);return()=>window.removeEventListener('explanation-recovered',recover)},[]);
 
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});

@@ -197,6 +197,7 @@ export default function SubjectNotesPage() {
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [colorApplyMessage, setColorApplyMessage] = useState("");
   const [noteUndoStack, setNoteUndoStack] = useState<NoteUndoSnapshot[]>([]);
+  const [replacementHiddenMap,setReplacementHiddenMap]=useState<Record<string,boolean>>({});
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   useEffect(()=>{const recover=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;const override={...saved,updatedAt:new Date().toISOString()};saveQuestionExplanationOverride(id,override);setExplanationOverrides(current=>({...current,[id]:override}));setExplanationErrorMap(current=>({...current,[id]:''}));};window.addEventListener('explanation-recovered',recover);return()=>window.removeEventListener('explanation-recovered',recover)},[]);
   useEffect(()=>{const changed=(event:Event)=>{const id=(event as CustomEvent).detail?.id;if(typeof id!=='string')return;const saved=loadQuestionExplanationOverridesForIds([id])[id];setExplanationOverrides(current=>{const next={...current};if(saved)next[id]=saved;else delete next[id];return next});};window.addEventListener('explanation-version-changed',changed);return()=>window.removeEventListener('explanation-version-changed',changed)},[]);
@@ -1720,7 +1721,7 @@ export default function SubjectNotesPage() {
                           <summary className="secondary-pill cursor-pointer list-none px-4 py-2 text-sm">
                             看答案與詳解
                           </summary>
-                          <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
+                          <div hidden={Boolean(replacementHiddenMap[question.id])} className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
                             <p className="font-bold">答案：{getQuestionAnswerLabel(question)}</p>
                             <StructuredExplanationText
                               text={explanation}
@@ -1769,7 +1770,7 @@ export default function SubjectNotesPage() {
                         ) : null}
                       </div>
                       <ExplanationGenerationStatus recoveryKind="generation" key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={override?.updatedAt} />
-                      <div className="mt-2"><ExplanationReplacementControls questionId={question.id}/></div>
+                      <div className="mt-2"><ExplanationReplacementControls questionId={question.id} onReplacingChange={replacing=>setReplacementHiddenMap(previous=>previous[question.id]===replacing?previous:{...previous,[question.id]:replacing})}/></div>
                       {explanationError ? (
                         <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">
                           {explanationError}

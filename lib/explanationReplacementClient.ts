@@ -4,7 +4,7 @@ import {clearQuestionExplanationBackgroundCache} from "@/lib/cloudSync";
 export type ReplacementPending={operationId:string;startedAt:number;kind:"replace"|"restore"};
 const key=(id:string)=>`explanation-replacement-pending-v1:${id}`;
 export function pendingReplacement(id:string):ReplacementPending|null{try{const value=JSON.parse(localStorage.getItem(key(id))||"null");return value&&typeof value.operationId==="string"&&Number.isFinite(value.startedAt)&&["replace","restore"].includes(value.kind)?value:null;}catch{return null;}}
-export function setPendingReplacement(id:string,value:ReplacementPending|null){try{if(value)localStorage.setItem(key(id),JSON.stringify(value));else localStorage.removeItem(key(id));}catch{throw Error("無法保存請求識別，未開始替換。");}}
+export function setPendingReplacement(id:string,value:ReplacementPending|null){try{if(value)localStorage.setItem(key(id),JSON.stringify(value));else localStorage.removeItem(key(id));}catch{throw Error("無法保存請求識別，未開始替換。");}try{if(typeof window!=="undefined")window.dispatchEvent(new CustomEvent("explanation-replacement-pending-changed",{detail:{id,pending:Boolean(value)}}));}catch{}}
 export async function replacementAction(id:string,token:string,action:"status"|"restore",operationId?:string,baseVersion?:string){
  const response=await fetch("/api/explanation-replacement",{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:JSON.stringify({questionId:id,action,operationId,baseVersion})});
  const result=await response.json();if(!response.ok||!result.ok)throw Error("替換狀態暫時無法確認；原詳解仍可閱讀。");return result;

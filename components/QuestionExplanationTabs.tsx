@@ -18,10 +18,11 @@ type QuestionExplanationTabsProps = {
   question: Question; compact?: boolean; className?: string;
   mainExplanationContent?: ReactNode; aiExplanationContent?: ReactNode;
   relatedQuestionsContent?: () => ReactNode; moreActionsContent?: ReactNode;
+  onReplacementVisibilityChange?:(questionId:string,replacing:boolean)=>void;
 };
 
 export function QuestionExplanationTabs({question, compact = false, className = "", mainExplanationContent,
-  aiExplanationContent, relatedQuestionsContent, moreActionsContent}: QuestionExplanationTabsProps) {
+  aiExplanationContent, relatedQuestionsContent, moreActionsContent,onReplacementVisibilityChange}: QuestionExplanationTabsProps) {
   const { session } = useAuth();
   const [reactions,setReactions] = useState<QuestionSupplementReactionSummary[]>([]);
   const [reactionLoading,setReactionLoading] = useState(false);
@@ -54,6 +55,10 @@ export function QuestionExplanationTabs({question, compact = false, className = 
   const [supplementCount,setSupplementCount] = useState<number|null>(null);
   const [isMoreActionsOpen,setIsMoreActionsOpen] = useState(false);
   const morePresence = useMotionPresence(isMoreActionsOpen);
+  const [replacementActionsNode,setReplacementActionsNode]=useState<HTMLDivElement|null>(null);
+  const [replacementView,setReplacementView]=useState({questionId:question.id,replacing:false});
+  const replacingCurrent= replacementView.questionId===question.id&&replacementView.replacing;
+  const handleReplacingChange=useCallback((replacing:boolean)=>{setReplacementView(previous=>previous.questionId===question.id&&previous.replacing===replacing?previous:{questionId:question.id,replacing});onReplacementVisibilityChange?.(question.id,replacing);},[question.id,onReplacementVisibilityChange]);
   const moreActionsButtonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId(), moreId = useId();
   const handleCountChange = useCallback((count:number)=>setSupplementCount(count),[]);
@@ -94,12 +99,12 @@ export function QuestionExplanationTabs({question, compact = false, className = 
     {reactionError?<p role="alert" className="mb-2 text-sm text-rose-700">{reactionError}</p>:null}
     <div {...morePresence.attributes} id={moreId} role="group" aria-label="更多操作" hidden={!morePresence.present}
       className="mb-3 ml-auto w-full rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:w-64">
-      <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg">{moreActionsContent}</div>
+      <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg"><div ref={setReplacementActionsNode} aria-label="詳解版本操作"/>{moreActionsContent}</div>
     </div>
     <div id={panelId} className="min-w-0 max-w-full">
-      <div className="mb-3"><ExplanationReplacementControls questionId={question.id} onStart={()=>{setSelection({questionId:question.id,source:null});setIsMoreActionsOpen(false);}}/></div>
+      <ExplanationReplacementControls questionId={question.id} portalActions actionsContainer={replacementActionsNode} onReplacingChange={handleReplacingChange} onStart={()=>{setSelection({questionId:question.id,source:null});setIsMoreActionsOpen(false);window.requestAnimationFrame(()=>moreActionsButtonRef.current?.focus());}}/>
       {/* Keep the original reader mounted: preserve 簡解／詳解 and image state. */}
-      <div hidden={activeTab!==null} role="region" aria-label="原詳解" className="min-w-0 space-y-3">
+      <div hidden={activeTab!==null||replacingCurrent} role="region" aria-label="原詳解" className="min-w-0 space-y-3">
         {mainExplanationContent || <p className="text-sm text-slate-500">此題尚無原詳解。</p>}
         {aiExplanationContent&&!fullGenerated?<details className="rounded-xl border border-slate-200 p-3"><summary className="cursor-pointer text-sm font-semibold text-brand-800">展開完整詳解</summary><div className="mt-3">{aiExplanationContent}</div></details>:null}
       </div>

@@ -15,7 +15,7 @@ import { formatRocYear } from "@/lib/rocDate";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {OriginalSessionExamRenderer} from "@/components/OriginalSessionExamRenderer";
 import {clearRendererAttempt,replaceRendererAttempt} from "@/lib/examRendererProjection";
 import { useRouter } from "next/navigation";
@@ -844,6 +844,8 @@ function OwnerQuizPage() {
   const [session, setSession] = useState<QuizSession | null>(null);
   const examPresentation = session?.settings?.mode === "simulation" && session.settings.simulationPresentation === "exam";
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
+  const [replacingExplanationIds,setReplacingExplanationIds]=useState<Record<string,boolean>>({});
+  const handleReplacementVisibilityChange=useCallback((id:string,replacing:boolean)=>setReplacingExplanationIds(previous=>previous[id]===replacing?previous:{...previous,[id]:replacing}),[]);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   useEffect(()=>{const change=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;setExplanationOverrides(current=>{const next={...current};if(saved)next[id]=saved;else delete next[id];return next;});};window.addEventListener("explanation-version-changed",change);return()=>window.removeEventListener("explanation-version-changed",change);},[]);
   useEffect(()=>{const recover=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;const override={...saved,updatedAt:new Date().toISOString()};saveQuestionExplanationOverride(id,override);setExplanationOverrides(current=>({...current,[id]:override}));setExplanationErrorMap(current=>({...current,[id]:''}));};window.addEventListener('explanation-recovered',recover);return()=>window.removeEventListener('explanation-recovered',recover)},[]);
@@ -2860,7 +2862,7 @@ function OwnerQuizPage() {
                         className="mb-3"
                       />
                       {!hasReviewedExplanation(currentQuestion.id)&&!currentExplanationOverride&&<button type="button" disabled={currentExplanationLoading} onClick={()=>void handleGenerateQuestionExplanation(currentQuestion,submittedAttempt)} className="mb-3 min-h-11 rounded-xl bg-brand-700 px-4 py-2 font-semibold text-white disabled:opacity-60">{currentExplanationLoading?'詳解生成中…':'產生圖文詳解'}</button>}
-                      <QuestionExplanationTabs mainExplanationContent={<>
+                      <QuestionExplanationTabs onReplacementVisibilityChange={handleReplacementVisibilityChange} mainExplanationContent={<>
 {shouldShowAiExplanationDetails ? (
                         <StructuredExplanationText text={currentQuestion.explanation} label={!currentExplanationOverride&&!hasReviewedExplanation(currentQuestion.id)?"題庫既有說明":"整題詳解"} compact questionId={currentQuestion.id} />
                       ) : null}
@@ -2919,7 +2921,7 @@ function OwnerQuizPage() {
                     </p>
                   ) : null}
                   {shouldShowExplanation && shouldShowAiExplanationDetails && !hasReviewedExplanation(currentQuestion.id) && currentQuestion.optionAnalysis ? (
-                    <div className="border-t border-slate-200 pt-4 text-sm text-slate-800">
+                    <div hidden={Boolean(replacingExplanationIds[currentQuestion.id])} className="border-t border-slate-200 pt-4 text-sm text-slate-800">
                       <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
                       <div className="mt-2">
                         {Object.entries(currentQuestion.optionAnalysis).map(([key, value]) => (

@@ -40,6 +40,9 @@ const KEYBOARD_QUESTION_NAVIGATION_KEY = "anatomy-confidence-keyboard-question-n
 const SIMULATION_OPTION_ELIMINATION_KEY = "anatomy-confidence-simulation-option-elimination";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
+// Failed browser persistence must not roll a confirmed explanation back to old disk bytes.
+// Null values are explicit server restores to no override, not missing cache entries.
+const questionExplanationMemoryOverlay = new Map<string, Record<string, QuestionExplanationOverride|null>>();
 const completedSessionsMemoryCache = new Map<string, QuizSession[]>();
 // Full cloud reads may exceed browser storage. Bounded cross-tab freshness hints
 // must not evict this owner-scoped source when they invalidate derived caches.
@@ -2274,22 +2277,25 @@ export function loadQuizSettings(): QuizSettings | null {
 export function loadQuestionExplanationOverrides() {
   if (!isBrowser()) return {} as Record<string, QuestionExplanationOverride>;
   const raw = getLegacyOrScopedRaw(QUESTION_EXPLANATION_OVERRIDES_KEY);
-  if (!raw) return {};
-
+  let disk: Record<string,QuestionExplanationOverride> = {};
   try {
-    const parsed = JSON.parse(raw) as Record<string, QuestionExplanationOverride>;
-    return Object.fromEntries(
-      Object.entries(parsed)
-        .map(([questionId, override]) => {
-          const normalized = normalizeQuestionExplanationOverride(override);
-          if (!normalized) return null;
-          return [questionId, normalized] as const;
-        })
-        .filter((entry): entry is readonly [string, QuestionExplanationOverride] => Boolean(entry))
-    );
-  } catch {
-    return {};
-  }
+    const parsed = JSON.parse(raw || "{}") as Record<string, QuestionExplanationOverride>;
+    disk=Object.fromEntries(Object.entries(parsed).map(([id,value])=>[id,normalizeQuestionExplanationOverride(value)]).filter((entry):entry is [string,QuestionExplanationOverride]=>Boolean(entry[1])));
+  } catch {}
+  const overlay=questionExplanationMemoryOverlay.get(getActiveStorageUser());
+  if(!overlay)return disk;
+  const next={...disk};
+  for(const [id,value] of Object.entries(overlay)){if(value)next[id]=value;else delete next[id];}
+  return next;
+}
+
+function preserveExplanationOverlay(values:Record<string,QuestionExplanationOverride|null>) {
+ const owner=getActiveStorageUser();
+ questionExplanationMemoryOverlay.set(owner,{...(questionExplanationMemoryOverlay.get(owner)||{}),...values});
+}
+function persistExplanationOverrides(values:Record<string,QuestionExplanationOverride>) {
+ const owner=getActiveStorageUser();
+ if(safeLocalStorageSetItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY),JSON.stringify(values)))questionExplanationMemoryOverlay.delete(owner);
 }
 
 export function loadQuestionExplanationOverride(questionId: string) {
@@ -2371,7 +2377,9 @@ export function saveQuestionExplanationOverrides(
       .filter((entry): entry is readonly [string, QuestionExplanationOverride] => Boolean(entry))
   );
   const next = mergeQuestionExplanationOverrides(current, normalizedIncoming);
-  safeLocalStorageSetItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY), JSON.stringify(next));
+  const accepted=Object.fromEntries(Object.entries(normalizedIncoming).filter(([id,value])=>next[id]===value));
+  preserveExplanationOverlay(accepted);
+  persistExplanationOverrides(next);
   for(const [id,value] of Object.entries(normalizedIncoming)){
     if(next[id]===value && (value.replacementRevision || value.readingFormat === "full-v1") && (current[id]?.replacementRevision!==value.replacementRevision || current[id]?.readingFormat!==value.readingFormat))
       window.dispatchEvent(new CustomEvent("explanation-version-changed",{detail:{id,saved:value}}));
@@ -2383,7 +2391,8 @@ export function applyConfirmedExplanationVersion(questionId:string,override:Ques
  if(!isBrowser())return;
  const current=loadQuestionExplanationOverrides();
  if(override)current[questionId]=override;else delete current[questionId];
- safeLocalStorageSetItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY),JSON.stringify(current));
+ preserveExplanationOverlay({[questionId]:override});
+ persistExplanationOverrides(current);
  window.dispatchEvent(new CustomEvent("explanation-version-changed",{detail:{id:questionId,saved:override}}));
 }
 
