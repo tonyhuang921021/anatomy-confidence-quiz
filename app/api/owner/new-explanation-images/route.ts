@@ -1,4 +1,5 @@
 import {runNewImageContinuation} from '@/lib/newExplanationImageContinuation.cjs';
+import {enqueueSavedPlan} from '@/lib/savedExplanationImagePlan.cjs';
 import {continueFigure,createContinuationRepository} from '@/lib/figureContinuation.cjs';
 import {resolveTrustedExplanationQuestion} from "@/lib/trustedQuestionLoader";
 import {createFinalFigureReviewer} from "@/lib/finalFigureRuntime.cjs";
@@ -66,13 +67,17 @@ export async function POST(request:NextRequest){
    const target=boundedImageTarget(process.env,body.questionId);
    if(pilotTargets.length&&!target)return reply({ok:false,code:'outside_single_batch'},403);
    if(typeof body.questionId!=='string'||! /^[A-Za-z0-9_-]{1,200}$/.test(body.questionId))return reply({ok:false},400);
-   const saved=await db.from('question_explanation_overrides').select('explanation,figure_status').eq('question_id',body.questionId).maybeSingle();
+   const saved=await db.from('question_explanation_overrides').select('explanation,figure_status,replacement_revision').eq('question_id',body.questionId).maybeSingle();
    if(saved.error||!saved.data?.explanation)return reply({ok:false},404);
    const needs=buildNeeds(saved.data.explanation,body.hints);
    if(target&&needs?.explanationHash!==target.textHash)return reply({ok:false,code:'stale_single_batch'},409);
    if(!needs?.items?.length)return reply({ok:false,code:'heading_not_found'},400);
    const eligible=await db.rpc('ai_guard_image_eligible',{p_question:body.questionId,p_text_sha:needs.explanationHash});
    if(eligible.error||eligible.data!==true)return reply({ok:false,code:'saved_text_not_eligible'},409);
+   if(process.env.EXPLANATION_SITEWIDE_ENABLED==='1'){
+    const result=await enqueueSavedPlan({db,requestId:body.requestId,actorId:u.id,questionId:body.questionId,replacementRevision:saved.data.replacement_revision,needs});
+    return reply({ok:result.ok,code:result.code},result.httpStatus);
+   }
    const result=await db.rpc('figure_image_plan_saved',{p_question:body.questionId,p_needs:needs});
    return reply({ok:!result.error&&['awaiting','existing'].includes(result.data)});
   }
