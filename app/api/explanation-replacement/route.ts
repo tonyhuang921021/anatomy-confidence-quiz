@@ -20,7 +20,7 @@ export async function POST(request:NextRequest){
   if(result.error||!result.data)return reply({ok:false,code:"replacement_unavailable"},503);
   // Whitelist presentation fields; private snapshot/actor/source references never leave SQL.
   let data=result.data;
-  if(action==='status'&&operationId&&data.status==='pending'){
+  if(action==='status'&&operationId&&['pending','completed'].includes(data.status)){
    // Durable recovery remains available after new sitewide admission is disabled.
    const recovered=await db.rpc('explanation_sitewide_result_recover',{p_id:operationId,p_actor:auth.data.user.id,p_question:questionId});
    if(!recovered.error&&['completed','not_written'].includes(recovered.data?.status))data=recovered.data;

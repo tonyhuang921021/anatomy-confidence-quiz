@@ -13,3 +13,18 @@ test('previously attempted lease cannot be reused after claim race',async()=>{co
 test('scope lookup failure dispatches nothing and reports a hold',async()=>{const f=fixture();f.db.rpc=async()=>({error:'unavailable'});let reports=0,runs=0;scheduleNewImageContinuation({...f,run:async()=>runs++,report:()=>reports++});await Promise.all(f.work);assert.equal(runs,0);assert.equal(reports,1)});
 
 test('invalid first plan is held and a later valid plan is approved without claiming the invalid job',async()=>{const f=fixture();const original=f.db.rpc;f.db.rpc=async(name,args)=>{if(name==='explanation_sitewide_image_plans'){const base=await original(name,args);return {data:[{request_id:'invalid-first',state:'pending',attempts:0,needs_state:'awaiting',figure_needs:null},...base.data]}}return original(name,args)};let claim; scheduleNewImageContinuation({...f,run:async({store})=>claim=await store.claim('lease')});await Promise.all(f.work);assert.equal(f.calls.find(([n])=>n==='explanation_sitewide_hold_plan')[1].p_id,'invalid-first');assert.equal(f.calls.find(([n])=>n==='figure_image_review')[1].p_id,'fresh');assert.equal(claim.request_id,'fresh')});
+test('owner-triggered continuation uses the same exact scope and returns one result',async()=>{
+ const {runNewImageContinuation}=require('../lib/newExplanationImageContinuation.cjs');const f=fixture();
+ const result=await runNewImageContinuation({...f,run:async({store})=>{const job=await store.claim('lease');return {status:'staged',requestId:job.request_id}}});
+ assert.deepEqual(result,{status:'staged',requestId:'fresh'});assert.equal(f.calls.filter(([n])=>n==='figure_image_claim_fresh').length,1);
+});
+test('owner-triggered continuation does not bypass capture or worker gates',async()=>{
+ const {runNewImageContinuation}=require('../lib/newExplanationImageContinuation.cjs');const f=fixture();
+ assert.deepEqual(await runNewImageContinuation({...f,env:{...f.env,NEW_EXPLANATION_FIGURES_WORKER:'0'},run:async()=>assert.fail('no worker')}),{status:'disabled'});assert.equal(f.calls.length,0);
+});
+test('recovery endpoints allow completed saved-result repair without reopening restored/superseded work',()=>{
+ const fs=require('node:fs'),first=fs.readFileSync('app/api/explanation-generation/route.ts','utf8'),replacement=fs.readFileSync('app/api/explanation-replacement/route.ts','utf8');
+ assert.match(first,/result\?\.state==='pending'\|\|result\?\.state==='completed'/);
+ assert.match(first,/if\(result\?\.state!=='completed'\)throw error/);
+ assert.match(replacement,/\['pending','completed'\]\.includes\(data.status\)/);
+});

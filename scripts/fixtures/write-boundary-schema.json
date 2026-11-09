@@ -1,0 +1,1705 @@
+[
+  {
+    "owner": "postgres",
+    "table": "question_explanation_overrides",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "question_id",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "explanation",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "option_analysis",
+        "type": "jsonb",
+        "default": "'{}'::jsonb",
+        "notnull": true
+      },
+      {
+        "name": "memory_tip",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "model",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "default": "now()",
+        "notnull": true
+      },
+      {
+        "name": "figure_status",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "replacement_revision",
+        "type": "uuid",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "reading_format",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "explanation_reading_format",
+        "definition": "CHECK (((reading_format IS NULL) OR (reading_format = 'full-v1'::text)))"
+      },
+      {
+        "name": "question_explanation_overrides_pkey",
+        "definition": "PRIMARY KEY (question_id)"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "ai_guard_budget",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "id",
+        "type": "boolean",
+        "default": "true",
+        "notnull": true
+      },
+      {
+        "name": "enabled",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "disabled_reason",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "disabled_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "verified_credit_expires_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "cap_microusd",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "spent_microusd",
+        "type": "bigint",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "reserved_microusd",
+        "type": "bigint",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "envelope_microusd",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "max_calls",
+        "type": "integer",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "per_call_ceiling_microusd",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "max_parallel",
+        "type": "integer",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "max_actor_parallel",
+        "type": "integer",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "cooldown_seconds",
+        "type": "integer",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "hourly_limit",
+        "type": "integer",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "daily_limit",
+        "type": "integer",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "model",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "pricing_revision",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "verified_grant_microusd",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "budget_phase",
+        "type": "text",
+        "default": "'first_batch'::text",
+        "notnull": true
+      },
+      {
+        "name": "batch_review_evidence_sha256",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "credit_observed_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "credit_grant_expires_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "run_authorized_until",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "ai_guard_bounded_authorization",
+        "definition": "CHECK (((credit_observed_at <= run_authorized_until) AND (run_authorized_until <= '2026-11-03 16:25:32+00'::timestamp with time zone) AND (verified_credit_expires_at <= run_authorized_until) AND (verified_credit_expires_at <= credit_grant_expires_at) AND (cap_microusd <= 2000000) AND (spent_microusd >= 168000)))"
+      },
+      {
+        "name": "ai_guard_budget_batch_review_evidence_sha256_check",
+        "definition": "CHECK (((batch_review_evidence_sha256 IS NULL) OR (batch_review_evidence_sha256 ~ '^[0-9a-f]{64}$'::text)))"
+      },
+      {
+        "name": "ai_guard_budget_budget_phase_check",
+        "definition": "CHECK ((budget_phase = ANY (ARRAY['first_batch'::text, 'ongoing'::text])))"
+      },
+      {
+        "name": "ai_guard_budget_cap_microusd_check",
+        "definition": "CHECK ((cap_microusd > 0))"
+      },
+      {
+        "name": "ai_guard_budget_cooldown_seconds_check",
+        "definition": "CHECK ((cooldown_seconds > 0))"
+      },
+      {
+        "name": "ai_guard_budget_daily_limit_check",
+        "definition": "CHECK ((daily_limit > 0))"
+      },
+      {
+        "name": "ai_guard_budget_disabled_reason_check",
+        "definition": "CHECK ((disabled_reason = ANY (ARRAY['cost_overflow'::text, 'usage_over_ceiling'::text, 'pricing_error'::text, 'provider_unknown'::text])))"
+      },
+      {
+        "name": "ai_guard_budget_envelope_microusd_check",
+        "definition": "CHECK ((envelope_microusd > 0))"
+      },
+      {
+        "name": "ai_guard_budget_hourly_limit_check",
+        "definition": "CHECK ((hourly_limit > 0))"
+      },
+      {
+        "name": "ai_guard_budget_id_check",
+        "definition": "CHECK (id)"
+      },
+      {
+        "name": "ai_guard_budget_max_actor_parallel_check",
+        "definition": "CHECK ((max_actor_parallel > 0))"
+      },
+      {
+        "name": "ai_guard_budget_max_calls_check",
+        "definition": "CHECK (((max_calls >= 1) AND (max_calls <= 5)))"
+      },
+      {
+        "name": "ai_guard_budget_max_parallel_check",
+        "definition": "CHECK ((max_parallel > 0))"
+      },
+      {
+        "name": "ai_guard_budget_per_call_ceiling_microusd_check",
+        "definition": "CHECK ((per_call_ceiling_microusd > 0))"
+      },
+      {
+        "name": "ai_guard_budget_pkey",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ai_guard_budget_reserved_microusd_check",
+        "definition": "CHECK ((reserved_microusd >= 0))"
+      },
+      {
+        "name": "ai_guard_budget_spent_microusd_check",
+        "definition": "CHECK ((spent_microusd >= 0))"
+      },
+      {
+        "name": "ai_guard_budget_verified_grant_microusd_check",
+        "definition": "CHECK ((verified_grant_microusd >= 0))"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "ai_guard_requests",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "actor_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "question_id",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      },
+      {
+        "name": "envelope_microusd",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "call_limit",
+        "type": "integer",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "per_call_ceiling_microusd",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "model",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "pricing_revision",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "reviewed_generation",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "result_committed",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "state",
+        "type": "text",
+        "default": "'active'::text",
+        "notnull": true
+      },
+      {
+        "name": "closed_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "action_kind",
+        "type": "text",
+        "default": "'explanation'::text",
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "ai_guard_requests_action_kind_check",
+        "definition": "CHECK ((action_kind = ANY (ARRAY['explanation'::text, 'custom_search'::text, 'classification'::text, 'owner_neuro'::text])))"
+      },
+      {
+        "name": "ai_guard_requests_call_limit_check",
+        "definition": "CHECK (((call_limit >= 1) AND (call_limit <= 5)))"
+      },
+      {
+        "name": "ai_guard_requests_envelope_microusd_check",
+        "definition": "CHECK ((envelope_microusd > 0))"
+      },
+      {
+        "name": "ai_guard_requests_per_call_ceiling_microusd_check",
+        "definition": "CHECK ((per_call_ceiling_microusd > 0))"
+      },
+      {
+        "name": "ai_guard_requests_pkey",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ai_guard_requests_question_id_check",
+        "definition": "CHECK (((length(question_id) >= 1) AND (length(question_id) <= 200)))"
+      },
+      {
+        "name": "ai_guard_requests_state_check",
+        "definition": "CHECK ((state = ANY (ARRAY['active'::text, 'closed'::text])))"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "ai_guard_calls",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "request_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "seq",
+        "type": "integer",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "state",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "cost_microusd",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "input_tokens",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "output_tokens",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "started_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      },
+      {
+        "name": "settled_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "ai_guard_calls_check",
+        "definition": "CHECK ((((state = 'started'::text) AND (cost_microusd IS NULL)) OR ((state = 'settled'::text) AND (cost_microusd IS NOT NULL))))"
+      },
+      {
+        "name": "ai_guard_calls_cost_microusd_check",
+        "definition": "CHECK ((cost_microusd >= 0))"
+      },
+      {
+        "name": "ai_guard_calls_input_tokens_check",
+        "definition": "CHECK ((input_tokens >= 0))"
+      },
+      {
+        "name": "ai_guard_calls_output_tokens_check",
+        "definition": "CHECK ((output_tokens >= 0))"
+      },
+      {
+        "name": "ai_guard_calls_pkey",
+        "definition": "PRIMARY KEY (request_id, seq)"
+      },
+      {
+        "name": "ai_guard_calls_seq_check",
+        "definition": "CHECK ((seq > 0))"
+      },
+      {
+        "name": "ai_guard_calls_state_check",
+        "definition": "CHECK ((state = ANY (ARRAY['started'::text, 'settled'::text])))"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "ai_guard_reviewed_state",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "id",
+        "type": "boolean",
+        "default": "true",
+        "notnull": true
+      },
+      {
+        "name": "generation",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "manifest_sha256",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "source_commit",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "installed_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "ai_guard_reviewed_state_generation_check",
+        "definition": "CHECK ((generation > 0))"
+      },
+      {
+        "name": "ai_guard_reviewed_state_id_check",
+        "definition": "CHECK (id)"
+      },
+      {
+        "name": "ai_guard_reviewed_state_manifest_sha256_check",
+        "definition": "CHECK ((manifest_sha256 ~ '^[0-9a-f]{64}$'::text))"
+      },
+      {
+        "name": "ai_guard_reviewed_state_pkey",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ai_guard_reviewed_state_source_commit_check",
+        "definition": "CHECK ((source_commit ~ '^[0-9a-f]{40}$'::text))"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "ai_guard_reviewed_questions",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "question_id",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "generation",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "ai_guard_reviewed_questions_pkey",
+        "definition": "PRIMARY KEY (question_id)"
+      },
+      {
+        "name": "ai_guard_reviewed_questions_question_id_check",
+        "definition": "CHECK (((length(question_id) >= 1) AND (length(question_id) <= 200)))"
+      }
+    ]
+  },
+  {
+    "owner": "postgres",
+    "table": "figure_queue_config",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "id",
+        "type": "boolean",
+        "default": "true",
+        "notnull": true
+      },
+      {
+        "name": "enabled",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "capture_new",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "max_rows",
+        "type": "integer",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "reclaimed_done",
+        "type": "bigint",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "reclaimed_failed",
+        "type": "bigint",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "reclaimed_cancelled",
+        "type": "bigint",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "max_image_bytes",
+        "type": "bigint",
+        "default": "104857600",
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "figure_bounded_capture_storage",
+        "definition": "CHECK (((NOT capture_new) OR (enabled AND (max_rows <= 1000) AND (max_image_bytes <= 104857600))))"
+      },
+      {
+        "name": "figure_queue_config_id_check",
+        "definition": "CHECK (id)"
+      },
+      {
+        "name": "figure_queue_config_max_image_bytes_check",
+        "definition": "CHECK (((max_image_bytes >= 1) AND (max_image_bytes <= 1073741824)))"
+      },
+      {
+        "name": "figure_queue_config_max_rows_check",
+        "definition": "CHECK (((max_rows >= 1) AND (max_rows <= 10000)))"
+      },
+      {
+        "name": "figure_queue_config_pkey",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "figure_queue_config_reclaimed_cancelled_check",
+        "definition": "CHECK ((reclaimed_cancelled >= 0))"
+      },
+      {
+        "name": "figure_queue_config_reclaimed_done_check",
+        "definition": "CHECK ((reclaimed_done >= 0))"
+      },
+      {
+        "name": "figure_queue_config_reclaimed_failed_check",
+        "definition": "CHECK ((reclaimed_failed >= 0))"
+      }
+    ]
+  },
+  {
+    "owner": "postgres",
+    "table": "figure_queue_jobs",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "request_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "question_id",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "explanation_sha256",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "state",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "attempts",
+        "type": "integer",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "lease_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "lease_until",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      },
+      {
+        "name": "figure_needs",
+        "type": "jsonb",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "needs_reviewer",
+        "type": "uuid",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "needs_reviewed_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "needs_state",
+        "type": "text",
+        "default": "'awaiting'::text",
+        "notnull": true
+      },
+      {
+        "name": "image_status",
+        "type": "text",
+        "default": "'awaiting_image'::text",
+        "notnull": true
+      },
+      {
+        "name": "needs_review_method",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "figure_queue_jobs_attempts_check",
+        "definition": "CHECK (((attempts >= 0) AND (attempts <= 3)))"
+      },
+      {
+        "name": "figure_queue_jobs_check",
+        "definition": "CHECK (((state = 'leased'::text) = ((lease_id IS NOT NULL) AND (lease_until IS NOT NULL))))"
+      },
+      {
+        "name": "figure_queue_jobs_check1",
+        "definition": "CHECK (((state = ANY (ARRAY['reserved'::text, 'cancelled'::text])) OR (explanation_sha256 IS NOT NULL)))"
+      },
+      {
+        "name": "figure_queue_jobs_explanation_sha256_check",
+        "definition": "CHECK ((explanation_sha256 ~ '^[0-9a-f]{64}$'::text))"
+      },
+      {
+        "name": "figure_queue_jobs_needs_state_check",
+        "definition": "CHECK ((needs_state = ANY (ARRAY['awaiting'::text, 'approved'::text, 'rejected'::text, 'no_need'::text])))"
+      },
+      {
+        "name": "figure_queue_jobs_pkey",
+        "definition": "PRIMARY KEY (request_id)"
+      },
+      {
+        "name": "figure_queue_jobs_state_check",
+        "definition": "CHECK ((state = ANY (ARRAY['reserved'::text, 'pending'::text, 'leased'::text, 'done'::text, 'failed'::text, 'cancelled'::text])))"
+      },
+      {
+        "name": "figure_single_q020_batch",
+        "definition": "CHECK (((state = 'done'::text) OR ((question_id = 'MOEX-C217-091030-S4004-STAGE1-Q001'::text) AND (explanation_sha256 = 'f0466d93226044af9ea384b5c96665e8087ab0094c2d5446c9cfebd945cd6ca7'::text)) OR ((question_id = 'MOEX-C217-091030-S4004-STAGE1-Q002'::text) AND (explanation_sha256 = '95cce750da4bad5a2b3ce3edbb9c48de4c3bfc1a364e38e97e4594a1cf8082a9'::text)) OR ((question_id = 'MOEX-C217-091030-S4004-STAGE1-Q003'::text) AND (explanation_sha256 = 'c1829810209699bdf5ada7c6c6d1109d363ca6862e609b53e216510c73af4549'::text)) OR explanation_private.sitewide_image_binding(request_id, question_id, explanation_sha256)))"
+      }
+    ]
+  },
+  {
+    "owner": "postgres",
+    "table": "explanation_figure_candidates",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "question_id",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "explanation_sha256",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "image_sha256",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "image_mime",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "image_bytes",
+        "type": "bytea",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "source_url",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "license_url",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "license",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "attribution",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "section_title",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "status",
+        "type": "text",
+        "default": "'pending'::text",
+        "notnull": true
+      },
+      {
+        "name": "reviewer_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "reviewed_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "now()",
+        "notnull": true
+      },
+      {
+        "name": "pdm_image_url",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "pdm_evidence_by",
+        "type": "uuid",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "pdm_evidence_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "pdm_revoked_by",
+        "type": "uuid",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "pdm_revoked_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "section_anchor",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "section_heading",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "section_sha256",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "machine_review_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "explanation_figure_candidates_attribution_check",
+        "definition": "CHECK (((char_length(attribution) >= 1) AND (char_length(attribution) <= 500)))"
+      },
+      {
+        "name": "explanation_figure_candidates_check1",
+        "definition": "CHECK ((((status = 'rejected'::text) AND (image_bytes IS NULL)) OR ((status <> 'rejected'::text) AND (image_bytes IS NOT NULL))))"
+      },
+      {
+        "name": "explanation_figure_candidates_explanation_sha256_check",
+        "definition": "CHECK ((explanation_sha256 ~ '^[0-9a-f]{64}$'::text))"
+      },
+      {
+        "name": "explanation_figure_candidates_image_bytes_check",
+        "definition": "CHECK (((image_bytes IS NULL) OR ((octet_length(image_bytes) >= 1) AND (octet_length(image_bytes) <= 3145728))))"
+      },
+      {
+        "name": "explanation_figure_candidates_image_mime_check",
+        "definition": "CHECK ((image_mime = ANY (ARRAY['image/png'::text, 'image/jpeg'::text, 'image/webp'::text])))"
+      },
+      {
+        "name": "explanation_figure_candidates_image_sha256_check",
+        "definition": "CHECK ((image_sha256 ~ '^[0-9a-f]{64}$'::text))"
+      },
+      {
+        "name": "explanation_figure_candidates_license_check",
+        "definition": "CHECK ((license = ANY (ARRAY['CC BY 4.0'::text, 'CC BY-SA 4.0'::text, 'CC BY 3.0'::text, 'CC BY-SA 3.0'::text, 'CC0'::text, 'PDM 1.0'::text])))"
+      },
+      {
+        "name": "explanation_figure_candidates_license_url_check",
+        "definition": "CHECK ((license_url ~~ 'https://creativecommons.org/%'::text))"
+      },
+      {
+        "name": "explanation_figure_candidates_pdm_evidence_check",
+        "definition": "CHECK ((((license = 'PDM 1.0'::text) AND (license_url = 'https://creativecommons.org/publicdomain/mark/1.0/'::text) AND (source_url ~* '^https://commons[.]wikimedia[.]org/wiki/File:[^?#]+[.](png|jpe?g|webp|svg)$'::text)) OR ((license <> 'PDM 1.0'::text) AND (license_url !~~ 'https://creativecommons.org/publicdomain/mark/%'::text))))"
+      },
+      {
+        "name": "explanation_figure_candidates_pkey",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "explanation_figure_candidates_question_id_check",
+        "definition": "CHECK (((char_length(question_id) >= 1) AND (char_length(question_id) <= 200)))"
+      },
+      {
+        "name": "explanation_figure_candidates_question_id_explanation_sha25_key",
+        "definition": "UNIQUE (question_id, explanation_sha256, image_sha256)"
+      },
+      {
+        "name": "explanation_figure_candidates_section_title_check",
+        "definition": "CHECK (((char_length(section_title) >= 1) AND (char_length(section_title) <= 80)))"
+      },
+      {
+        "name": "explanation_figure_candidates_source_url_check",
+        "definition": "CHECK ((source_url ~~ 'https://commons.wikimedia.org/%'::text))"
+      },
+      {
+        "name": "explanation_figure_candidates_status_check",
+        "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text])))"
+      },
+      {
+        "name": "figure_pdm_manual_evidence_check",
+        "definition": "CHECK (((license <> 'PDM 1.0'::text) OR (((pdm_image_url ~* '^https://upload[.]wikimedia[.]org/wikipedia/commons/[0-9a-f]/[0-9a-f]{2}/[^/?#]+[.](png|jpe?g|webp)$'::text) AND (pdm_evidence_by IS NOT NULL) AND (pdm_evidence_at IS NOT NULL) AND (\"substring\"(source_url, '[^/]+$'::text) = ('File:'::text || \"substring\"(pdm_image_url, '[^/]+$'::text)))) IS TRUE)))"
+      },
+      {
+        "name": "figure_pdm_revocation_check",
+        "definition": "CHECK ((((pdm_revoked_by IS NULL) AND (pdm_revoked_at IS NULL)) OR ((license = 'PDM 1.0'::text) AND (pdm_revoked_by IS NOT NULL) AND (pdm_revoked_at IS NOT NULL))))"
+      },
+      {
+        "name": "figure_review_identity",
+        "definition": "CHECK ((((status = 'pending'::text) AND (reviewer_id IS NULL) AND (reviewed_at IS NULL) AND (machine_review_id IS NULL)) OR ((status <> 'pending'::text) AND (reviewed_at IS NOT NULL) AND ((reviewer_id IS NOT NULL) OR (machine_review_id IS NOT NULL)))))"
+      }
+    ]
+  },
+  {
+    "owner": "postgres",
+    "table": "figure_image_limits",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "id",
+        "type": "boolean",
+        "default": "true",
+        "notnull": true
+      },
+      {
+        "name": "enabled",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "capture",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "captured",
+        "type": "integer",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "max_new",
+        "type": "integer",
+        "default": "5",
+        "notnull": true
+      },
+      {
+        "name": "searches",
+        "type": "integer",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "downloads",
+        "type": "integer",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "max_searches",
+        "type": "integer",
+        "default": "5",
+        "notnull": true
+      },
+      {
+        "name": "max_downloads",
+        "type": "integer",
+        "default": "15",
+        "notnull": true
+      },
+      {
+        "name": "download_bytes",
+        "type": "bigint",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "max_download_bytes",
+        "type": "bigint",
+        "default": "47185920",
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "figure_image_limits_captured_check",
+        "definition": "CHECK ((captured >= 0))"
+      },
+      {
+        "name": "figure_image_limits_download_bytes_check",
+        "definition": "CHECK ((download_bytes >= 0))"
+      },
+      {
+        "name": "figure_image_limits_downloads_check",
+        "definition": "CHECK ((downloads >= 0))"
+      },
+      {
+        "name": "figure_image_limits_id_check",
+        "definition": "CHECK (id)"
+      },
+      {
+        "name": "figure_image_limits_max_download_bytes_check",
+        "definition": "CHECK (((max_download_bytes >= 1) AND (max_download_bytes <= 104857600)))"
+      },
+      {
+        "name": "figure_image_limits_max_downloads_check",
+        "definition": "CHECK (((max_downloads >= 1) AND (max_downloads <= 120)))"
+      },
+      {
+        "name": "figure_image_limits_max_new_check",
+        "definition": "CHECK (((max_new >= 1) AND (max_new <= 20)))"
+      },
+      {
+        "name": "figure_image_limits_max_searches_check",
+        "definition": "CHECK (((max_searches >= 1) AND (max_searches <= 40)))"
+      },
+      {
+        "name": "figure_image_limits_pkey",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "figure_image_limits_searches_check",
+        "definition": "CHECK ((searches >= 0))"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "explanation_replacement_versions",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "request_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "actor_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "question_id",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "base_version",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "before_snapshot",
+        "type": "jsonb",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "after_snapshot",
+        "type": "jsonb",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "write_transaction",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "committed_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      },
+      {
+        "name": "restored_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "restore_transaction",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "restored_snapshot",
+        "type": "jsonb",
+        "default": null,
+        "notnull": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "explanation_replacement_versions_base_version_check",
+        "definition": "CHECK ((length(base_version) = 64))"
+      },
+      {
+        "name": "explanation_replacement_versions_check",
+        "definition": "CHECK ((((after_snapshot IS NULL) AND (write_transaction IS NULL) AND (committed_at IS NULL)) OR ((after_snapshot IS NOT NULL) AND (write_transaction IS NOT NULL))))"
+      },
+      {
+        "name": "explanation_replacement_versions_pkey",
+        "definition": "PRIMARY KEY (request_id)"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "explanation_format_commits",
+    "schema": "public",
+    "columns": [
+      {
+        "name": "request_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "write_transaction",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "payload",
+        "type": "jsonb",
+        "default": null,
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "explanation_format_commits_pkey",
+        "definition": "PRIMARY KEY (request_id)"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "batch",
+    "schema": "figure_model_private",
+    "columns": [
+      {
+        "name": "id",
+        "type": "boolean",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "enabled",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "model_enabled",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "actor_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "targets",
+        "type": "text[]",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "cap",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "charged",
+        "type": "bigint",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "text_requests",
+        "type": "integer",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "model_calls",
+        "type": "integer",
+        "default": "0",
+        "notnull": true
+      },
+      {
+        "name": "max_model_calls",
+        "type": "integer",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "model",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "pricing_revision",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "reserve_cost",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "max_output_tokens",
+        "type": "integer",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "max_input_tokens",
+        "type": "integer",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "input_rate",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "output_rate",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "credit_evidence_sha",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "no_cash",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "credit_until",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "funding_mode",
+        "type": "text",
+        "default": "'verified_credit'::text",
+        "notnull": true
+      },
+      {
+        "name": "cash_authorized",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "funding_evidence_sha",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "batch_cap_check",
+        "definition": "CHECK (((cap >= 1) AND (cap <= 168000)))"
+      },
+      {
+        "name": "batch_charged_check",
+        "definition": "CHECK ((charged >= 0))"
+      },
+      {
+        "name": "batch_check",
+        "definition": "CHECK ((charged <= cap))"
+      },
+      {
+        "name": "batch_check1",
+        "definition": "CHECK (((reserve_cost)::numeric >= ceil(((((max_input_tokens)::numeric * (input_rate)::numeric) + ((max_output_tokens)::numeric * (output_rate)::numeric)) / (1000000)::numeric))))"
+      },
+      {
+        "name": "batch_credit_evidence_sha_check",
+        "definition": "CHECK ((credit_evidence_sha ~ '^[0-9a-f]{64}$'::text))"
+      },
+      {
+        "name": "batch_funding_evidence_sha_check",
+        "definition": "CHECK ((funding_evidence_sha ~ '^[0-9a-f]{64}$'::text))"
+      },
+      {
+        "name": "batch_funding_mode_check",
+        "definition": "CHECK ((funding_mode = ANY (ARRAY['verified_credit'::text, 'cash_authorized'::text])))"
+      },
+      {
+        "name": "batch_id_check",
+        "definition": "CHECK (id)"
+      },
+      {
+        "name": "batch_input_rate_check",
+        "definition": "CHECK ((input_rate > 0))"
+      },
+      {
+        "name": "batch_max_input_tokens_check",
+        "definition": "CHECK (((max_input_tokens >= 16000) AND (max_input_tokens <= 32000)))"
+      },
+      {
+        "name": "batch_max_model_calls_check",
+        "definition": "CHECK (((max_model_calls >= 1) AND (max_model_calls <= 30)))"
+      },
+      {
+        "name": "batch_max_output_tokens_check",
+        "definition": "CHECK (((max_output_tokens >= 16) AND (max_output_tokens <= 512)))"
+      },
+      {
+        "name": "batch_model_calls_check",
+        "definition": "CHECK ((model_calls >= 0))"
+      },
+      {
+        "name": "batch_output_rate_check",
+        "definition": "CHECK ((output_rate > 0))"
+      },
+      {
+        "name": "batch_pkey",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "batch_reserve_cost_check",
+        "definition": "CHECK ((reserve_cost > 0))"
+      },
+      {
+        "name": "batch_targets_check",
+        "definition": "CHECK (((cardinality(targets) >= 1) AND (cardinality(targets) <= 3)))"
+      },
+      {
+        "name": "batch_text_requests_check",
+        "definition": "CHECK (((text_requests >= 0) AND (text_requests <= 3)))"
+      },
+      {
+        "name": "funding_evidence_required",
+        "definition": "CHECK ((((funding_mode = 'verified_credit'::text) AND (credit_until IS NOT NULL) AND (credit_evidence_sha IS NOT NULL) AND (NOT cash_authorized)) OR ((funding_mode = 'cash_authorized'::text) AND cash_authorized AND (funding_evidence_sha IS NOT NULL) AND (NOT no_cash))))"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "operations",
+    "schema": "figure_model_private",
+    "columns": [
+      {
+        "name": "operation_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "key",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "candidate_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "binding",
+        "type": "jsonb",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "state",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "model",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "pricing_revision",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "reserved_cost",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "max_output_tokens",
+        "type": "integer",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "send_token",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "image_bytes",
+        "type": "bytea",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "source_evidence",
+        "type": "jsonb",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "verdict",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "response_id",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "response_sha",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "observed_cost",
+        "type": "bigint",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      },
+      {
+        "name": "sent_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "settled_at",
+        "type": "timestamp with time zone",
+        "default": null,
+        "notnull": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "operations_candidate_id_key",
+        "definition": "UNIQUE (candidate_id)"
+      },
+      {
+        "name": "operations_check",
+        "definition": "CHECK (((state <> ALL (ARRAY['committed'::text, 'stale'::text])) OR ((verdict IS NOT NULL) AND (response_id IS NOT NULL) AND (settled_at IS NOT NULL))))"
+      },
+      {
+        "name": "operations_image_bytes_check",
+        "definition": "CHECK (((octet_length(image_bytes) >= 1) AND (octet_length(image_bytes) <= 3145728)))"
+      },
+      {
+        "name": "operations_key_check",
+        "definition": "CHECK ((key ~ '^[0-9a-f]{64}$'::text))"
+      },
+      {
+        "name": "operations_key_key",
+        "definition": "UNIQUE (key)"
+      },
+      {
+        "name": "operations_observed_cost_check",
+        "definition": "CHECK ((observed_cost >= 0))"
+      },
+      {
+        "name": "operations_pkey",
+        "definition": "PRIMARY KEY (operation_id)"
+      },
+      {
+        "name": "operations_reserved_cost_check",
+        "definition": "CHECK ((reserved_cost > 0))"
+      },
+      {
+        "name": "operations_state_check",
+        "definition": "CHECK ((state = ANY (ARRAY['reserved'::text, 'sent'::text, 'unknown'::text, 'committed'::text, 'stale'::text])))"
+      },
+      {
+        "name": "operations_verdict_check",
+        "definition": "CHECK ((verdict = ANY (ARRAY['match'::text, 'partial_match'::text, 'mismatch'::text])))"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "events",
+    "schema": "figure_model_private",
+    "columns": [
+      {
+        "name": "id",
+        "type": "bigint",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "operation_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "event",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "evidence_sha",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "events_pkey",
+        "definition": "PRIMARY KEY (id)"
+      }
+    ]
+  }
+]

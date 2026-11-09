@@ -19,7 +19,10 @@ export async function POST(request:NextRequest){
   if(auth.error||!auth.data.user?.id||!auth.data.user.email)return reply({ok:false,code:'authentication_required'},401);
   const journal=createGenerationJournal({db}),identity={questionId,operationId,actorId:auth.data.user.id};
   let result:any=await withServerTimeout(journal.readGeneration(identity),2000,'status unavailable');
-  if(result?.state==='pending')result=await withServerTimeout(journal.recoverGeneration(identity),2500,'recovery unavailable');
+  if(result?.state==='pending'||result?.state==='completed'){
+   try{result=await withServerTimeout(journal.recoverGeneration(identity),2500,'recovery unavailable')}
+   catch(error){if(result?.state!=='completed')throw error; /* Keep already confirmed text if optional queue repair fails. */}
+  }
   if(result?.state==='completed')return reply({ok:true,status:'completed',value:result.value});
   return reply({ok:true,status:result?.state==='not_written'?'not_written':'pending'});
  }catch{return reply({ok:false,code:'generation_pending'},503)}

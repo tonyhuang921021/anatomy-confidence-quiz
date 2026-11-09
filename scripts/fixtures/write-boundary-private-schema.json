@@ -1,0 +1,200 @@
+[
+  {
+    "owner": "ai_guard_owner",
+    "table": "generation_results",
+    "schema": "explanation_private",
+    "columns": [
+      {
+        "name": "request_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "actor_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "required_options",
+        "type": "text[]",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "response",
+        "type": "jsonb",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "response_sha",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "generation_results_pkey",
+        "definition": "PRIMARY KEY (request_id)"
+      },
+      {
+        "name": "generation_results_response_check",
+        "definition": "CHECK ((octet_length((response)::text) <= 262144))"
+      },
+      {
+        "name": "generation_results_response_sha_check",
+        "definition": "CHECK ((response_sha ~ '^[a-f0-9]{64}$'::text))"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "sitewide_policy",
+    "schema": "explanation_private",
+    "columns": [
+      {
+        "name": "id",
+        "type": "boolean",
+        "default": "true",
+        "notnull": true
+      },
+      {
+        "name": "enabled",
+        "type": "boolean",
+        "default": "false",
+        "notnull": true
+      },
+      {
+        "name": "cap_ceiling_microusd",
+        "type": "bigint",
+        "default": "2000000",
+        "notnull": true
+      },
+      {
+        "name": "funding_evidence_sha",
+        "type": "text",
+        "default": null,
+        "notnull": false
+      }
+    ],
+    "constraints": [
+      {
+        "name": "sitewide_policy_cap_ceiling_microusd_check",
+        "definition": "CHECK (((cap_ceiling_microusd >= 1) AND (cap_ceiling_microusd <= 2000000)))"
+      },
+      {
+        "name": "sitewide_policy_funding_evidence_sha_check",
+        "definition": "CHECK ((funding_evidence_sha ~ '^[a-f0-9]{64}$'::text))"
+      },
+      {
+        "name": "sitewide_policy_id_check",
+        "definition": "CHECK (id)"
+      },
+      {
+        "name": "sitewide_policy_pkey",
+        "definition": "PRIMARY KEY (id)"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "sitewide_requests",
+    "schema": "explanation_private",
+    "columns": [
+      {
+        "name": "request_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "actor_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "question_id",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "action",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "sitewide_requests_action_check",
+        "definition": "CHECK ((action = ANY (ARRAY['generate'::text, 'replace'::text])))"
+      },
+      {
+        "name": "sitewide_requests_pkey",
+        "definition": "PRIMARY KEY (request_id)"
+      }
+    ]
+  },
+  {
+    "owner": "ai_guard_owner",
+    "table": "sitewide_image_plan_holds",
+    "schema": "explanation_private",
+    "columns": [
+      {
+        "name": "request_id",
+        "type": "uuid",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "revision",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "reason",
+        "type": "text",
+        "default": null,
+        "notnull": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "default": "clock_timestamp()",
+        "notnull": true
+      }
+    ],
+    "constraints": [
+      {
+        "name": "sitewide_image_plan_holds_pkey",
+        "definition": "PRIMARY KEY (request_id, revision)"
+      },
+      {
+        "name": "sitewide_image_plan_holds_reason_check",
+        "definition": "CHECK ((reason = 'invalid_schema_query'::text))"
+      },
+      {
+        "name": "sitewide_image_plan_holds_revision_check",
+        "definition": "CHECK ((revision ~ '^[a-f0-9]{64}$'::text))"
+      }
+    ]
+  }
+]

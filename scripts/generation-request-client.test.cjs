@@ -14,3 +14,16 @@ test('terminal exact journal recovery clears the operation without model request
 test('journal disabled or generic uncertain server failure never clears an ID',async()=>{for(const code of ['generation_journal_unavailable','generation_unconfirmed_held','commit_unconfirmed_held','result_checkpoint_unconfirmed_held']){const f=fixture(async()=>Response.json({ok:false,code},{status:503}));await f.client.requestExplanation('/api/question-explanation',init);assert.ok(f.pending.pendingGeneration('Q'),code)}});
 test('known budget refusal permits a later explicit new attempt',async()=>{const ids=[];const f=fixture(async(_url,request)=>{ids.push(JSON.parse(request.body).operationId);return Response.json({ok:false,code:'budget'},{status:503})});await f.client.requestExplanation('/api/question-explanation',init);assert.equal(f.pending.pendingGeneration('Q'),null);await f.client.requestExplanation('/api/question-explanation',init);assert.equal(ids.length,2);assert.notEqual(ids[0],ids[1])});
 test('missing status and absent shared content do not allow replay',async()=>{let n=0;const f=fixture(async url=>{if(url==='/api/question-explanation'){n++;throw Error('timeout')}if(url==='/api/explanation-generation')return Response.json({ok:true,status:'missing'});return Response.json({overrides:[]})});await assert.rejects(f.client.requestExplanation('/api/question-explanation',init));await f.client.requestExplanation('/api/question-explanation',init);assert.equal(n,1);assert.ok(f.pending.pendingGeneration('Q'))});
+
+test('confirmed sitewide pre-reservation denials allow a later explicit operation without replay',async()=>{
+ for(const code of ['sitewide_admission_unavailable','question_busy','review_snapshot_unavailable','reviewed_protected']){
+  const ids=[];let generated=0;const f=fixture(async(url,request)=>{assert.equal(url,'/api/question-explanation');ids.push(JSON.parse(request.body).operationId);if(ids.length===1)return Response.json({ok:false,code},{status:503});generated++;return Response.json({ok:true,explanation:'confirmed result'})});
+  await f.client.requestExplanation('/api/question-explanation',init);assert.equal(f.pending.pendingGeneration('Q'),null,code);assert.equal(f.client.pendingExplanation('Q'),0);
+  const r=await (await f.client.requestExplanation('/api/question-explanation',init)).json();assert.equal(r.explanation,'confirmed result');assert.equal(generated,1);assert.equal(ids.length,2);assert.notEqual(ids[0],ids[1]);
+ }
+});
+test('reservation errors and unknown duplicate operations remain held after a missing recovery',async()=>{
+ for(const code of ['reservation_unavailable','reservation_unconfirmed_held','duplicate']){let requests=0;const f=fixture(async url=>{if(url==='/api/question-explanation'){requests++;return Response.json({ok:false,code},{status:503})}if(url==='/api/explanation-generation')return Response.json({ok:true,status:'missing'});return Response.json({overrides:[]})});
+  await f.client.requestExplanation('/api/question-explanation',init);const id=f.pending.pendingGeneration('Q').operationId;await f.client.requestExplanation('/api/question-explanation',init);assert.equal(requests,1);assert.equal(f.pending.pendingGeneration('Q').operationId,id,code);
+ }
+});
