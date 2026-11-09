@@ -28,3 +28,12 @@ test('recovery endpoints allow completed saved-result repair without reopening r
  assert.match(first,/if\(result\?\.state!=='completed'\)throw error/);
  assert.match(replacement,/\['pending','completed'\]\.includes\(data.status\)/);
 });
+
+test('image success, unknown and budget states have distinct honest owner messages',()=>{
+ const {imageWorkMessage}=require('../lib/newExplanationImageStatus.cjs');
+ assert.match(imageWorkMessage('approved'),/已通過驗圖並顯示/);
+ assert.match(imageWorkMessage('held_for_review'),/待確認.*不會重送/);
+ assert.match(imageWorkMessage('awaiting_budget'),/額度已用完/);
+ assert.match(imageWorkMessage('idle'),/沒有.*新圖片需求/);
+ assert.doesNotMatch(imageWorkMessage('unknown-new-status'),/已通過|已保存/);
+});
