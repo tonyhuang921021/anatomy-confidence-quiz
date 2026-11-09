@@ -1,4 +1,5 @@
 export function buildNeeds(text:string,hints:unknown):any;
+export function automaticQuery(item:any):string|null;
 export function approveConcepts(needs:any,choices:any):any;
 export function runOne(args:any):Promise<any>;
 export function createStore(db:any,options?:any):any;

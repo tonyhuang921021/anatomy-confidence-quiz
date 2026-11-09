@@ -2,6 +2,7 @@
 import {requestExplanation} from "@/lib/explanationRequestClient";
 
 import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
+import { ExplanationReplacementControls } from "@/components/ExplanationReplacementControls";
 
 import { getQuestionAnswerLabel } from "@/lib/answerScoring";
 
@@ -37,6 +38,8 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
     question ? loadQuestionExplanationOverride(question.id) ?? null : null
   );
   useEffect(()=>{const recover=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;if(id===question?.id)setExplanationOverride({...saved,updatedAt:new Date().toISOString()})};window.addEventListener('explanation-recovered',recover);return()=>window.removeEventListener('explanation-recovered',recover)},[question?.id]);
+  const questionId=question?.id;
+  useEffect(()=>{const changed=(event:Event)=>{const detail=(event as CustomEvent).detail;if(questionId&&detail?.id===questionId)setExplanationOverride(loadQuestionExplanationOverride(questionId)??null)};window.addEventListener('explanation-version-changed',changed);return()=>window.removeEventListener('explanation-version-changed',changed)},[questionId]);
   const [explanationLoading, setExplanationLoading] = useState(false);
   const [explanationError, setExplanationError] = useState("");
 
@@ -190,6 +193,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
                 : "產生圖文詳解"}
           </button> : null}
           <ExplanationGenerationStatus key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={explanationOverride?.updatedAt} />
+          <div className="mt-2"><ExplanationReplacementControls questionId={question.id}/></div>
           {explanationError ? (
             <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">
               {explanationError}

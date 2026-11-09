@@ -86,16 +86,16 @@ export function QuestionExplanationTabs({question, compact = false, className = 
           {pureChaosReaction.count>0?<span className="text-[10px]">{pureChaosReaction.count}</span>:null}
         </button>
       </div>
-      {moreActionsContent?<button ref={moreActionsButtonRef} type="button" onClick={()=>setIsMoreActionsOpen(v=>!v)}
+      <button ref={moreActionsButtonRef} type="button" onClick={()=>setIsMoreActionsOpen(v=>!v)}
         aria-expanded={isMoreActionsOpen} aria-controls={moreId}
         className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
-        <MoreHorizontal aria-hidden="true" className="size-4"/>更多</button>:null}
+        <MoreHorizontal aria-hidden="true" className="size-4"/>更多</button>
     </div>
     {reactionError?<p role="alert" className="mb-2 text-sm text-rose-700">{reactionError}</p>:null}
-    {moreActionsContent?<div {...morePresence.attributes} id={moreId} role="group" aria-label="更多操作" hidden={!morePresence.present}
+    <div {...morePresence.attributes} id={moreId} role="group" aria-label="更多操作" hidden={!morePresence.present}
       className="mb-3 ml-auto w-full rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:w-64">
       <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg"><ExplanationReplacementControls questionId={question.id}/>{moreActionsContent}</div>
-    </div>:null}
+    </div>
     <div id={panelId} className="min-w-0 max-w-full">
       {/* Keep the original reader mounted: preserve 簡解／詳解 and image state. */}
       <div hidden={activeTab!==null} role="region" aria-label="原詳解" className="min-w-0 space-y-3">

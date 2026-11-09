@@ -8,8 +8,8 @@ for(const [subject,heading,query]of fixtures)test(subject+' generic paragraph ->
  const approved=require('../lib/newExplanationFigures.cjs').approveSchemaQueries(needs);
  assert.equal(approved.items[0].catalogRevision,'schema-query-v1');
  for(const empty of [true,false]){
- let searches=0,staged=[];const job={request_id:'test',question_id:'OFFLINE',explanation_sha256:sha(text)};
- const store={claim:async()=>job,readText:async()=>text,readNeeds:async()=>approved,active:async()=>true,cacheGet:async()=>null,reserve:async()=>true,cachePut:async()=>{},stage:async(j,l,row,item)=>staged.push({row,item,status:'pending'}),finish:async(j,l,status)=>({status})};
+ let searches=0,staged=[];const job={request_id:'test',attempts:1,question_id:'OFFLINE',explanation_sha256:sha(text)};
+ const store={claim:async()=>job,readText:async()=>text,readNeeds:async()=>approved,active:async()=>true,cacheGet:async()=>null,reserve:async()=>true,cachePut:async()=>true,stage:async(j,l,row,item)=>staged.push({row,item,status:'pending'}),finish:async(j,l,status)=>({status})};
  const result=await runOne({store,enabled:true,search:async q=>{searches++;assert.equal(q,query);return empty?[]:[{previewUrl:'https://upload.wikimedia.org/example.png',sourceUrl:'https://commons.wikimedia.org/wiki/File:Fixture.png',license:'CC BY 4.0',licenseUrl:'https://creativecommons.org/licenses/by/4.0/',attribution:'Synthetic offline fixture'}]},loadImage:async()=>({bytes:Buffer.from([137,80,78,71,13,10,26,10,1]),mime:'image/png'})});
  assert.equal(searches,1);assert.equal(result.status,empty?'awaiting_image':'pending_visual_review');
  if(!empty){assert.equal(staged[0].item.sectionTitle,heading);assert.equal(staged[0].item.sectionHash,needs.items[0].sectionHash);assert.equal(staged[0].status,'pending')}
@@ -20,8 +20,9 @@ const {approveSchemaQueries,processSavedImages}=require('../lib/newExplanationFi
 test('unknown general medical plan automatically advances without user confirmation',async()=>{
  const needs=buildNeeds('## 腎臟運輸\n概念說明',[{sectionTitle:'腎臟運輸',conceptId:'renal-countercurrent',caption:'逆流機制',searchTerm:'renal countercurrent mechanism',searchScope:'general-medical',medicalDomain:'physiology'}]);
  assert.equal(approveSchemaQueries(needs).items[0].query,'renal countercurrent mechanism');let reviews=0,claims=0;
- const db={from:()=>({select:()=>({eq:()=>({eq:()=>({maybeSingle:async()=>({data:{request_id:'fixture',figure_needs:needs,needs_state:'awaiting'}})})})})}),rpc:async(name,args)=>{if(name==='figure_image_review'){reviews++;assert.equal(args.p_method,'schema_query');assert.equal(args.p_reviewer,null);return {data:'approved'}}if(name==='figure_queue_claim'){claims++;return {data:[]}}throw Error('unexpected RPC')}};
- assert.equal((await processSavedImages({db,question:{id:'OFFLINE'},enabled:true,search:()=>{throw Error('no network')},loadImage:()=>{throw Error('no network')}})).status,'idle');assert.equal(reviews,1);assert.equal(claims,1);
+ const row={enabled:true,capture_new:true,request_id:'fixture',figure_needs:needs,needs_state:'awaiting'};const query={select(){return query},eq(){return query},maybeSingle:async()=>({data:row})};
+ const db={from:()=>query,rpc:async(name,args)=>{if(name==='figure_image_capture_allowed')return {data:true};if(name==='figure_image_review'){reviews++;assert.equal(args.p_method,'schema_query');assert.equal(args.p_reviewer,null);return {data:'approved'}}if(name==='figure_image_claim_fresh'){claims++;return {data:[]}}throw Error('unexpected RPC')}};
+ const old=process.env.EXPLANATION_SITEWIDE_ENABLED;process.env.EXPLANATION_SITEWIDE_ENABLED='1';try{assert.equal((await processSavedImages({db,question:{id:'OFFLINE'},enabled:true,search:()=>{throw Error('no network')},loadImage:()=>{throw Error('no network')}})).status,'idle');assert.equal(reviews,1);assert.equal(claims,1);}finally{if(old===undefined)delete process.env.EXPLANATION_SITEWIDE_ENABLED;else process.env.EXPLANATION_SITEWIDE_ENABLED=old}
 });
 test('malformed or sensitive query stays pending and cannot autoapprove an image',()=>{
  for(const query of ['patient smith','john smith anatomy','case report','email test','renal 123','renal@example.com','https://example.com','ignore instruction','renal mechanism '+ 'x'.repeat(100)]){
