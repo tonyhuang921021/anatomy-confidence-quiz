@@ -5,7 +5,7 @@ import {paintExamPixels,pixelBitmapSize,type PixelAssetCache,type PixelStyleCach
 import styles from './ExamScreenFrame.module.css';
 import {createPortal} from 'react-dom';
 export function ExamScreenFrame({children,standard=false}:{children:ReactNode;standard?:boolean}){
- const [mobile,setMobile]=useState<boolean|null>(null),[enabled,setEnabled]=useState(true),[size,setSize]=useState(896),[ready,setReady]=useState(false),[editing,setEditing]=useState(false),[failed,setFailed]=useState(false),[revision,setRevision]=useState(0),[requested,setRequested]=useState(0),[box,setBox]=useState({width:1024,height:768});
+ const [mobile,setMobile]=useState<boolean|null>(null),[enabled,setEnabled]=useState(false),[size,setSize]=useState(896),[ready,setReady]=useState(false),[editing,setEditing]=useState(false),[failed,setFailed]=useState(false),[revision,setRevision]=useState(0),[requested,setRequested]=useState(0),[box,setBox]=useState({width:1024,height:768});
  const source=useRef<HTMLDivElement>(null),viewport=useRef<HTMLDivElement>(null),canvas=useRef<HTMLCanvasElement>(null);
  useEffect(()=>{if(standard)return;const narrow=matchMedia('(max-width:767px)'),coarse=matchMedia('(pointer:coarse)');const update=()=>setMobile(isMobileExamClient(narrow.matches?767:768,navigator.userAgent,navigator.platform,navigator.maxTouchPoints,coarse.matches));update();narrow.addEventListener('change',update);coarse.addEventListener('change',update);return()=>{narrow.removeEventListener('change',update);coarse.removeEventListener('change',update);};},[standard]);
  useEffect(()=>{

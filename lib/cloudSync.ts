@@ -327,17 +327,29 @@ async function withAbortableClientTimeout<T>(
   message: string
 ) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  // Supabase may be waiting for auth/storage before it starts fetch. Aborting
+  // a signal alone cannot settle that wait. This deadline is for read-only
+  // history: reject even if the SDK ignores abort, and ignore late results.
+  const deadline = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      reject(new Error(message));
+    }, timeoutMs);
+  });
 
   try {
-    return await task(controller.signal);
+    return await Promise.race([
+      Promise.resolve().then(() => task(controller.signal)),
+      deadline
+    ]);
   } catch (error) {
     if (controller.signal.aborted) {
       throw new Error(message);
     }
     throw error;
   } finally {
-    clearTimeout(timeoutId);
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
   }
 }
 
