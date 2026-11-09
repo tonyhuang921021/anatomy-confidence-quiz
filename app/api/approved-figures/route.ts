@@ -1,6 +1,7 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {createHash} from 'node:crypto';
+import {imageActivityForJob} from '@/lib/explanationImageActivity';
 import {publishedTrialFigure} from '@/lib/publishedTrialFigures';
 import {safeApprovedMeta} from '@/lib/approvedFigureSecurity';
 import {userProvidedExplanationFigure} from '@/lib/userProvidedExplanationFigure.cjs';
@@ -25,12 +26,12 @@ export async function GET(request:NextRequest){
   if(userProvided)return NextResponse.json({figures:[],sectionFigures:[],explanationHash:hash,replacementRevision:saved.data.replacement_revision,userProvidedFigureId:userProvided.id,imageStatus:'user_provided',sections:[{sectionTitle:userProvided.sectionTitle}]},{headers});
   const published=publishedTrialFigure(id,hash);
   if(published)return NextResponse.json({figures:[],sectionFigures:[published],explanationHash:hash,imageStatus:'approved',sections:[{sectionTitle:published.section_heading}]},{headers});
-  const jobs=await db.from('figure_queue_jobs').select('figure_needs,image_status').eq('question_id',id).eq('explanation_sha256',hash).maybeSingle();
+  const jobs=await db.from('figure_queue_jobs').select('figure_needs,image_status,state,lease_until,updated_at').eq('question_id',id).eq('explanation_sha256',hash).maybeSingle();
   const bound=await db.from('explanation_figure_candidates').select('id,section_anchor,section_heading,section_sha256,status,explanation_sha256').eq('question_id',id).limit(100);
   if(jobs.error||bound.error)throw Error('unavailable');
   const sectionFigures=figures.flatMap((x:any)=>{const m=bound.data?.find(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved'&&y.section_anchor);return m?[{...x,...m}]:[]});
   let imageStatus=jobs.data?.image_status||saved.data.figure_status;
   if(imageStatus==='pending_visual_review'&&!sectionFigures.length&&!bound.data?.some(x=>x.explanation_sha256===hash&&x.status==='pending'))imageStatus='awaiting_image';
-  return NextResponse.json({figures:versioned?[]:figures.filter((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved')&&!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus,sections:(jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
+  return NextResponse.json({figures:versioned?[]:figures.filter((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved')&&!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus,imageActivity:imageActivityForJob(jobs.data,figures.some((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved'))),sections:(jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
  }catch{return NextResponse.json({figures:[]},{status:503,headers})}
 }

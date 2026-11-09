@@ -8,7 +8,7 @@ import { explanationPrefix } from "@/lib/explanationStream";
 import {waitUntil} from '@vercel/functions';
 import { dispatchReplacementImages } from "@/lib/replacementFigures.cjs";
 import { createGenerationJournal } from "@/lib/generationResultJournal.cjs";
-import { uncertainTeachingSource } from '@/lib/trustedRelatedContext';
+import { uncertainPrimaryTeachingSource } from '@/lib/primaryTeachingSource';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 import { imageWindowOpen, buildNeedsWithFallback, IMAGE_PROMPT, processSavedImages } from "@/lib/newExplanationFigures.cjs";
 import { createHash } from "node:crypto";
@@ -868,7 +868,7 @@ export async function POST(request: NextRequest) {
         const q = found.question;
         // Mark restrictions without blocking access to an existing shared row.
         return {...q,trustedContext:found.sharedContext,requiresContext:found.requiresContext,
-          hasUncertainSource:uncertainTeachingSource(q),
+          hasUncertainSource:uncertainPrimaryTeachingSource(q),
           hasUnresolvedImage:Boolean(q.stemImage || (q.optionImages && Object.values(q.optionImages).some(Boolean)))};
       },
       prepare: async (q:any) => {
@@ -977,12 +977,42 @@ export async function POST(request: NextRequest) {
       }
     });
     const messages: Record<string,string> = {
+      shared_sync_paused:"共享詳解同步暫停，原文保留。",
+      unsupported_action:"這個詳解操作不受支援，沒有開始新生成。",
+      generation_journal_required:"缺少有效的請求識別，沒有開始新生成。請重新載入網站。",
+      invalid_replacement:"替換請求的版本識別不完整，原詳解保留。",
+      reviewed_explanation_protected:"此題已有已審核完整詳解，保留原文與圖片；可由更多選單明確選擇替換。",
+      reviewed_protected:"此題已有已審核完整詳解，保留原文與圖片；可由更多選單明確選擇替換。",
+      guard_unavailable:"詳解安全檢查暫時無法完成，尚未開始生成。",
+      account_banned:"這個帳號目前受生成使用限制，既有詳解仍可閱讀。",
+      result_journal_unavailable:"先前結果紀錄暫時無法確認，不會另開生成。",
+      reservation_unavailable:"請求預留結果尚未確認，已保留識別，不會重複生成。",
+      reservation_unconfirmed_held:"請求預留仍待確認，已保留識別，不會重複生成。",
+      price_ceiling_unconfirmed_held:"單次費用上限尚未核實，請求已保留，不會呼叫模型。",
+      invalid_grant_held:"生成預留設定不完整，請求已保留，不會呼叫模型。",
+      cancel_unconfirmed_held:"已有共享詳解，但先前預留的結束狀態仍待確認，不會重複生成。",
+      winner_changed:"共享詳解版本已變更，請重新讀取目前內容。",
+      duplicate:"這個請求已有紀錄，正在保留原請求，不會重複生成。",
+      start_failed_held:"生成啟動狀態尚未確認，請求已保留，不會重送。",
+      global_stop_unconfirmed_held:"生成已安全停止，但確認尚未完成；原請求保留，不會重送。",
+      provider_unknown_held:"模型回覆尚未確認，原請求已保留，不會重複生成。",
+      usage_unknown_held:"已收到模型回覆，但用量尚未核實；原請求保留，不會重送。",
+      result_checkpoint_unconfirmed_held:"模型回覆的保存狀態仍待確認，原請求保留，不會重生。",
+      settlement_failed_held:"這次生成的費用結算尚未確認，原請求保留，不會重送。",
+      commit_unconfirmed_held:"新詳解寫入狀態尚未確認，原文與請求識別保留，不會重生。",
       replacement_version_changed:"詳解已被更新，保留較新的版本；請重新確認後再操作。",
       replacement_pending:"先前替換仍在確認中，不會重複生成。",
       replacement_unavailable:"替換功能尚未啟用，原詳解仍可閱讀。",
       invalid_id:"題號不足，無法產生詳解。", authentication_required:"請登入後再使用。",
       untrusted_question:"此題尚無可驗證的官方或站內來源，不會使用客戶端題文生成。",
       trusted_context_missing:"此題缺少可驗證的承上題情境。", source_image_not_supported:"此題需要原圖判讀，請先使用原題及既有詳解。",
+      trusted_question_incomplete:"這題的題文、選項或答案仍有待核內容，暫不生成新詳解；既有詳解保留。",
+      sitewide_admission_unavailable:"詳解接單狀態暫時無法確認，尚未開始生成。既有詳解保留。",
+      generation_journal_unavailable:"無法讀取先前生成紀錄，尚未開始新生成。既有請求不會重送。",
+      generation_pending:"先前生成仍在確認中，不會重複生成。既有詳解保留。",
+      generation_not_written:"先前生成已結束，沒有寫入新詳解。既有詳解保留。",
+      replacement_not_written:"先前替換已結束，沒有寫入新詳解。原詳解保留。",
+      busy:"目前有其他詳解正在產生，請稍後再操作。",
       incomplete_explanation:"詳解未包含所有選項，未儲存，請稍後再試。",
       run_window_expired:"本次詳解開放期限已到，既有詳解仍可閱讀。",
       unavailable:"詳解生成的信用核實或安全設定目前不可用，既有詳解仍可閱讀。",
@@ -1000,6 +1030,8 @@ export async function POST(request: NextRequest) {
       console.info("question_explanation_timing",JSON.stringify({questionId:body.question?.id,...timing}));
       return NextResponse.json({ok:true,configured:true,sharedSaved:true,...outcome.value,delivery:timing});
     }
+    // Operational code only. Never log tokens, actor IDs or question content.
+    console.warn("question_explanation_blocked",JSON.stringify({questionId:body.question?.id,code:outcome.code,status:outcome.status}));
     return NextResponse.json({ok:false,code:outcome.code,recoverable:true,message:messages[outcome.code] || "暫時無法產生詳解，既有詳解不受影響。"},{status:outcome.status});
   } catch (error) {
     console.error("question_explanation_safe_candidate_error",error instanceof Error ? error.message : "unknown");
