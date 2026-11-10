@@ -50,3 +50,20 @@ test('discovery logs exact metadata stage only once and never retries a failed s
  assert.equal(reservations,1);assert.equal(http,1);assert.equal(logs.length,1);assert.equal(logs[0][0],'pmc_metadata_failed');
  assert.equal(logs[0][1].kind,'search');assert.equal(logs[0][1].code,'metadata_parse_failed');assert.ok(Number.isFinite(logs[0][1].elapsedMs));assert.doesNotMatch(JSON.stringify(logs),/private|medical fixture|payload|https:/);
 });
+
+test('PMC fresh search preserves standard medical phrases and TCA aliases',()=>{
+ const {pmcSearchExpression}=require('../lib/medicalImageQuery.cjs');
+ for(const q of ['tca cycle','citric acid cycle products reaction steps','citric acid cycle intermediates and products','krebs cycle'])assert.equal(pmcSearchExpression(q),'("tca cycle" OR "citric acid cycle" OR "krebs cycle") AND OPEN_ACCESS:Y');
+ assert.equal(pmcSearchExpression('base excision repair'),'("base excision repair") AND OPEN_ACCESS:Y');
+ assert.equal(pmcSearchExpression('urea cycle reaction steps'),'("urea cycle") AND OPEN_ACCESS:Y');
+ assert.equal(pmcSearchExpression('tca cycle inhibitor mechanism'),'("tca cycle inhibitor mechanism") AND OPEN_ACCESS:Y');
+ for(const term of ['polymerase chain reaction','pentose phosphate pathway','advanced glycation end products'])for(const suffix of ['', ' diagram'])assert.equal(pmcSearchExpression(term+suffix),'("'+term+'") AND OPEN_ACCESS:Y');
+ for(const q of ['abc OR xyz','tca cycle:secret','https://example.invalid','tca cycle 42'])assert.throws(()=>pmcSearchExpression(q));
+});
+test('phrase discovery retains original cache identity and never calls HTTP for unknown reservation',async()=>{
+ const q='citric acid cycle products reaction steps',keys=[],urls=[];
+ await discoverPmcFigures(q,async(key,load)=>{keys.push(key);return load()},async url=>{urls.push(url);return new Response(JSON.stringify({resultList:{result:[]}}))});
+ assert.deepEqual(keys,['pmc-figure-v1:search:'+q]);assert.equal(urls.length,1);assert.equal(new URL(urls[0]).searchParams.get('query'),'("tca cycle" OR "citric acid cycle" OR "krebs cycle") AND OPEN_ACCESS:Y');
+ let http=0;await assert.rejects(()=>discoverPmcFigures(q,async()=>{throw Error('prior unknown')},async()=>{http++;}),/prior unknown/);assert.equal(http,0);
+ await discoverPmcFigures(q,async key=>[{kind:'search',identity:q,value:[]}],async()=>{http++});assert.equal(http,0);
+});

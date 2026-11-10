@@ -49,3 +49,43 @@ test('BER long medical query has one fixed core fallback after a confirmed empty
  const queries=[];assert.equal((await f.run({search:async q=>{queries.push(q);return queries.length===1?[]:[commons]}})).status,'approved');
  assert.deepEqual(queries,['base excision repair enzyme sequence','base excision repair mechanism']);assert.equal(f.stats().reviews,1);
 });
+
+test('both real long TCA plans use the standard cycle name after a confirmed first result',async()=>{
+ for(const searchTerm of ['citric acid cycle products reaction steps','citric acid cycle intermediates and products']){
+  const f=fixture({verdicts:['display']});
+  const plan=approveSchemaQueries(buildNeeds(text,[{sectionTitle:'機轉',conceptId:'citric-acid-cycle',caption:'循環中間物與產物',searchScope:'general-medical',medicalDomain:'biochemistry',searchTerm}]));
+  f.store.readNeeds=async()=>plan;const before=JSON.stringify(plan),queries=[];
+  assert.equal((await f.run({search:async q=>{queries.push(q);return queries.length===1?[]:[commons]}})).status,'approved');
+  assert.deepEqual(queries,[searchTerm,'tca cycle']);assert.equal(f.stats().reviews,1);assert.equal(JSON.stringify(plan),before);
+  assert.equal(f.events.some(x=>x[0]==='discover'),false);
+ }
+});
+test('generic suffix trimming preserves distinguishing medical terms and exact short queries',()=>{
+ const {coreMedicalTerm}=require('../lib/medicalImageQuery.cjs');
+ assert.equal(coreMedicalTerm('urea cycle reaction steps'),'urea cycle');
+ assert.equal(coreMedicalTerm('glomerular filtration barrier diagram'),'glomerular filtration barrier');
+ assert.equal(coreMedicalTerm('tca cycle inhibitor mechanism'),null);
+ assert.equal(coreMedicalTerm('reverse tca cycle diagram'),'reverse tca cycle');
+ assert.equal(coreMedicalTerm('urea cycle'),null);
+ assert.equal(coreMedicalTerm('protein diagram'),null);
+ for(const term of ['polymerase chain reaction','pentose phosphate pathway','advanced glycation end products']){
+  assert.equal(coreMedicalTerm(term),null);assert.equal(coreMedicalTerm(term+' diagram'),term);
+ }
+ const {shorterMedicalQuery}=require('../lib/newExplanationFigures.cjs');
+ const base=toxinPlan().items[0];
+ for(const query of ['base excision repair','electron transport chain','inulin clearance'])assert.equal(shorterMedicalQuery({...base,query,proposedQuery:query}),null);
+ for(const query of ['patient tca cycle diagram','john urea cycle steps','https://example.invalid','tca cycle 123'])assert.equal(shorterMedicalQuery({...base,query,proposedQuery:query}),null);
+});
+test('TCA unknown original, core or failed cache acknowledgement never advances or replays',async()=>{
+ for(const failure of ['original','core','cache']){
+  const f=fixture({cacheAck:failure!=='cache'});f.store.readNeeds=async()=>approveSchemaQueries(buildNeeds(text,[{sectionTitle:'機轉',conceptId:'tca-cycle',caption:'循環產物',searchScope:'general-medical',medicalDomain:'biochemistry',searchTerm:'citric acid cycle products reaction steps'}]));
+  const queries=[];await f.run({search:async q=>{queries.push(q);if(failure==='original'||failure==='core'&&queries.length===2)throw Error('unknown');return []}});
+  assert.equal(queries.length,failure==='core'?2:1);assert.equal(f.events.some(x=>x[0]==='discover'),false);assert.equal(f.stats().reviews,0);
+ }
+});
+test('precise query prompt teaches a general selection rule rather than requiring a fixed question',()=>{
+ const {IMAGE_PROMPT}=require('../lib/newExplanationFigures.cjs');
+ for(const rule of ['根據本題及該段詳解','標準英文名稱或常用縮寫','精準不等於長','不要混入另一個比較概念','具體要標示的產物、位置或步驟寫在caption','不要省略會改變概念的專有名詞'])assert.ok(IMAGE_PROMPT.includes(rule));
+ assert.ok(IMAGE_PROMPT.includes('base excision repair'));assert.ok(IMAGE_PROMPT.includes('tca cycle'));
+ assert.doesNotMatch(IMAGE_PROMPT,/MOEX-|107020|111100/);
+});
