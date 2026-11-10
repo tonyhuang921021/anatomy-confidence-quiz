@@ -52,3 +52,11 @@ test('actual prompt uses Taiwan Traditional Chinese with English medical termino
 test('future generation visibly teaches transfer in a named main-explanation section, without another model call',()=>{assert.ok(prefix.includes('## 觸類旁通'));assert.ok(prefix.includes('不能把這段省略、只藏在選項解析'));assert.ok(prefix.includes('完整寫出推導和不能類推的界線'));assert.ok(!prefix.includes('不另加固定標題'));});
 
 test('trusted related questions are actually used internally for joint knowledge teaching but never named publicly',()=>{for(const phrase of ['讀完所附可靠背景的題幹、選項與採計答案','共同知識及重要不同點','有直接教學關聯的背景應實際融入知識解說'])assert.ok(prefix.includes(phrase),phrase);assert.ok(prefix.includes(teaching.PRIVATE_SOURCE_RULE));for(const phrase of ['相關題','MOEX-111100-1301-Q083','其他考題'])assert.equal(teaching.validPublicTeaching({explanation:phrase}),false);});
+
+test('model chooses useful visuals and comparison tables freely while trusted related context remains private',()=>{
+ for(const phrase of ['自行判斷','哪裡適合用表格對照','不必照固定的圖表模板','Markdown 比較表','現成圖解','對照圖表','網站實際搜尋','不要自行畫圖','所附可靠相關背景照樣用來整合'])assert.ok(IMAGE_PROMPT.includes(phrase),phrase);
+ assert.ok(prefix.includes('依題目自由安排'));assert.ok(prefix.includes('有實質內容的對照表'));
+ assert.ok(IMAGE_PROMPT.includes('技術上限3項'));assert.ok(IMAGE_PROMPT.includes('技術上限8詞'));
+ assert.ok(prefix.includes(teaching.PRIVATE_SOURCE_RULE));assert.ok(source.includes('resolveTrustedRelatedQuestions(q.id)'));
+ assert.ok(source.includes('appendTeachingContext(canonicalPrompt,related)'));
+});

@@ -10,3 +10,29 @@ test('review uses its own wording and displayed images finish the indicator',()=
 test('API only reads exact text version; UI only consumes status and does not dispatch searches',()=>{const api=fs.readFileSync('app/api/approved-figures/route.ts','utf8'),ui=fs.readFileSync('components/SectionExplanationFigures.tsx','utf8');assert.match(api,/eq\('explanation_sha256',hash\)/);assert.match(api,/imageActivity:imageActivityForJob\(jobs.data,figures.some/);assert.match(ui,/data.explanationHash!==hash/);assert.match(ui,/<ExplanationProgressCat\//);assert.match(ui,/imageActivityCopy\(/);assert.doesNotMatch(ui,/method:\s*['"]POST|processSavedImages|continueFigure/)});
 
 test('unconfirmed stage or model result with a leftover lease is not active, nor is a legacy awaiting-image lease',()=>{for(const image_status of ['pending_visual_review','awaiting_image','approved'])assert.equal(copy(activity({...job,image_status},false,now),now,now).active,false)});
+
+test('confirmed terminal quota stop is explicit and never animates or claims no search result',()=>{
+ const state=activity({...job,state:'done',image_status:'awaiting_budget'},false,now,{mode:'taipei_daily_v1',searchExhausted:true});
+ assert.equal(state.phase,'budget_blocked');assert.equal(state.ttlMs,0);const message=copy(state,now,now);
+ assert.equal(message.active,false);assert.match(message.label,/今日找圖額度已達上限/);assert.match(message.caption,/台灣時間每日 00:00/);
+ assert.doesNotMatch(message.caption,/自動恢復|沒有找到|還在找/);
+});
+test('an actually displayed image takes priority over a stale quota status',()=>{
+ assert.equal(activity({...job,state:'done',image_status:'awaiting_budget'},true,now).phase,'complete');
+ assert.equal(copy(activity({...job,state:'done',image_status:'awaiting_budget'},true,now),now,now),null);
+ assert.equal(activity({...job,state:'pending',image_status:'awaiting_budget'},false,now).phase,'queued');
+});
+
+test('ambiguous old awaiting-budget value alone or read failure never claims quota was exhausted',()=>{
+ const row={...job,state:'done',image_status:'awaiting_budget'};
+ for(const evidence of [null,{}, {mode:'legacy',searchExhausted:true},{mode:'taipei_daily_v1',searchExhausted:false}]){
+  const state=activity(row,false,now,evidence);assert.equal(state.phase,'stopped');assert.doesNotMatch(copy(state,now,now).label,/上限/);
+ }
+});
+test('download limits are distinct from the Taiwan daily search cap and successful images win',()=>{
+ const row={...job,state:'done',image_status:'awaiting_budget'};
+ for(const key of ['downloadExhausted','downloadBytesExhausted']){
+  const capacity={mode:'taipei_daily_v1',[key]:true};assert.match(copy(activity(row,false,now,capacity),now,now).label,/圖片下載額度/);
+  assert.equal(activity(row,true,now,capacity).phase,'complete');
+ }
+});

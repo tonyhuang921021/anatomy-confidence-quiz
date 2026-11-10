@@ -30,8 +30,16 @@ export async function GET(request:NextRequest){
   const bound=await db.from('explanation_figure_candidates').select('id,section_anchor,section_heading,section_sha256,status,explanation_sha256').eq('question_id',id).limit(100);
   if(jobs.error||bound.error)throw Error('unavailable');
   const sectionFigures=figures.flatMap((x:any)=>{const m=bound.data?.find(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved'&&y.section_anchor);return m?[{...x,...m}]:[]});
+  // Read-only, current quota evidence. An unavailable/old database never
+  // becomes a fabricated 'quota exceeded' cause and never hides saved images.
+  let capacity:any=null;
+  if(jobs.data?.state==='done'&&jobs.data.image_status==='awaiting_budget'){
+   try{const quota=await db.rpc('figure_search_capacity');
+    if(!quota.error&&quota.data?.mode==='taipei_daily_v1')capacity=quota.data;
+   }catch{/* Keep saved images and neutral status if the optional read fails. */}
+  }
   let imageStatus=jobs.data?.image_status||saved.data.figure_status;
   if(imageStatus==='pending_visual_review'&&!sectionFigures.length&&!bound.data?.some(x=>x.explanation_sha256===hash&&x.status==='pending'))imageStatus='awaiting_image';
-  return NextResponse.json({figures:versioned?[]:figures.filter((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved')&&!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus,imageActivity:imageActivityForJob(jobs.data,figures.some((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved'))),sections:(jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
+  return NextResponse.json({figures:versioned?[]:figures.filter((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved')&&!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus,imageActivity:imageActivityForJob(jobs.data,figures.some((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved')),Date.now(),capacity),sections:(jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
  }catch{return NextResponse.json({figures:[]},{status:503,headers})}
 }

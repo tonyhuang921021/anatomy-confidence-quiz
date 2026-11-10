@@ -86,6 +86,6 @@ test('TCA unknown original, core or failed cache acknowledgement never advances 
 test('precise query prompt teaches a general selection rule rather than requiring a fixed question',()=>{
  const {IMAGE_PROMPT}=require('../lib/newExplanationFigures.cjs');
  for(const rule of ['根據本題及該段詳解','標準英文名稱或常用縮寫','精準不等於長','不要混入另一個比較概念','具體要標示的產物、位置或步驟寫在caption','不要省略會改變概念的專有名詞'])assert.ok(IMAGE_PROMPT.includes(rule));
- assert.ok(IMAGE_PROMPT.includes('base excision repair'));assert.ok(IMAGE_PROMPT.includes('tca cycle'));
+ assert.ok(IMAGE_PROMPT.includes('自行判斷'));assert.ok(IMAGE_PROMPT.includes('範例只示範格式'));assert.ok(!IMAGE_PROMPT.includes('通常2至5詞'));
  assert.doesNotMatch(IMAGE_PROMPT,/MOEX-|107020|111100/);
 });
