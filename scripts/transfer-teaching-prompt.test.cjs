@@ -14,12 +14,12 @@ const {build,prefix}=moduleExports;
 
 test('actual canonical prompt requires transferable judgement without forcing quantity or retrieved links',()=>{
  assert.ok(prefix.includes(teaching.INTEGRATED_TEACHING_RULE));assert.ok(prefix.includes(teaching.TRANSFER_SELF_CHECK_RULE));
- for(const phrase of ['教會讀者觸類旁通','共同機轉、關鍵差異與何時不能類推','不能只重述正解','沒有可靠背景時','不編造題庫關係或缺失條件'])assert.ok(prefix.includes(phrase),phrase);
- assert.ok(prefix.includes('不要求固定段落數'));assert.ok(prefix.includes('不設字數下限或固定延伸數量'));
+ for(const phrase of ['教會讀者觸類旁通','相近概念、條件變化或應用','因果、比較或推導','沒有可靠背景時','不編造題庫關係或缺失條件'])assert.ok(prefix.includes(phrase),phrase);
+ assert.ok(prefix.includes('不要求固定段落數'));assert.ok(prefix.includes('不設字數上下限或固定延伸數量'));
  assert.ok(!prefix.includes('不要求每題有表格、延伸段落或圖片'));
 });
-test('self-check uses condition-transfer or mechanistic analogy with limits, in the same response',()=>{
- for(const phrase of ['同一次回答內自檢','改變哪個條件 → 結論如何改變 → 為什麼','另一情境 → 共通機轉 → 關鍵限制','自檢過程不要輸出','沒有改變本題官答'])assert.ok(teaching.TRANSFER_SELF_CHECK_RULE.includes(phrase),phrase);
+test('self-check verifies teaching and medical correctness in the same response without prescribing caveats',()=>{
+ for(const phrase of ['同一次回答內自檢','本題與各選項是否解釋清楚','補充有用的知識與推導','自檢過程不要輸出','醫學內容是否正確、符合本題判分'])assert.ok(teaching.TRANSFER_SELF_CHECK_RULE.includes(phrase),phrase);
  assert.ok(prefix.includes(teaching.PRIVATE_SOURCE_RULE));assert.ok(teaching.INTEGRATED_TEACHING_RULE.includes('採計選項本身不是正確知識'));
 });
 test('real Q100/Q068/Q082 prompts retain bounded trusted evidence and transfer requirements',()=>{
@@ -38,7 +38,7 @@ test('real Q099 has zero retrieved links but still gets transferable teaching in
 });
 test('new teaching objective does not add a paid retry, title-only runtime gate, or old-text overwrite',()=>{
  const callProvider=source.slice(source.indexOf('callProvider: async (args:any)'),source.indexOf('settle: async (g:any'));
- assert.equal((callProvider.match(/await createOpenAIText\(/g)||[]).length,1);assert.ok(callProvider.includes('canonicalPrompt,2400'));
+ assert.equal((callProvider.match(/await createOpenAIText\(/g)||[]).length,1);assert.ok(callProvider.includes('canonicalPrompt,outputPolicy?.maxOutputTokens??LEGACY_OUTPUT_TOKENS'));
  assert.ok(source.includes('maxCalls:1'));assert.ok(callProvider.includes('validPublicTeaching(parsed)?parsed:null'));assert.ok(!callProvider.includes('TRANSFER_SELF_CHECK_RULE'));
  const parsed={explanation:'共同機轉與適用條件可說明判斷的變化。',optionAnalysis:{A:'本題判斷。'},memoryTip:''};assert.equal(teaching.validPublicTeaching(parsed),true);
  const prepare=source.slice(source.indexOf('prepare: async (q:any)'),source.indexOf('readShared: reservedReads.read'));
@@ -49,9 +49,9 @@ test('actual prompt uses Taiwan Traditional Chinese with English medical termino
  for(const phrase of ['臺灣繁體中文和必要的英文','重要醫學專有名詞首次出現時附英文','保留題目中的必要英文、通用縮寫與標準符號','臺灣慣用醫學譯名','避免簡體字與中國慣用語','不為翻譯改變醫學意義'])assert.ok(prefix.includes(phrase),phrase);
 });
 
-test('future generation visibly teaches transfer in a named main-explanation section, without another model call',()=>{assert.ok(prefix.includes('## 觸類旁通'));assert.ok(prefix.includes('不能把這段省略、只藏在選項解析'));assert.ok(prefix.includes('完整寫出推導和不能類推的界線'));assert.ok(!prefix.includes('不另加固定標題'));});
+test('future generation visibly teaches transfer in a named main-explanation section, without another model call',()=>{assert.ok(prefix.includes('## 觸類旁通'));assert.ok(teaching.INTEGRATED_TEACHING_RULE.includes('explanation 的「## 觸類旁通」段落'));assert.ok(prefix.includes('因果、比較或推導'));assert.ok(!prefix.includes('不另加固定標題'));});
 
-test('trusted related questions are actually used internally for joint knowledge teaching but never named publicly',()=>{for(const phrase of ['讀完所附可靠背景的題幹、選項與採計答案','共同知識及重要不同點','有直接教學關聯的背景應實際融入知識解說'])assert.ok(prefix.includes(phrase),phrase);assert.ok(prefix.includes(teaching.PRIVATE_SOURCE_RULE));for(const phrase of ['相關題','MOEX-111100-1301-Q083','其他考題'])assert.equal(teaching.validPublicTeaching({explanation:phrase}),false);});
+test('trusted related questions are actually used internally for joint knowledge teaching but never named publicly',()=>{for(const phrase of ['讀完所附可靠背景的題幹、選項與採計答案','共同知識及重要不同點','把直接相關的共同知識及重要不同點融入解說'])assert.ok(prefix.includes(phrase),phrase);assert.ok(prefix.includes(teaching.PRIVATE_SOURCE_RULE));for(const phrase of ['相關題','MOEX-111100-1301-Q083','其他考題'])assert.equal(teaching.validPublicTeaching({explanation:phrase}),false);});
 
 test('model chooses useful visuals and comparison tables freely while trusted related context remains private',()=>{
  for(const phrase of ['自行判斷','哪裡適合用表格對照','不必照固定的圖表模板','Markdown 比較表','現成圖解','對照圖表','網站實際搜尋','不要自行畫圖','所附可靠相關背景照樣用來整合'])assert.ok(IMAGE_PROMPT.includes(phrase),phrase);
@@ -59,4 +59,23 @@ test('model chooses useful visuals and comparison tables freely while trusted re
  assert.ok(IMAGE_PROMPT.includes('技術上限3項'));assert.ok(IMAGE_PROMPT.includes('技術上限8詞'));
  assert.ok(prefix.includes(teaching.PRIVATE_SOURCE_RULE));assert.ok(source.includes('resolveTrustedRelatedQuestions(q.id)'));
  assert.ok(source.includes('appendTeachingContext(canonicalPrompt,related)'));
+});
+
+
+test('caveats are conditional once, not a repeated mandatory teaching template',()=>{
+ for(const old of ['何時不能類推','不能類推的界線','不可泛化成所有病例','另一情境 → 共通機轉 → 關鍵限制'])assert.ok(!prefix.includes(old),old);
+ assert.equal(prefix.split('例外、限制或爭議僅在影響本題判斷或理解時說明').length-1,1);
+ assert.ok(prefix.includes('不例行添加免責或防禦性結語'));
+ assert.ok(teaching.INTEGRATED_TEACHING_RULE.includes('選項須依題幹問法判讀'));
+ assert.ok(teaching.INTEGRATED_TEACHING_RULE.includes('採計選項本身不是正確知識'));
+ assert.ok(teaching.INTEGRATED_TEACHING_RULE.includes('不用它改寫本題官答'));
+ assert.ok(teaching.INTEGRATED_TEACHING_RULE.length<350);assert.ok(teaching.TRANSFER_SELF_CHECK_RULE.length<100);
+});
+test('editorial prompt has no word-count limit; technical usage fence remains consistent',()=>{
+ assert.ok(prefix.includes('不設字數上下限'));
+ assert.ok(!/(?:至少|最多|不超過)\s*\d+\s*字/.test(prefix));
+ // Token/fee/storage policy is separate and must not silently diverge in a wording-only change.
+ assert.ok(source.includes('validatedOutputPolicy(row.output_policy'));
+ assert.ok(source.includes('canonicalPrompt,outputPolicy?.maxOutputTokens??LEGACY_OUTPUT_TOKENS,args.model'));
+ assert.ok(source.includes('usage.outputTokens > (g.outputPolicy?.maxOutputTokens??LEGACY_OUTPUT_TOKENS)'));
 });

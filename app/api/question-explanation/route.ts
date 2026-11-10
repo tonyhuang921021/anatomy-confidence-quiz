@@ -1,3 +1,4 @@
+import {validatedOutputPolicy,outputUsageCost,LEGACY_OUTPUT_TOKENS,MAX_EXPLANATION_TEXT_CHARS,type ExplanationOutputPolicy} from '@/lib/explanationOutputPolicy';
 import {discoverPmcFigures} from '@/lib/pmcFigureSource.cjs';
 import {createFinalFigureReviewer} from "@/lib/finalFigureRuntime.cjs";
 import {authorizationWindow} from "@/lib/authorizationWindow.cjs";
@@ -113,20 +114,18 @@ const AI_EXPLANATION_USAGE_PREFIX = "AI_EXPLANATION:";
 const HOURLY_LIMIT = 30;
 const DAILY_LIMIT = 100;
 const MAX_SYNC_OVERRIDES_PER_REQUEST = 50;
-const GPT_5_MINI_MAX_OUTPUT_TOKENS = 2400;
 const QUESTION_EXPLANATION_MODEL = getOpenAIModel(process.env.QUESTION_EXPLANATION_MODEL);
 const QUESTION_EXPLANATION_PROMPT_PREFIX = [
   "用自然、清楚的臺灣繁體中文和必要的英文，幫學習者理解這道國考題。以臺灣繁體中文說明為主，重要醫學專有名詞首次出現時附英文；保留題目中的必要英文、通用縮寫與標準符號。使用臺灣慣用醫學譯名，避免簡體字與中國慣用語，不為翻譯改變醫學意義。",
-  "先說明正解及關鍵判斷，再依題目需要解釋機轉、相近概念與選項差異；篇幅和小標按內容需要安排，不設字數下限或固定延伸數量。",
+  "先說明正解及關鍵判斷，再依題目需要解釋機轉、相近概念與選項差異；篇幅和小標按內容需要安排，不設字數上下限或固定延伸數量。",
   "各選項的判斷與能區分的原因放在 optionAnalysis，每個實際存在的選項都要說明。",
   "題庫標籤可能不準，以可信題幹、原始選項、官方答案與判分方式為準。若有一律給分或多個可接受答案，應依實際判分說明。",
-  "遇到足以影響判斷的爭議、歷史版本或資訊不足，以具體條件說清楚；不要補造原題缺失或虛構來源與連結。",
+  "例外、限制或爭議僅在影響本題判斷或理解時說明，不例行添加免責或防禦性結語。內容依可靠醫學知識，不補造原題缺失或虛構來源與連結。",
   "直接說明知識與機轉，不評論模型、提示詞、寫作過程或稿件；不要根據任何單一使用者的作答情況改變內容。",
   INTEGRATED_TEACHING_RULE,
   PRIVATE_SOURCE_RULE,
   TRANSFER_SELF_CHECK_RULE,
   MATH_FORMAT_RULE,
-  "若附有經核對的相關題資料，將共通機制、易混鑑別、延伸概念及可能變化整合到本題教學，不要只列相關題，也不要提年份、卷別或出題次數；仍補足相關題未提到但理解需要的內容。相關題中的可能原因或部分情況不可泛化成所有病例。",
   "圖片由網站根據已核對的資料提供；內部背景僅供教學整合，不輸出題目連結、題號、年份、圖片、引用或網址。",
   "你可依題目自由安排段落、粗體、條列、圖解需求與 Markdown 表格，選最能讓讀者理解的方式。適合比較多個機轉、條件或選項時，可整理有實質內容的對照表；若現成圖表更適合，提出圖表搜尋需求，由網站實際取得與核對，不捏造來源或聲稱已找到。篇幅與安排不要求固定段落數，也不要求每題有表格或圖片，不為湊格式切碎論述。",
   "只輸出 JSON，不要輸出 HTML、code block 或 JSON 外文字。explanation 為文字；optionAnalysis 僅包含實際存在的 A、B、C、D、E 選項鍵；memoryTip 沒有則留空字串。",
@@ -781,6 +780,7 @@ export async function POST(request: NextRequest) {
   const reviewedSourceCommit = "f379b49497467abc02d9203228d1956d13565eae";
   const reviewedManifestSha = createHash("sha256").update(JSON.stringify(Object.keys(reviewedIndex).sort()),"utf8").digest("hex");
   let canonicalPrompt = "";
+  let outputPolicy:ExplanationOutputPolicy|null=null;
   const requestStarted=Date.now();let delivery:any=null;
   const stages:Record<string,number>={};
   const measured=async<T,>(name:string,work:()=>Promise<T>):Promise<T>=>{const started=Date.now();try{return await work()}finally{stages[name]=(stages[name]||0)+Date.now()-started}};
@@ -826,22 +826,24 @@ export async function POST(request: NextRequest) {
         const id = operationId || generationOperationId || crypto.randomUUID();
         if(operationId)replacementReservationAttempted=true;
         if(generationOperationId)generationReservationAttempted=true;
-        const {data,error} = await measured("reserveMs",()=>withServerTimeout(db.rpc(sitewide?'explanation_sitewide_reserve':operationId ? "ai_guard_reserve_replacement" : figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit,...(sitewide?{p_action:operationId?'replace':'generate',p_base_version:baseVersion??null}:operationId?{p_base_version:baseVersion}:{})}),1600,"預算預留逾時"));
+        const {data,error} = await measured("reserveMs",()=>withServerTimeout(db.rpc(sitewide?'explanation_reserve_full_output':operationId ? "ai_guard_reserve_replacement" : figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit,...(sitewide?{p_action:operationId?'replace':'generate',p_base_version:baseVersion??null}:operationId?{p_base_version:baseVersion}:{})}),1600,"預算預留逾時"));
         if (error || data !== "reserved") {if(operationId && !error && typeof data==="string")replacementReservationAttempted=false;if(generationOperationId && !error && typeof data==="string")generationReservationAttempted=false;return {ok:false,code:typeof data === "string" ? data : "reservation_unavailable"};}
         // Reservation is committed. These independent reads run together;
         // neither is skipped, and start_call still follows full grant validation.
-        const fetched = await (operationId ? (work:()=>Promise<any>)=>work() : (work:()=>Promise<any>)=>reservedReads.confirmAndRead(questionId,work))(()=>measured("grantReadMs",()=>withServerTimeout(db.rpc("ai_guard_read_reservation",{p_id:id,p_actor:actor}),1600,"預留驗證逾時")));
+        const fetched = await (operationId ? (work:()=>Promise<any>)=>work() : (work:()=>Promise<any>)=>reservedReads.confirmAndRead(questionId,work))(()=>measured("grantReadMs",()=>withServerTimeout(db.rpc(sitewide?"explanation_read_output_policy":"ai_guard_read_reservation",{p_id:id,p_actor:actor}),1600,"預留驗證逾時")));
         const row = Array.isArray(fetched.data) ? fetched.data[0] : fetched.data;
         if (fetched.error || !row || row.model !== model || row.pricing_revision !== pricingRevision) return {ok:false,code:"reservation_unconfirmed_held"};
         // Token count cannot exceed UTF-8 bytes for normal encoded text. The
         // configured rates must be conservative for the actual provider tier.
-        const inputBound = 16000 * inRate, outputBound = 2400 * outRate;
+        outputPolicy=sitewide?validatedOutputPolicy(row.output_policy,model!,pricingRevision,inRate,outRate):null;
+        if(sitewide&&!outputPolicy)return {ok:false,code:"price_ceiling_unconfirmed_held"};
+        const inputBound = 16000 * inRate, outputBound = (outputPolicy?.maxOutputTokens??LEGACY_OUTPUT_TOKENS) * outRate;
         if (!Number.isSafeInteger(inputBound) || !Number.isSafeInteger(outputBound) ||
             !Number.isSafeInteger(inputBound + outputBound)) return {ok:false,code:"price_ceiling_unconfirmed_held"};
         const worst = Math.ceil((inputBound + outputBound) / 1_000_000);
         const ceiling = Number(row.per_call_ceiling_microusd);
         if (!Number.isSafeInteger(worst) || !Number.isSafeInteger(ceiling) || ceiling < worst) return {ok:false,code:"price_ceiling_unconfirmed_held"};
-        return {ok:true,leaseId:id,fence:id,actorId:actor,model,mode,maxCalls:1,ceiling};
+        return {ok:true,leaseId:id,fence:id,actorId:actor,model,mode,maxCalls:1,ceiling,outputPolicy};
   };
   const replacementValue=(row:any)=>({explanation:row.explanation,optionAnalysis:row.option_analysis??{},memoryTip:row.memory_tip??"",model:row.model,updatedAt:row.updated_at,replacementRevision:row.replacement_revision,readingFormat:row.reading_format??null});
   const wantsStream=request.headers.get("accept")?.includes("text/event-stream");
@@ -936,8 +938,8 @@ export async function POST(request: NextRequest) {
       callProvider: async (args:any) => {
         const providerStart=Date.now();
         let raw="",last="",firstTextMs:number|null=null;
-        const result = await createOpenAIText(canonicalPrompt,2400,args.model,args.mode,wantsStream ? delta=>{
-          raw+=delta;if(raw.length>100000)throw Error("Provider output too large");
+        const result = await createOpenAIText(canonicalPrompt,outputPolicy?.maxOutputTokens??LEGACY_OUTPUT_TOKENS,args.model,args.mode,wantsStream ? delta=>{
+          raw+=delta;if(raw.length>MAX_EXPLANATION_TEXT_CHARS)throw Error("Provider output too large");
           const text=safeTeachingDraft(explanationPrefix(raw));
           if(text && text!==last){last=text;firstTextMs ??= Date.now()-requestStarted;emit({type:"draft",text,firstTextMs});}
         } : undefined);
@@ -948,13 +950,16 @@ export async function POST(request: NextRequest) {
       settle: async (g:any, seq:number, usage:any) => {
         // A provider-side bound violation makes the estimate unsafe for every
         // request. Disable further calls and hold this started call for reconciliation.
-        if (usage.inputTokens > 16000 || usage.outputTokens > 2400) {
+        if (usage.inputTokens > 16000 || usage.outputTokens > (g.outputPolicy?.maxOutputTokens??LEGACY_OUTPUT_TOKENS)) {
           const stopped = await withServerTimeout(db.rpc("ai_guard_disable",{p_reason:"usage_over_ceiling"}),1600,"安全停止逾時");
           if (stopped.error || stopped.data !== "disabled") throw new Error("安全停止未確認，請立即人工停用並對帳。");
           return false;
         }
-        // Reserve and account full per-call ceiling, not a speculative discount.
-        const {data,error} = await measured("settleMs",()=>withServerTimeout(db.rpc("ai_guard_settle_call",{p_id:g.leaseId,p_seq:seq,p_cost:g.ceiling,p_input:usage.inputTokens,p_output:usage.outputTokens}),1600,"用量結算逾時"));
+        // Full-output requests reserve the model maximum, then settle reliable standard usage.
+        // Legacy requests keep their original conservative ceiling; unknown requests never release it.
+        const cost=g.outputPolicy?outputUsageCost(g.outputPolicy,usage.inputTokens,usage.outputTokens):g.ceiling;
+        if(cost===null)return false;
+        const {data,error} = await measured("settleMs",()=>withServerTimeout(db.rpc("ai_guard_settle_call",{p_id:g.leaseId,p_seq:seq,p_cost:cost,p_input:usage.inputTokens,p_output:usage.outputTokens}),1600,"用量結算逾時"));
         return !error && data === "settled";
       },
       insertIfAbsentFenced: async (g:any, id:string, result:any) => {

@@ -1,3 +1,4 @@
+import {MAX_EXPLANATION_FRAME_CHARS} from './explanationOutputPolicy';
 // Bounded SSE decoding shared by provider and browser. A truncated stream is
 // never a completed generation; callers must require their final event.
 export async function readJsonEvents(body: ReadableStream<Uint8Array>, onEvent: (event: any) => void) {
@@ -7,7 +8,7 @@ export async function readJsonEvents(body: ReadableStream<Uint8Array>, onEvent: 
     for (;;) {
       const { value, done } = await reader.read();
       buffer = (buffer + decoder.decode(value, { stream: !done })).replace(/\r\n/g, "\n");
-      if (buffer.length > 262144) throw Error("stream frame too large");
+      if (buffer.length > MAX_EXPLANATION_FRAME_CHARS) throw Error("stream frame too large");
       let end: number;
       while ((end = buffer.indexOf("\n\n")) >= 0) {
         const frame = buffer.slice(0, end); buffer = buffer.slice(end + 2);

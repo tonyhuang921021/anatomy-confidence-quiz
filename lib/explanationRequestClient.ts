@@ -1,3 +1,4 @@
+import {MAX_EXPLANATION_TEXT_CHARS} from './explanationOutputPolicy';
 import {hydrateQuestionExplanationPending,matchesQuestionExplanationOperation,explanationPendingIdentity} from './explanationPendingStore';
 import {pendingReplacement,setPendingReplacement,recoverReplacement} from "./explanationReplacementClient";
 import {pendingGeneration,setPendingGeneration,recoverGeneration} from './generationRequestClient';
@@ -48,7 +49,7 @@ export async function requestExplanation(_url:string,init:RequestInit,isCurrent:
    if(response.headers.get('content-type')?.includes('text/event-stream')){
     if(!response.body)throw Error('stream missing');let final:{status:number;data:any}|null=null;
     await readJsonEvents(response.body,event=>{
-     if(event.type==='draft'&&typeof event.text==='string'&&event.text.length<=100000){firstTextMs ??= Date.now()-started;draft(id,event.text)}
+     if(event.type==='draft'&&typeof event.text==='string'&&event.text.length<=MAX_EXPLANATION_TEXT_CHARS){firstTextMs ??= Date.now()-started;draft(id,event.text)}
      if(event.type==='result'&&Number.isInteger(event.status)&&event.status>=200&&event.status<600&&event.data)final={status:event.status,data:event.data};
     });
     if(!final)throw Error('stream outcome unconfirmed');

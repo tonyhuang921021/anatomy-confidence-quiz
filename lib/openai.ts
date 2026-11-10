@@ -11,6 +11,7 @@ type ResponseOutputItem = {
 
 type OpenAIResponsePayload = {
   id?: string;
+  status?: string;
   model?: string;
   service_tier?: string;
   output?: ResponseOutputItem[];
@@ -136,7 +137,7 @@ export async function createOpenAIText(
     let completed: OpenAIResponsePayload | null = null;
     await readJsonEvents(response.body, event => {
       if (event.type === "response.output_text.delta" && typeof event.delta === "string") onDelta(event.delta);
-      if (event.type === "response.completed") completed = event.response;
+      if (event.type === "response.completed") completed = {...event.response,status:event.response?.status??"completed"};
       if (["error", "response.failed", "response.incomplete"].includes(event.type)) throw Error("Provider stream incomplete");
     });
     if (!completed) throw Error("Provider stream completion unconfirmed");
@@ -149,11 +150,11 @@ export async function createOpenAIText(
 
   return {
     model,
-    text: extractOutputText(payload),
+    text: payload.status === "completed" ? extractOutputText(payload) : "",
     servedModel: payload.model ?? null,
     requestId: response.headers.get("x-request-id"),
     responseId: typeof payload.id === "string" ? payload.id : null,
-    usageKnown: payload.service_tier === "default" && Number.isSafeInteger(payload.usage?.input_tokens) && Number(payload.usage?.input_tokens) >= 0 &&
+    usageKnown: payload.status === "completed" && payload.service_tier === "default" && Number.isSafeInteger(payload.usage?.input_tokens) && Number(payload.usage?.input_tokens) >= 0 &&
       Number.isSafeInteger(payload.usage?.output_tokens) && Number(payload.usage?.output_tokens) >= 0,
     usage: {
       inputTokens: payload.usage?.input_tokens ?? 0,
