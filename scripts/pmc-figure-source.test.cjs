@@ -10,7 +10,7 @@ const xml=xmlFor();
 const manifest={pmcid,version:1,is_pmc_openaccess:true,is_manuscript:false,is_retracted:false,license_code:'CC BY',xml_url:`s3://pmc-oa-opendata/${version}/${version}.xml?md5=${hash(xml,'md5')}`,media_urls:[`s3://pmc-oa-opendata/${version}/${filename}?md5=${hash(image,'md5')}`]};
 const listing='<ListBucketResult><IsTruncated>false</IsTruncated><CommonPrefixes><Prefix>PMC123456.1/</Prefix></CommonPrefixes></ListBucketResult>';
 const facts=()=>manifestFacts(JSON.stringify(manifest),pmcid,version);
-function harness(){const cache=new Map(),requests=[];const fetcher=async url=>{requests.push(url);const u=new URL(url);let raw;if(u.hostname==='www.ebi.ac.uk')raw=JSON.stringify({resultList:{result:[{pmcid,isOpenAccess:'Y',license:'cc by'}]}});else if(u.searchParams.has('list-type'))raw=listing;else if(u.pathname.endsWith('.json'))raw=JSON.stringify(manifest);else if(u.pathname.endsWith('.xml'))raw=xml;else throw Error('unexpected HTTP');return new Response(raw,{status:200,headers:{'content-type':'binary/octet-stream'}})};const read=async(key,load)=>{if(!cache.has(key))cache.set(key,await load());return structuredClone(cache.get(key))};return {cache,requests,run:()=>discoverPmcFigures('inulin clearance diagram',read,fetcher)}}
+function harness(){const cache=new Map(),requests=[];const fetcher=async url=>{requests.push(url);const u=new URL(url);let raw;if(u.hostname==='www.ebi.ac.uk')raw=JSON.stringify({resultList:{result:[{pmcid,isOpenAccess:'Y',license:'cc by',title:'Inulin clearance diagram',abstractText:'Inulin clearance and renal filtration.'}]}});else if(u.searchParams.has('list-type'))raw=listing;else if(u.pathname.endsWith('.json'))raw=JSON.stringify(manifest);else if(u.pathname.endsWith('.xml'))raw=xml;else throw Error('unexpected HTTP');return new Response(raw,{status:200,headers:{'content-type':'binary/octet-stream'}})};const read=async(key,load)=>{if(!cache.has(key))cache.set(key,await load());return structuredClone(cache.get(key))};return {cache,requests,run:()=>discoverPmcFigures('inulin clearance diagram',read,fetcher)}}
 test('official version, manifest and floats-group JATS yield an attributed candidate',()=>{assert.deepEqual(versions(listing,pmcid),[version]);const [c]=jatsFigures(xml,facts());assert.equal(classifySource(c),'pending_visual_review');assert.match(c.attribution,/Fixture Author/);assert.doesNotMatch(c.attribution,/Not Author/);assert.match(c.attribution,new RegExp(hash(xml)));assert.match(c.attribution,new RegExp(facts().manifestHash));assert.ok(c.attribution.length<=500);assert.match(c.sourceUrl,/#fig-1$/)});
 test('four individually reserved metadata reads replay from cache with zero HTTP',async()=>{const h=harness();const first=await h.run();assert.equal(first.length,1);assert.equal(h.requests.length,4);assert.equal(h.cache.size,4);assert.deepEqual(await h.run(),first);assert.equal(h.requests.length,4)});
 test('manifest identity, version and tri-state flags fail closed',()=>{for(const changes of [{pmcid:'PMC999'},{version:2},{is_pmc_openaccess:'true'},{is_retracted:null},{is_manuscript:undefined},{license_code:'CC BY-NC'}])assert.equal(manifestFacts(JSON.stringify({...manifest,...changes}),pmcid,version),null)});
@@ -56,7 +56,7 @@ test('PMC fresh search preserves standard medical phrases and TCA aliases',()=>{
  for(const q of ['tca cycle','citric acid cycle products reaction steps','citric acid cycle intermediates and products','krebs cycle'])assert.equal(pmcSearchExpression(q),'("tca cycle" OR "citric acid cycle" OR "krebs cycle") AND OPEN_ACCESS:Y');
  assert.equal(pmcSearchExpression('base excision repair'),'("base excision repair") AND OPEN_ACCESS:Y');
  assert.equal(pmcSearchExpression('urea cycle reaction steps'),'("urea cycle") AND OPEN_ACCESS:Y');
- assert.equal(pmcSearchExpression('tca cycle inhibitor mechanism'),'("tca cycle inhibitor mechanism") AND OPEN_ACCESS:Y');
+ assert.equal(pmcSearchExpression('tca cycle inhibitor mechanism'),'("tca cycle" OR "citric acid cycle" OR "krebs cycle") AND inhibitor AND mechanism AND OPEN_ACCESS:Y');
  for(const term of ['polymerase chain reaction','pentose phosphate pathway','advanced glycation end products'])for(const suffix of ['', ' diagram'])assert.equal(pmcSearchExpression(term+suffix),'("'+term+'") AND OPEN_ACCESS:Y');
  for(const q of ['abc OR xyz','tca cycle:secret','https://example.invalid','tca cycle 42'])assert.throws(()=>pmcSearchExpression(q));
 });
@@ -66,4 +66,56 @@ test('phrase discovery retains original cache identity and never calls HTTP for 
  assert.deepEqual(keys,['pmc-figure-v1:search:'+q]);assert.equal(urls.length,1);assert.equal(new URL(urls[0]).searchParams.get('query'),'("tca cycle" OR "citric acid cycle" OR "krebs cycle") AND OPEN_ACCESS:Y');
  let http=0;await assert.rejects(()=>discoverPmcFigures(q,async()=>{throw Error('prior unknown')},async()=>{http++;}),/prior unknown/);assert.equal(http,0);
  await discoverPmcFigures(q,async key=>[{kind:'search',identity:q,value:[]}],async()=>{http++});assert.equal(http,0);
+});
+
+
+test('ordinary descriptive terms are ANDed without demanding one literal phrase',()=>{
+ const {pmcSearchExpression}=require('../lib/medicalImageQuery.cjs');
+ assert.equal(pmcSearchExpression('parasympathetic bladder innervation'),'(parasympathetic AND bladder AND innervation) AND OPEN_ACCESS:Y');
+ assert.equal(pmcSearchExpression('medullary thyroid carcinoma histology'),'(medullary AND thyroid AND carcinoma AND histology) AND OPEN_ACCESS:Y');
+});
+test('article selection scans ten metadata rows, ranks actual topic and saves only two identities',()=>{
+ const {searchArticles}=require('../lib/pmcFigureSource.cjs');
+ const row=(pmcid,title,abstractText='')=>({pmcid,title,abstractText,isOpenAccess:'Y',license:'cc by'});
+ const rows=[row('PMC1',"Glial cells and Alzheimer's neuroinflammation"),row('PMC2','Androgen induced hepatocellular adenomatosis'),row('PMC3','Hepatitis B virus induces carcinogenesis'),row('PMC4','Hepatitis B virus molecular mechanisms'),row('PMC5','Hepatitis B virus carcinogenesis')];
+ let diagnostic;const result=searchArticles(JSON.stringify({resultList:{result:rows}}),'hepatitis b virus carcinogenesis',x=>diagnostic=x);
+ assert.deepEqual(result,[{pmcid:'PMC5'},{pmcid:'PMC3'}]);assert.equal(diagnostic.reasons.topic_not_established,2);
+ assert.equal(JSON.stringify(result).includes('title'),false);assert.doesNotMatch(JSON.stringify(diagnostic),/Hepatitis|Glial|http/);
+});
+test('topic scoring ignores presentation words, requires metadata and respects term boundaries',()=>{
+ const {relevantArticleScore}=require('../lib/pmcFigureSource.cjs');
+ assert.equal(relevantArticleScore({title:'A mechanism diagram and histology overview'},'medullary thyroid carcinoma histology'),0);
+ assert.equal(relevantArticleScore({},'acanthamoeba cyst'),0);
+ assert.equal(relevantArticleScore({title:'Transferase activity'},'ras mechanism'),0);
+ assert.ok(relevantArticleScore({title:'Acanthamoeba cysts in infection'},'acanthamoeba cyst')>0);
+});
+test('safe extensionless graphics resolve uniquely without weakening manifest binding',()=>{
+ const {resolveGraphicMedia}=require('../lib/pmcFigureSource.cjs');
+ const raw=xml.replace('xlink:href="diagram.jpg"','xlink:href="diagram"');
+ assert.equal(jatsFigures(raw,facts()).length,1);
+ for(const ref of ['../diagram','https://evil.test/diagram','folder/diagram','diagram.tif','diagram.jpg?x=1'])assert.deepEqual(jatsFigures(xml.replace('xlink:href="diagram.jpg"',`xlink:href="${ref}"`),facts()),[]);
+ assert.deepEqual(resolveGraphicMedia(['diagram'],[{filename:'diagram.jpg'},{filename:'diagram.png'}]),[]);
+ assert.deepEqual(resolveGraphicMedia(['diagram','other'],[{filename:'diagram.jpg'}]),[]);
+});
+test('JATS emits fixed rejection counts rather than unexplained empty candidates',()=>{
+ let d;assert.deepEqual(jatsFigures(xml.replace('diagram.jpg','missing.jpg'),facts(),x=>d=x),[]);
+ assert.equal(d.reasons.graphic_manifest_binding_missing_or_ambiguous,1);assert.equal(d.selected,0);assert.equal(d.figures,1);
+ assert.doesNotMatch(JSON.stringify(d),/Fixture|Synthetic|PMC123456|http|caption/);
+ let rights;assert.deepEqual(jatsFigures(xmlFor(figure,license.replace('/by/4.0/','/by-nc/4.0/')),facts(),x=>rights=x),[]);assert.equal(rights.reasons.article_license_unproven,1);
+});
+test('fresh JATS metadata saves diagnostic counts without raw XML or altered cache identity',async()=>{
+ const h=harness();await h.run();const entry=[...h.cache.entries()].find(([key])=>key.includes(':jats:'));
+ assert.match(entry[0],/^pmc-figure-v1:jats:PMC123456\.1:/);assert.equal(entry[1][0].value.diagnostic.selected,1);
+ assert.equal(entry[1][0].value.rawXml,undefined);assert.equal(entry[1][0].value.diagnostic.policy,'jats-selection-v1');
+ const n=h.requests.length;await h.run();assert.equal(h.requests.length,n);
+});
+
+test('topic ranking shares core query normalization and retains distinguishing medical letters',()=>{
+ const {relevantArticleScore}=require('../lib/pmcFigureSource.cjs');
+ assert.ok(relevantArticleScore({title:'The citric acid cycle'},'citric acid cycle products reaction steps')>0);
+ assert.ok(relevantArticleScore({title:'Krebs cycle'},'tca cycle intermediates and products')>0);
+ assert.equal(relevantArticleScore({title:'Hepatitis C virus carcinogenesis'},'hepatitis b virus carcinogenesis'),0);
+ assert.equal(relevantArticleScore({title:'B cell receptor signaling'},'t cell receptor signaling'),0);
+ assert.ok(relevantArticleScore({title:'Hepatitis B virus carcinogenesis'},'hepatitis b virus carcinogenesis')>0);
+ assert.ok(relevantArticleScore({title:'T-cell receptor signaling'},'t cell receptor signaling')>0);
 });

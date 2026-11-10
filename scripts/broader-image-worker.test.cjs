@@ -89,3 +89,10 @@ test('precise query prompt teaches a general selection rule rather than requirin
  assert.ok(IMAGE_PROMPT.includes('自行判斷'));assert.ok(IMAGE_PROMPT.includes('範例只示範格式'));assert.ok(!IMAGE_PROMPT.includes('通常2至5詞'));
  assert.doesNotMatch(IMAGE_PROMPT,/MOEX-|107020|111100/);
 });
+
+test('duplicate bytes still consume the three-download hard bound across expanded discovery',async()=>{
+ const f=fixture({verdicts:['mismatch','mismatch','mismatch']});
+ const all=Array.from({length:9},(_,i)=>({...commons,sourceUrl:'https://commons.wikimedia.org/wiki/File:Fixture'+i+'.png',previewUrl:'https://upload.wikimedia.org/fixture'+i+'.png'}));
+ let calls=0;const result=await f.run({search:async()=>all.slice(0,3),discover:async()=>all.slice(3,6),loadImage:async()=>{calls++;return {bytes:Buffer.from([137,80,78,71,13,10,26,10,1]),mime:'image/png'}}});
+ assert.ok(calls<=3);assert.equal(result.status,'awaiting_image');
+});
