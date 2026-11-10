@@ -3,7 +3,7 @@ import {runNewImageContinuation} from '@/lib/newExplanationImageContinuation.cjs
 import {enqueueSavedPlan} from '@/lib/savedExplanationImagePlan.cjs';
 import {continueFigure,createContinuationRepository} from '@/lib/figureContinuation.cjs';
 import {resolveTrustedExplanationQuestion} from "@/lib/trustedQuestionLoader";
-import {createFinalFigureReviewer} from "@/lib/finalFigureRuntime.cjs";
+import {createFinalFigureReviewer,recoverStoredFigureReview} from "@/lib/finalFigureRuntime.cjs";
 import {reviewStagedFigure} from "@/lib/stagedFigureReview.cjs";
 import {figureCaptureAllowed,guardFigureTraffic} from "@/lib/figureCaptureGate.cjs";
 import {NextRequest,NextResponse} from 'next/server';
@@ -26,6 +26,17 @@ export async function POST(request:NextRequest){
   const sitewide=process.env.EXPLANATION_SITEWIDE_ENABLED==='1';
   if(process.env.EXPLANATION_SITEWIDE_ENABLED!=='1'&&process.env.NEW_EXPLANATION_IMAGES_SINGLE_BATCH&&!pilotTargets.length)return reply({ok:false,code:'invalid_pilot'},503);
   if(pilotTargets.length>1&&(!process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID||u.id!==process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID))return reply({ok:false,code:'pilot_operator'},403);
+  if(body.action==='model_recover'){
+   if(typeof body.operationId!=='string'||! /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.operationId))return reply({ok:false,code:'invalid_operation'},400);
+   if(process.env.FIGURE_LUNA_REVIEW_ENABLED!=='1'||!imageWindowOpen(process.env)||!await figureCaptureAllowed(db))return reply({ok:false,code:'worker_disabled'},503);
+   // Reads only saved response bytes; never creates an operation or calls a model.
+   const result=await recoverStoredFigureReview({db,operationId:body.operationId,authorize:async(e:any)=>{
+    if(!sitewide)return u.id===process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID&&pilotTargets.some(t=>t.questionId===e.binding?.questionId&&t.textHash===e.binding?.textHash);
+    const admitted=await db.rpc('explanation_sitewide_request_allowed',{p_id:e.binding?.requestId,p_actor:u.id});
+    return !admitted.error&&admitted.data===true;
+   }});
+   return reply({ok:true,...result});
+  }
   if(['continuation_open','continuation_run','continuation_status'].includes(body.action)){
    if(!sitewide&&(!pilotTargets.length||u.id!==process.env.NEW_EXPLANATION_IMAGES_OPERATOR_ID))return reply({ok:false,code:'pilot_operator'},403);
    if(typeof body.id!=='string'||! /^[0-9a-f-]{36}$/i.test(body.id))return reply({ok:false,code:'invalid_operation'},400);
