@@ -39,3 +39,42 @@
 .frame.frame :global(.jump){order:0;grid-column:3;grid-row:1;margin-left:0}
 .frame.frame :global(.flags){gap:12px;flex-wrap:wrap;white-space:normal}
 .frame.frame :global(.flags legend){margin-right:12px}
+
+/* Keep the reading viewport independent of the fixed exam chrome. */
+.frame.frame :global(.question-reading-area){display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;overflow:hidden}
+.frame.frame :global(.question-content){min-width:0;margin:0}
+.frame.frame :global(.question-content > div:first-child){margin-bottom:12px}
+.frame.frame :global(.question-body){scrollbar-width:auto;scrollbar-color:#888 #eee;scroll-padding:8px}
+.frame.frame :global(.question-scroll-cue){flex:none;min-height:22px;text-align:right;font:12px/22px Arial,"Microsoft JhengHei",sans-serif}
+.frame.frame :global(.question-scroll-cue button){padding:0 6px;border:0;background:transparent;color:#314f69;text-decoration:underline;cursor:pointer;font:inherit}
+
+@media(max-height:800px){
+ .frame.frame :global(.exam-header){padding:0 0 3px}
+ .frame.frame :global(.exam-title){min-height:26px;padding:1px 10px;font-size:16px;line-height:24px}
+ .frame.frame :global(.candidate-panel){padding:5px 10px 6px}
+ .frame.frame :global(.candidate-top){padding-bottom:5px;gap:10px}
+ .frame.frame :global(.identity){gap:2px 24px;font-size:14px;line-height:22px}
+ .frame.frame :global(.header-actions){gap:8px;padding-top:0}
+ .frame.frame :global(.exam-stats){padding-top:5px;gap:4px 0;font-size:14px;line-height:22px}
+ .frame.frame :global(.exam-stats > span){padding:0 10px}
+ .frame.frame :global(.exam-stats > span:first-child){padding-left:0}
+ .frame.frame :global(.toolbar){gap:8px;margin-bottom:5px}
+ .frame.frame :global(.flags),.frame.frame :global(.flags legend),.frame.frame :global(.flags label),.frame.frame :global(.jump){font-size:14px;line-height:22px}
+ .frame.frame :global(.flags){gap:8px;min-height:22px}
+ .frame.frame :global(.flags legend){margin-right:6px}
+ .frame.frame :global(.single-note){font-size:13px;line-height:19px}
+ .frame.frame :global(.question-caption){margin-bottom:5px}
+ .frame.frame :global(.exam-footer){font-size:10px;line-height:15px;padding-top:2px;padding-bottom:2px}
+}
+@media(max-width:1000px){
+ .frame.frame :global(.toolbar){grid-template-columns:minmax(0,1fr) auto}
+ .frame.frame :global(.answer-tools){grid-column:1/-1;grid-row:2}
+ .frame.frame :global(.jump){grid-column:2;grid-row:1}
+ .frame.frame :global(.identity){column-gap:12px}
+ .frame.frame :global(.exam-stats > span){padding-left:7px;padding-right:7px}
+}
+@media(max-height:650px){
+ .frame.frame :global(.bottom-nav){display:none}
+ .frame.frame :global(.answer-area){padding-top:5px}
+ .frame.frame :global(.question-caption){margin-bottom:3px}
+}
