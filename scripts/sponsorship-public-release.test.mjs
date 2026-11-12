@@ -39,3 +39,15 @@ test('existing official paper-card fix and release note are preserved',()=>{
  assert.match(read('app/page.tsx'),/考卷續作卡片排版修正/);
  assert.match(read('components/PastPaperCard.tsx'),/本次已答/);
 });
+
+test('published copy uses formal policy language without preview or development narration',()=>{
+ const info=read('components/SponsorshipInformation.tsx');
+ const form=read('components/SponsorshipSupportForm.tsx');
+ const page=read('components/SponsorshipPage.tsx');
+ const donor=read('components/SponsorshipDonorPreferences.tsx');
+ assert.doesNotMatch(info,/目前填寫|當前頁面|不會送出或儲存|重新整理後即清除/);
+ assert.doesNotMatch(form,/填寫內容不會送出|操作預覽|設定預覽/);
+ assert.doesNotMatch(page,/本版|此版|先列出|暫不提供|確認後再補入/);
+ assert.doesNotMatch(donor,/設定預覽|你的顯示預覽|目前只在本頁預覽/);
+ assert.match(form,/付款尚未開放/); assert.match(page,/付款尚未開放/); assert.match(info,/款項完全用於支持網站維護，展開可查看詳細說明。/);
+});
