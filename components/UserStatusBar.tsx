@@ -10,6 +10,7 @@ import {
   Cloud,
   FileClock,
   Home,
+  Heart,
   Library,
   LogOut,
   Menu,
@@ -78,7 +79,8 @@ const STUDY_TOOL_LINKS: NavItem[] = [
 
 const REVIEW_LINKS: NavItem[] = [
   { href: "/leaderboard", label: "刷題榜", icon: Trophy },
-  { href: "/post-exam", label: "考後回顧", icon: BookOpenText }
+  { href: "/post-exam", label: "考後回顧", icon: BookOpenText },
+  { href: "/sponsorship", label: "贊助與支出", icon: Heart }
 ];
 
 const MORE_LINK_GROUPS = [

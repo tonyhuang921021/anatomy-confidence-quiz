@@ -6,3 +6,11 @@ reports
 tsconfig.tsbuildinfo
 
 output/
+
+# Keep private recovery notes and non-deployed backend recipes out of website uploads.
+/.codex/
+/docs/
+/scripts/*
+!/scripts/moex-primary-subject.js
+!/scripts/moex-primary-subject.d.ts
+/supabase/
