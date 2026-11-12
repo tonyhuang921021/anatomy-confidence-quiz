@@ -43,7 +43,7 @@ test('UI-review release blocks every sponsorship API before inherited project co
     assert.ok(gate > 0 && gate < dispatch, route);
   }
   const ignores = read('.vercelignore');
-  for (const name of ['.env*', '.codex', 'docs', 'scripts', 'supabase']) assert.ok(ignores.split('\n').includes(name));
+  for (const name of ['.env*', '/.codex/', '/docs/', '/scripts/*', '/supabase/']) assert.ok(ignores.split('\n').includes(name));
 });
 
 test('owner requested amounts only: no receipt images, PDF links or uploaded files', () => {
@@ -57,4 +57,11 @@ test('owner requested amounts only: no receipt images, PDF links or uploaded fil
     assert.equal('images' in row, false);
   }
   assert.equal(fs.existsSync(new URL('../public/sponsorship/receipts', import.meta.url)), false);
+});
+
+test('deployment exclusions retain existing nested Supabase and required quiz modules', async () => {
+  const { default: ignore } = await import('ignore');
+  const rules = ignore().add(read('.vercelignore'));
+  for (const path of ['.codex/CURRENT_WORK.md', 'docs/sponsorship-private-password-setup.md', 'supabase/functions/oen-sandbox/index.ts', '.env.local']) assert.equal(rules.ignores(path), true, path);
+  for (const path of ['lib/supabase/client.ts', 'lib/supabase/recoveryMode.ts', 'scripts/moex-primary-subject.js', 'scripts/moex-primary-subject.d.ts']) assert.equal(rules.ignores(path), false, path);
 });
