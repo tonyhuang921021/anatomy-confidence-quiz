@@ -1,0 +1,16 @@
+export type SandboxDonorPreferenceInput = { displayName: string; publishDisplayName: boolean; publishAmount: boolean };
+export type SandboxDonorPreferences = { displayName: string | null; publishDisplayName: boolean; publishAmount: boolean; revision: number };
+export type SandboxPublicConfig = { environment: 'sandbox'; supabaseUrl: string; publishableKey: string; checkoutEnabled: boolean; donorPreferencesEnabled: boolean };
+export type SandboxOrderStatus = { orderId: string; amount: number; currency: 'TWD'; environment: 'sandbox'; status: 'pending' | 'verified_paid'; verifiedPaidAt: string | null; needsReview: boolean | null; donorPreferences: SandboxDonorPreferences | null };
+export type SandboxReconciliation = { order: SandboxOrderStatus; needsReview: boolean; verification: 'verified_paid' | 'not_verified_paid' | 'no_transaction' | 'multiple_transactions' | 'mismatch' };
+export const SANDBOX_AUTH_URL: string;
+export function parseSandboxOrderId(value: unknown): string | null;
+export function readSandboxReturnOrder(params: URLSearchParams): string | null;
+export function parseSandboxAmount(value: unknown): number | null;
+export function parseSandboxPublicConfig(value: unknown): SandboxPublicConfig | null;
+export function parseSandboxDonorPreferences(value: unknown): SandboxDonorPreferences | null;
+export function parseSandboxDonorConsent(value: unknown, expectedOrderId: string): { environment: 'sandbox'; orderId: string; donorPreferences: SandboxDonorPreferences } | null;
+export function parseSandboxOrderStatus(value: unknown, expectedOrderId: string): SandboxOrderStatus | null;
+export function parseSandboxCheckout(value: unknown): { orderId: string; checkoutUrl: string | null; status: SandboxOrderStatus | null; donorPreferences: SandboxDonorPreferences | null } | null;
+export function parseSandboxReconciliation(value: unknown, expectedOrderId: string): SandboxReconciliation | null;
+export function sandboxErrorMessage(code: string): string;

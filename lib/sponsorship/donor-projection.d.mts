@@ -1,0 +1,11 @@
+export const MAX_DISPLAY_NAME_CODEPOINTS: 40;
+export const MIN_SPONSORSHIP_AMOUNT: 1;
+export const MAX_SPONSORSHIP_AMOUNT: 100000;
+export type DonorPreferencesInput = { displayName?: string; publishDisplayName?: boolean; publishAmount?: boolean };
+export type DonorPreferences = Readonly<{ displayName: string | null; publishDisplayName: boolean; publishAmount: boolean }>;
+export type PublicDonorEntry = Readonly<{ id: string; displayName: string; amount: number | null; currency: 'TWD' }>;
+export function validateSponsorshipAmount(value: unknown): number;
+export function normalizeDonorDisplayName(value?: unknown): string;
+export function normalizeDonorPreferences(value?: DonorPreferencesInput): DonorPreferences;
+export function projectPublicDonor(record: unknown, options?: { now?: number }): PublicDonorEntry | null;
+export function buildPublicDonorList(records: unknown[], options?: { now?: number }): Readonly<{ donors: PublicDonorEntry[]; publicAmountTotal: number; currency: 'TWD' }>;

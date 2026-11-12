@@ -1,0 +1,108 @@
+{
+  "asOf": "2026-10-17",
+  "paidTotal": 251.37,
+  "invoiceOnlyTotal": 0,
+  "currency": "USD",
+  "records": [
+    {
+      "vendor": "Supabase",
+      "date": "2026-06-07",
+      "period": "2026-06-07 – 2026-07-06",
+      "amount": 25,
+      "status": "paid_user_confirmed",
+      "detail": "Pro Plan；站長已確認付款，納入已付合計；6 月 7 日為原始發票日期",
+      "currency": "USD"
+    },
+    {
+      "vendor": "Vercel",
+      "date": "2026-06-16",
+      "period": "2026-06-16 – 2026-07-15",
+      "amount": 20,
+      "status": "paid",
+      "detail": "Pro $20；收據未另列稅",
+      "currency": "USD"
+    },
+    {
+      "vendor": "Supabase",
+      "date": "2026-07-07",
+      "period": "2026-07-07 – 2026-08-06",
+      "usagePeriod": "2026-06-07 – 2026-07-06",
+      "amount": 25,
+      "status": "paid",
+      "detail": "Pro $25；前期用量 $16.42 由同額折抵抵銷；收據未另列稅",
+      "currency": "USD"
+    },
+    {
+      "vendor": "Vercel",
+      "date": "2026-07-17",
+      "period": "2026-07-16 – 2026-08-15",
+      "usagePeriod": "2026-06-16 – 2026-07-15",
+      "amount": 42.62,
+      "status": "paid",
+      "detail": "Pro $20＋前期用量 $22.62；收據未另列稅",
+      "currency": "USD"
+    },
+    {
+      "vendor": "Supabase",
+      "date": "2026-08-07",
+      "period": "2026-08-07 – 2026-09-06",
+      "usagePeriod": "2026-07-07 – 2026-08-06",
+      "amount": 26.25,
+      "status": "paid",
+      "detail": "Pro $25＋TW 5% $1.25；前期用量 $19.46 由同額折抵抵銷",
+      "currency": "USD"
+    },
+    {
+      "vendor": "Vercel",
+      "date": "2026-08-16",
+      "period": "2026-08-16 – 2026-09-15",
+      "amount": 20,
+      "status": "paid",
+      "detail": "Pro $20；Observability Plus $0；收據未另列稅",
+      "currency": "USD"
+    },
+    {
+      "vendor": "Supabase",
+      "date": "2026-09-07",
+      "period": "2026-09-07 – 2026-10-06",
+      "usagePeriod": "2026-08-07 – 2026-09-06",
+      "amount": 26.25,
+      "status": "paid",
+      "detail": "Pro $25＋TW 5% $1.25；前期用量 $11.53 由同額折抵抵銷",
+      "currency": "USD"
+    },
+    {
+      "vendor": "Vercel",
+      "date": "2026-09-17",
+      "period": "2026-09-16 – 2026-10-15",
+      "amount": 20,
+      "status": "paid",
+      "detail": "Pro $20；Observability Plus $0；收據未另列稅",
+      "currency": "USD"
+    },
+    {
+      "vendor": "Supabase",
+      "date": "2026-10-07",
+      "period": "2026-10-07 – 2026-11-06",
+      "usagePeriod": "2026-09-07 – 2026-10-06",
+      "amount": 26.25,
+      "status": "paid",
+      "detail": "Pro $25＋TW 5% $1.25；前期用量 $10.58 由同額折抵抵銷",
+      "currency": "USD"
+    },
+    {
+      "vendor": "Vercel",
+      "date": "2026-10-16",
+      "period": "2026-10-16 – 2026-11-15",
+      "amount": 20,
+      "status": "paid",
+      "detail": "Pro $20；Observability Plus $0；收據未另列稅",
+      "currency": "USD"
+    }
+  ],
+  "conversion": {
+    "rate": 32.43,
+    "quotedAt": "2026-10-16 15:33 Asia/Taipei",
+    "source": "https://rate.bot.com.tw/xrt?Lang=zh-TW"
+  }
+}

@@ -6,3 +6,9 @@ reports
 tsconfig.tsbuildinfo
 
 output/
+
+# Keep private recovery notes and non-deployed backend recipes out of website uploads.
+.codex
+docs
+scripts
+supabase

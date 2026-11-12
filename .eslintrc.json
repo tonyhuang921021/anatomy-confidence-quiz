@@ -1,3 +1,9 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "overrides": [
+    {
+      "files": ["**/*.d.mts", "**/*.d.cts"],
+      "parser": "@typescript-eslint/parser"
+    }
+  ]
 }
