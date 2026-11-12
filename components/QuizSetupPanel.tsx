@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { SelectedSimulationPaperPanel } from "@/components/SelectedSimulationPaperPanel";
+import { PastPaperCard } from "@/components/PastPaperCard";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { getAISimulationPaperOptions, getPastPaperOptions } from "@/data/med1QuestionBank";
 import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
@@ -554,14 +555,20 @@ export function QuizSetupPanel({
                       {allPastPapers.filter((paper) => paper.sourceYear === visibleYear).map((paper) => {
                         const summary = completedPaperSummaries[paper.key];
                         const progress = currentPaperKey === paper.key && currentSession ? currentSession.attempts.length : null;
-                        return <div key={paper.key} className="min-w-0 rounded-xl border border-slate-200 bg-white">
-                          <button type="button" aria-pressed={settings.selectedPaperKey === paper.key} onClick={() => updateSettings({ subjectFilter: paper.subject, selectedPaperKey: paper.key })} className={`w-full min-w-0 rounded-xl px-3 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${settings.selectedPaperKey === paper.key ? "bg-brand-50 text-brand-800 ring-1 ring-brand-600" : "text-slate-700"}`}>
-                            <span className="block text-xs text-slate-500">{paper.cardTrackLabel}</span>
-                            <span className="mt-1 block text-sm font-semibold">第 {paper.sourceRound ?? 1} 次・{paper.cardPaperTitle ?? paper.subject}</span>
-                            <span className="mt-1 block text-xs text-slate-500">{paper.questionCount} 題・{summary ? summary.lastScore === null ? "上次未作答" : `上次已答題正確率 ${summary.lastScore}%` : "尚未作答"}</span>
-                          </button>
-                          {progress !== null && currentSession ? <div className="px-3 pb-3 text-xs text-slate-600">進行中，已答 {progress} / {currentSession.questionOrder?.length ?? paper.questionCount} 題・<a className="font-semibold text-brand-700 underline" href={`/quiz?resume=1&sessionId=${encodeURIComponent(currentSession.id)}`}>繼續作答</a></div> : null}
-                        </div>;
+                        return <PastPaperCard
+                          key={paper.key}
+                          selected={settings.selectedPaperKey === paper.key}
+                          onSelect={() => updateSettings({ subjectFilter: paper.subject, selectedPaperKey: paper.key })}
+                          trackLabel={paper.cardTrackLabel}
+                          title={`第 ${paper.sourceRound ?? 1} 次・${paper.cardPaperTitle ?? paper.subject}`}
+                          questionCount={paper.questionCount}
+                          lastAttemptSummary={summary ? summary.lastScore === null ? "上次未作答" : `上次已答題正確率 ${summary.lastScore}%` : "尚未作答"}
+                          resume={progress !== null && currentSession ? {
+                            href: `/quiz?resume=1&sessionId=${encodeURIComponent(currentSession.id)}`,
+                            answeredCount: progress,
+                            totalCount: currentSession.questionOrder?.length ?? paper.questionCount
+                          } : undefined}
+                        />;
                       })}
                     </div>
                   </div>
