@@ -96,3 +96,17 @@ test('Q036 keeps D grading external to original and notes the printed A/body D d
  const q=release.rows.find(r=>r.questionId==='MOEX-106020-5301-Q036');assert.ok(q.sourceNotes.some(n=>n.includes('D')&&n.includes('A')));assert.equal(q.sourceFile,'106-1醫學(一).pdf');
  assert.ok(release.rows.filter(r=>r.sourceFile==='115-1醫學一合併總檔.pdf'&&r.status!=='pending_source').every(r=>r.sourceLabel==='長庚117級原稿詳解'));
 });
+test('115-2 supplement serves original images and preserves live human notes without mutations',async()=>{
+ const supplement=require('../data/sources/yangming_1152_release.json');
+ for(const row of supplement.rows){
+  assert.equal(helper.isReviewedYangmingQuestion(row.questionId),true);
+  const found=helper.findReviewedYangmingExplanation(row.questionId,'https://offline.invalid');
+  assert.equal(found.content.releaseId,supplement.releaseId);
+  assert.equal(found.content.assets.length,row.assets.length);
+  assert.ok(found.content.assets.every(asset=>asset.src.startsWith('/assets/yangming1152/')));
+ }
+ const result=await request('MOEX-115090-1301-Q021',{active:[{body:'獨立人工補充'}]});
+ assert.equal(result.response.status,200);assert.equal(result.calls.writes,0);
+ assert.equal(result.response.body.explanation.humanNotes[0].body,'獨立人工補充');
+ assert.equal(helper.findReviewedYangmingExplanation('MOEX-115090-2301-Q061','https://offline.invalid'),null);
+});

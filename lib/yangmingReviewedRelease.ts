@@ -1,17 +1,37 @@
 import release from "../data/sources/yangming_reviewed_release.json";
+import supplement from "../data/sources/yangming_1152_release.json";
 import type { YangmingExplanationContent } from "../types/quiz";
 
 const rows = new Map(release.rows.map(row => [row.questionId, row]));
 const aliases = new Map(release.rows.map(row => [row.sourceQuestionId, row.questionId]));
+const supplementalRows = new Map(supplement.rows.map(row => [row.questionId, row]));
 export const YANGMING_REVIEWED_RELEASE_ID = release.releaseId;
 export function isReviewedYangmingQuestion(questionId: string) {
-  return rows.has(aliases.get(questionId) ?? questionId);
+  return rows.has(aliases.get(questionId) ?? questionId) || supplementalRows.has(questionId);
 }
 
 export function findReviewedYangmingExplanation(questionId: string, storageUrl: string) {
   const canonicalId = aliases.get(questionId) ?? questionId;
   const row = rows.get(canonicalId);
-  if (!row) return null;
+  if (!row) {
+    const supplemental = supplementalRows.get(questionId);
+    if (!supplemental) return null;
+    const content: YangmingExplanationContent = {
+      body: supplemental.body,
+      reviewedOriginal: true,
+      releaseId: supplement.releaseId,
+      author: supplemental.author ?? undefined,
+      reviewer: supplemental.reviewer ?? undefined,
+      sourceLabel: supplemental.sourceLabel,
+      sourceFile: supplemental.sourceFile,
+      sourcePageStart: supplemental.sourcePageStart,
+      sourcePageEnd: supplemental.sourcePageEnd,
+      sourceNotes: supplemental.sourceNotes,
+      humanNotes: [],
+      assets: supplemental.assets
+    };
+    return { canonicalId: questionId, sourceQuestionId: questionId, content };
+  }
   const publicPrefix = storageUrl.replace(/\/$/, "") + "/storage/v1/object/public/" + release.storageBucket + "/";
   const content: YangmingExplanationContent = {
     body: row.body, reviewedOriginal: true, releaseId: release.releaseId,
