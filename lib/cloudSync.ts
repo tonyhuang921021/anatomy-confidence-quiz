@@ -1155,7 +1155,7 @@ async function syncSessionsThroughServer(
     reconciled.push(canonical);
   }
   if (!response.ok || !payload?.ok) {
-    throw Object.assign(new Error(payload?.message || "作答版本已更新，已保留本機送出版本並取回最新作答，請確認後再交卷。"),{canonicalSessions:reconciled});
+    throw Object.assign(new Error(payload?.message || (response.status === 409 ? "作答版本已更新，已保留本機送出版本並取回最新作答，請確認後再交卷。" : response.status === 401 ? "登入狀態已失效，作答仍保留在本機；請重新登入後再交卷。" : "伺服器尚未確認交卷，作答仍保留在本機；請稍後重試。")),{canonicalSessions:reconciled});
   }
   if(sessions.some(s=>s.answerEdits&&!reconciled.some(c=>c.id===s.id)))throw Error('CANONICAL_ACK_MISSING');
   return reconciled;

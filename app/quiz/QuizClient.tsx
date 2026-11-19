@@ -2180,9 +2180,18 @@ function OwnerQuizPage() {
     persistSession(clearRendererAttempt(latestCurrentSessionRef.current??session,currentQuestion.id));
     resetQuestionUI();
   }
-  function finishExamPresentation() {
-    if(!session||session.completedAt)return;
-    completeSessionAndNavigate({...latestCurrentSessionRef.current??session,completedAt:new Date().toISOString(),isReviewingAnswer:false});
+  async function finishExamPresentation() {
+    if(!session||session.completedAt||isSubmittingAnswer)return;
+    setIsSubmittingAnswer(true);
+    setCompletionNotice("正在確認交卷；請保留此頁。");
+    try {
+      await completeSessionAndNavigate({...latestCurrentSessionRef.current??session,completedAt:new Date().toISOString(),isReviewingAnswer:false});
+    } catch (error) {
+      completingIds.current.delete(JSON.stringify([authSession?.user?.id??"guest",session.id]));
+      setCompletionNotice(error instanceof Error ? error.message : "交卷尚未完成，請保留此頁並重試。");
+    } finally {
+      setIsSubmittingAnswer(false);
+    }
   }
 
   function handleToggleEliminatedOption(value: OptionKey) {
@@ -2665,7 +2674,7 @@ function OwnerQuizPage() {
         : null;
 
   if(examPresentation&&process.env.NEXT_PUBLIC_EXAM_RENDERER_ENABLED==='true'&&session.settings?.mode==='simulation'&&!session.completedAt&&!session.examSessionSync){
-    return <>{completionNotice?<p role="status" className="mx-auto max-w-5xl p-3">{completionNotice}</p>:null}<OriginalSessionExamRenderer key={`${authSession?.user?.id??'guest'}:${session.id}`} session={session} questions={questionSet} owner={authSession?.user?.id??'guest'} elapsed={simulationTimerElapsedSeconds} paused={simulationTimerPaused} disabled={isSubmittingAnswer} onAnswer={option=>{confidenceRef.current=confidenceForNewExamAnswer(latestCurrentSessionRef.current??session,currentQuestion.id);setConfidence(confidenceRef.current);handleSubmit(option,true);}} onClear={clearExamAnswer} onFlag={value=>{confidenceRef.current=confidenceForExamFlag(value);setConfidence(confidenceRef.current);persistSession(setExamConfidenceFlag(latestCurrentSessionRef.current??session,currentQuestion.id,value));}} onNavigate={handleJumpToQuestion} onFinish={finishExamPresentation} onPause={handleToggleSimulationTimerPaused}/></>;
+    return <><OriginalSessionExamRenderer key={`${authSession?.user?.id??'guest'}:${session.id}`} session={session} questions={questionSet} owner={authSession?.user?.id??'guest'} elapsed={simulationTimerElapsedSeconds} paused={simulationTimerPaused} disabled={isSubmittingAnswer} completionNotice={completionNotice} onAnswer={option=>{confidenceRef.current=confidenceForNewExamAnswer(latestCurrentSessionRef.current??session,currentQuestion.id);setConfidence(confidenceRef.current);handleSubmit(option,true);}} onClear={clearExamAnswer} onFlag={value=>{confidenceRef.current=confidenceForExamFlag(value);setConfidence(confidenceRef.current);persistSession(setExamConfidenceFlag(latestCurrentSessionRef.current??session,currentQuestion.id,value));}} onNavigate={handleJumpToQuestion} onFinish={finishExamPresentation} onPause={handleToggleSimulationTimerPaused}/></>;
   }
 
   return (
