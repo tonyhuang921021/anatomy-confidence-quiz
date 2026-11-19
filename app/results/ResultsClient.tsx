@@ -16,6 +16,8 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSessionNames } from "@/components/useSessionNames";
+import { MAX_SESSION_NAME_LENGTH } from "@/lib/sessionNames";
 import { useAuth } from "@/components/AuthProvider";
 import { CloudHistoryReadStatus } from "@/components/CloudHistoryReadStatus";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
@@ -949,6 +951,7 @@ function ResultsPageContent() {
   const [resultsScope, setResultsScope] = useState<"default" | "simulation">("default");
   const [localHistoryVersion, setLocalHistoryVersion] = useState(0);
   const [editableSessionName, setEditableSessionName] = useState("");
+  const sessionNameDirtyRef = useRef(false);
   const [sessionNameNotice, setSessionNameNotice] = useState("");
   const [resultRecordNotice, setResultRecordNotice] = useState("");
   const [isSavingSessionName, setIsSavingSessionName] = useState(false);
@@ -958,6 +961,18 @@ function ResultsPageContent() {
     summary: null,
     completedSessions: []
   });
+
+  const resultNames = useSessionNames(user?.id, session?.access_token, [
+    ...state.sessions.map(item => item.id),
+    ...state.completedSessions.map(item => item.id),
+    ...(state.session ? [state.session.id] : [])
+  ]);
+  const currentCustomName = state.session ? resultNames.names[getCanonicalSessionId(state.session.id)] : undefined;
+  const nameContextRef = useRef("");
+  nameContextRef.current = `${user?.id ?? "guest"}:${state.session?.id ?? ""}`;
+  function displayResultName(result: QuizSession) {
+    return resultNames.names[getCanonicalSessionId(result.id)] || getSessionDisplayName(result);
+  }
 
   function queueResultCloudHandoff(resultSession: QuizSession) {
     if (!resultSession.completedAt || resultSession.attempts.length === 0) return;
@@ -1085,7 +1100,7 @@ function ResultsPageContent() {
       downloadConfidenceOverviewAsPng({
         width: getConfidenceOverviewExportWidth(),
         filename: `confidence-overview-${getCanonicalSessionId(state.session.id)}.png`,
-        sessionName: getSessionDisplayName(state.session),
+        sessionName: displayResultName(state.session),
         correctCount:
           state.summary?.correct ??
           confidenceOverviewItems.filter(({ attempt }) => attempt.isCorrect).length,
@@ -1375,6 +1390,8 @@ function ResultsPageContent() {
     setIsConfidenceOverviewOpen(false);
   }, [requestedSessionId]);
 
+  useEffect(() => { sessionNameDirtyRef.current = false; }, [state.session?.id, user?.id]);
+
   useEffect(() => {
     if (!state.session) {
       setEditableSessionName("");
@@ -1382,9 +1399,9 @@ function ResultsPageContent() {
       return;
     }
 
-    setEditableSessionName(getSessionDisplayName(state.session));
+    if (!sessionNameDirtyRef.current) setEditableSessionName(currentCustomName || getSessionDisplayName(state.session));
     setSessionNameNotice("");
-  }, [state.session]);
+  }, [state.session, currentCustomName, user?.id]);
 
   useEffect(() => {
     setExplanationOverrides((current) =>
@@ -1750,41 +1767,16 @@ function ResultsPageContent() {
     );
   }
 
-  async function handleSaveSimulationSessionName() {
-    if (!state.session || !isSimulationSession(state.session)) return;
-
-    const nextName =
-      editableSessionName.trim() || getDefaultSimulationSessionName(state.session) || "模擬考試卷";
-    const nextSession: QuizSession = {
-      ...state.session,
-      settings: {
-        ...(state.session.settings ?? DEFAULT_QUIZ_SETTINGS),
-        mode: "simulation",
-        sessionName: nextName,
-        paperMode:
-          state.session.settings?.paperMode ??
-          getPaperModeFromPaperKey(getPastPaperKeyFromSession(state.session)),
-        selectedPaperKey: state.session.settings?.selectedPaperKey ?? getPastPaperKeyFromSession(state.session)
-      }
-    };
-
+  async function handleSaveSessionName() {
+    if (!state.session || isSavingSessionName) return;
+    const context = nameContextRef.current;
     setIsSavingSessionName(true);
     setSessionNameNotice("");
-
-    saveCompletedSession(nextSession);
-    setState((current) => ({
-      ...current,
-      session: nextSession,
-      sessions: current.sessions.map((sessionItem) =>
-        sessionItem.id === nextSession.id ? nextSession : sessionItem
-      )
-    }));
-
     try {
-      await pushCompletedSessionToSupabase(nextSession);
-      setSessionNameNotice("已更新試卷名稱。");
-    } catch {
-      setSessionNameNotice("已更新本機名稱，雲端同步稍後再試。");
+      const saved = await resultNames.save(state.session.id, editableSessionName);
+      if (saved && nameContextRef.current === context) setSessionNameNotice(user ? "已儲存名稱，可跨裝置查看。" : "已儲存名稱於此瀏覽器（訪客紀錄）。");
+    } catch (error) {
+      if (nameContextRef.current === context) setSessionNameNotice(error instanceof Error ? error.message : "名稱尚未儲存，請再試一次。");
     } finally {
       setIsSavingSessionName(false);
     }
@@ -2091,10 +2083,10 @@ function ResultsPageContent() {
                       <div>
                         <p className="text-sm font-semibold text-ink">
                           {resultsScope === "simulation"
-                            ? getSessionDisplayName(sessionItem)
+                            ? displayResultName(sessionItem)
                             : sessionItem.settings?.mode === "search_practice"
-                              ? `第 ${recentCompletedSessions.length - index} 筆・${getSessionDisplayName(sessionItem)}`
-                              : `第 ${recentCompletedSessions.length - index} 筆・${sessionItem.subject}`}
+                              ? `第 ${recentCompletedSessions.length - index} 筆・${displayResultName(sessionItem)}`
+                              : `第 ${recentCompletedSessions.length - index} 筆・${resultNames.names[getCanonicalSessionId(sessionItem.id)] || sessionItem.subject}`}
                         </p>
                         <p className="mt-2 text-sm text-slate-500">
                           {getSessionModeLabel(sessionItem)} ・{" "}
@@ -2997,7 +2989,7 @@ function ResultsPageContent() {
         <div>
           <p className="workspace-page-kicker">作答結果</p>
           <h1 className="workspace-page-title">
-            {getSessionSubjectLabel(state.session, reviewedAttempts)}
+            {currentCustomName ? `${currentCustomName}結果分析` : getSessionSubjectLabel(state.session, reviewedAttempts)}
           </h1>
           <p className="mt-2 text-sm text-slate-500">
             本輪模式：{getSessionModeLabel(state.session)}
@@ -3045,18 +3037,19 @@ function ResultsPageContent() {
             重新開始
           </button>
             </div>
-          {isSimulationSession(state.session) ? (
+          {state.session ? (
             <div className="mt-4 flex flex-col gap-3 sm:max-w-xl sm:flex-row sm:items-center">
               <input
                 value={editableSessionName}
-                onChange={(event) => setEditableSessionName(event.target.value)}
+                onChange={(event) => { sessionNameDirtyRef.current = true; setEditableSessionName(event.target.value); }}
                 className="min-h-12 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-1"
-                aria-label="模擬考名稱"
-                placeholder="替這份模擬考命名"
+                aria-label="作答紀錄名稱"
+                maxLength={MAX_SESSION_NAME_LENGTH}
+                placeholder="替這次作答命名（留空恢復預設）"
               />
               <button
                 type="button"
-                onClick={handleSaveSimulationSessionName}
+                onClick={handleSaveSessionName}
                 disabled={isSavingSessionName}
                 className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
               >
@@ -3064,6 +3057,7 @@ function ResultsPageContent() {
               </button>
             </div>
           ) : null}
+          {resultNames.readError ? <p className="mt-2 text-sm text-amber-700" role="status">{resultNames.readError} 目前顯示預設或上次讀取的名稱。</p> : null}
           {sessionNameNotice ? (
             <p className="mt-2 text-sm text-emerald-700" role="status" aria-live="polite">{sessionNameNotice}</p>
           ) : null}

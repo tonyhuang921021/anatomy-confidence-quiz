@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import { getYangming1152SourceLink } from "@/lib/yangming1152SourceLinks";
 import { getYangmingLegacySourceLink } from "@/lib/yangmingLegacySourceLinks";
 import type { YangmingExplanationContent } from "@/types/quiz";
 
@@ -537,6 +538,24 @@ function YangmingExplanationContentBlock({
 }
 
 export function YangmingExplanationPanel(props: Props) {
+  const currentSource = getYangming1152SourceLink(props.questionId);
+  if (currentSource) return (
+    <details open={props.autoLoad || props.hideButton || undefined} className={`min-w-0 rounded-2xl bg-amber-50 p-4 text-sm text-amber-950 ring-1 ring-amber-100 ${props.className ?? ""}`}>
+      <summary className="cursor-pointer font-semibold">115-2 陽明原站詳解</summary>
+      <p className="mt-3 font-semibold">{currentSource.sourceFile}・第 {Number(props.questionId.split("-Q")[1])} 題</p>
+      {currentSource.pendingSource ? <p className="mt-2 leading-6">原站尚未收錄此題詳解。下方來源頁僅供查詢後續更新，不代表本題已有詳解。</p> : <>
+        <p className="mt-2 leading-6">撰寫：{currentSource.author}　校稿：{currentSource.reviewer}</p>
+        <p className="mt-2 leading-6">原始 PDF 第 {currentSource.pageStart}{currentSource.pageEnd !== currentSource.pageStart ? `–${currentSource.pageEnd}` : ""} 頁，請開啟後依頁碼查閱。</p>
+        <a className="mt-3 inline-block font-semibold underline underline-offset-4" href={currentSource.pdfUrl} target="_blank" rel="noopener noreferrer">開啟原始 PDF</a>
+      </>}
+      <div className="mt-3 flex flex-wrap gap-4 font-semibold">
+        <a href={currentSource.bookUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">陽明分卷來源頁</a>
+        <a href="https://sites.google.com/view/ymmedexam/ans/mis" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">原站勘誤回應表</a>
+        <a href="/#feedback" className="underline underline-offset-4">回報來源、署名或撤除</a>
+      </div>
+      <p className="mt-3 text-xs leading-5">發布：陽明醫師國考交流平台。回報時請附題號 {props.questionId}。勘誤回應是投稿紀錄，不等同作者確認。</p>
+    </details>
+  );
   const source = getYangmingLegacySourceLink(props.questionId);
   if (!source) return <LoadedYangmingExplanationPanel {...props} />;
 
