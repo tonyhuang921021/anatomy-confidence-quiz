@@ -26,7 +26,6 @@ export function findReviewedYangmingExplanation(questionId: string, storageUrl: 
       sourceFile: supplemental.sourceFile,
       sourcePageStart: supplemental.sourcePageStart,
       sourcePageEnd: supplemental.sourcePageEnd,
-      sourceNotes: supplemental.sourceNotes,
       humanNotes: [],
       assets: supplemental.assets
     };
