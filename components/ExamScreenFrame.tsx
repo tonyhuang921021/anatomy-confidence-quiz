@@ -15,6 +15,14 @@ export function ExamScreenFrame({children,standard=false}:{children:ReactNode;st
   root.style.overflow='hidden';body.style.overflow='hidden';
   return()=>{root.style.overflow=before[0];body.style.overflow=before[1];};
  },[standard,mobile]);
+ // Measure in clear mode too, so every resolution label reflects the live viewport.
+ useEffect(()=>{
+  if(standard||mobile!==false||!viewport.current)return;
+  const view=viewport.current;
+  const measure=()=>setBox({width:view.clientWidth,height:view.clientHeight});
+  const resize=new ResizeObserver(measure);resize.observe(view);measure();
+  return()=>resize.disconnect();
+ },[standard,mobile]);
  useEffect(()=>{
   if(standard||mobile!==false||!enabled)return;
   const content=source.current,view=viewport.current,target=canvas.current;if(!content||!view||!target)return;
@@ -25,9 +33,9 @@ export function ExamScreenFrame({children,standard=false}:{children:ReactNode;st
    finally{running=false;if(!stopped&&!broken&&wanted!==token)scheduled=setTimeout(()=>void render(),60);}
   };
   const request=()=>{wanted++;setRequested(wanted);if(!running&&!scheduled&&!broken)scheduled=setTimeout(()=>void render(),60);};
-  const measure=()=>{setReady(false);cache=new WeakMap();setBox({width:view.clientWidth,height:view.clientHeight});request();};
+  const measure=()=>{setReady(false);cache=new WeakMap();request();};
   const edit=()=>{const active=document.activeElement,text=active instanceof HTMLTextAreaElement||(active instanceof HTMLInputElement&&!['radio','checkbox','button','submit'].includes(active.type));const entered=Array.from(content.querySelectorAll<HTMLInputElement>('input:not([type=radio]):not([type=checkbox])')).some(x=>x.value.length>0);const selection=getSelection(),selected=Boolean(selection&&!selection.isCollapsed&&selection.anchorNode&&content.contains(selection.anchorNode));setEditing(Boolean(text||entered||selected));request();};
-  const sectionKey=()=>content.querySelector('.question-caption h1')?.textContent||(content.querySelector('.review-area')?'overview':content.querySelector('h1,h2')?.textContent)||'';let section=sectionKey();const changed=(records:MutationRecord[])=>{if(records.some(r=>r.type==='attributes'))cache=new WeakMap();const next=sectionKey();if(next!==section){setReady(false);section=next;view.scrollTop=0;view.scrollLeft=0;content.querySelectorAll<HTMLElement>('.question-body,.review-area').forEach(el=>{el.scrollTop=0;el.scrollLeft=0;});}request();};const observer=new MutationObserver(changed);observer.observe(content,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','style','checked','disabled','open']});
+  const sectionKey=()=>content.querySelector('.question-caption h1')?.textContent||(content.querySelector('.review-area')?'overview':content.querySelector('h1,h2')?.textContent)||'';let section=sectionKey();const changed=(records:MutationRecord[])=>{if(records.some(r=>r.type==='attributes'))cache=new WeakMap();const next=sectionKey();if(next!==section){setReady(false);section=next;view.scrollTop=0;view.scrollLeft=0;content.querySelectorAll<HTMLElement>('.question-body,.review-area,.confirm-page').forEach(el=>{el.scrollTop=0;el.scrollLeft=0;});}request();};const observer=new MutationObserver(changed);observer.observe(content,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','style','checked','disabled','open']});
   const scrolled=()=>{setReady(false);request();};
   const resize=new ResizeObserver(measure);resize.observe(view);
   for(const e of ['click','change','input','focusin','focusout','pointerover','pointerout'])content.addEventListener(e,edit);

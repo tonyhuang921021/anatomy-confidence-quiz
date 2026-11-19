@@ -21,3 +21,20 @@ test('new question resets scroll, re-render and text scale do not reset reading 
 test('resize remeasures overflow and handles an existing fifth option',()=>{const h=harness(['A','B','C','D','E']);h.render();h.flush();assert.match(find(h.render(),'button').props.children.join(''),/C、D、E/);h.view.getBoundingClientRect=()=>({bottom:1000});h.resize();h.flush();assert.equal(find(h.render(),'button'),null)});
 test('reading wrapper leaves original answer mapping and original mode untouched',()=>{const s=fs.readFileSync('components/ExamLikeSurface.tsx','utf8');assert.match(s,/Object.keys\(question.options\).map/);assert.match(s,/onChange=\{\(\)=>p.onAnswer\(key as OptionKey\)\}/);assert.match(s,/<ExamQuestionReadingArea questionId=\{question.id\} scale=\{p.scale\}>/);});
 test('pixel clone preserves font synthesis and scrollbar geometry; scroll invalidates old bitmap',()=>{const s=fs.readFileSync('lib/examPixelRenderer.ts','utf8'),frame=fs.readFileSync('components/ExamScreenFrame.tsx','utf8');assert.match(s,/'font-synthesis'/);assert.match(s,/'scrollbar-gutter'/);assert.match(frame,/const scrolled=\(\)=>\{setReady\(false\);request\(\);\}/);});
+test('confirmation scrolling is mirrored into every bitmap and reset between confirmation steps',()=>{
+ const pixel=fs.readFileSync('lib/examPixelRenderer.ts','utf8'),frame=fs.readFileSync('components/ExamScreenFrame.tsx','utf8');
+ assert.match(pixel,/original\.matches\('\.question-body,\.review-area,\.entry-panel,\.confirm-page'\)/);
+ assert.match(pixel,/translate\(\$\{-original.scrollLeft\}px,\$\{-original.scrollTop\}px\)/);
+ assert.match(frame,/querySelectorAll<HTMLElement>\('\.question-body,\.review-area,\.confirm-page'\)/);
+});
+test('resolution labels are measured even while clear mode is selected',()=>{
+ const frame=fs.readFileSync('components/ExamScreenFrame.tsx','utf8');
+ assert.match(frame,/if\(standard\|\|mobile!==false\|\|!viewport.current\)return;[\s\S]*?ResizeObserver\(measure\)[\s\S]*?\},\[standard,mobile\]\)/);
+});
+test('all three sampling grids keep the visible viewport aspect ratio at desktop sizes',()=>{
+ const mod={exports:{}};vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/examPixelRenderer.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:mod.exports,require});
+ for(const requested of [896,800,640])for(const [w,h] of [[1260,650],[1000,490],[780,390],[1420,820]]){
+  const size=mod.exports.pixelBitmapSize(requested,w,h);
+  assert.ok(size.width>0&&size.height>0);assert.ok(Math.abs(size.height-size.width*h/w)<=1,`${requested}/${w}/${h} distorted`);
+ }
+});

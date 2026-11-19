@@ -78,3 +78,10 @@
  .frame.frame :global(.answer-area){padding-top:5px}
  .frame.frame :global(.question-caption){margin-bottom:3px}
 }
+
+/* Submission feedback remains visible without squeezing low-height confirm controls. */
+.frame.frame :global(.completion-notice){flex:none;width:100%;max-width:none;margin:0;padding:6px 12px;background:#fff1dc;overflow-wrap:anywhere}
+@media(max-height:650px){
+ .frame.frame :global(.confirm-banner){height:auto;min-height:64px;padding:16px 20px;white-space:normal}
+ .frame.frame :global(.confirm-sheet){min-height:0;margin-top:16px;margin-bottom:24px;padding:20px}
+}

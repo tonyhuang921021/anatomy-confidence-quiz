@@ -58,7 +58,7 @@ export async function paintExamPixels(input:{source:HTMLElement;viewport:HTMLEle
  // region at the same position as its live, accessible DOM counterpart.
  for(let i=originals.length-1;i>=0;i--){
   const original=originals[i] as HTMLElement,copy=copies[i] as HTMLElement;
-  if(!original.matches('.question-body,.review-area,.entry-panel')||(!original.scrollTop&&!original.scrollLeft))continue;
+  if(!original.matches('.question-body,.review-area,.entry-panel,.confirm-page')||(!original.scrollTop&&!original.scrollLeft))continue;
   const inner=document.createElement('div');inner.style.cssText=`transform:translate(${-original.scrollLeft}px,${-original.scrollTop}px);width:100%;`;
   while(copy.firstChild)inner.append(copy.firstChild);copy.append(inner);copy.style.overflow='hidden';
  }
