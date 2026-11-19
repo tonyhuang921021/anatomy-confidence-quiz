@@ -358,7 +358,7 @@ function getResultOptionState(question: Question, attempt: Attempt, optionKey: O
   }
 
   return {
-    wrapperClassName: "rounded-2xl bg-white p-4",
+    wrapperClassName: "rounded-2xl border border-slate-300 bg-white p-4",
     labelClassName:
       "mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200",
     badge: "",
