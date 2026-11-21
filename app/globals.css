@@ -8212,7 +8212,7 @@ html[data-theme="dark"] .study-quiz .study-option {
   background-color: var(--dark-panel);
 }
 
-html[data-theme="dark"] .study-quiz .study-option:has(.study-choice[aria-pressed="true"]) {
+html[data-theme="dark"] .study-quiz .study-option.bg-brand-50 {
   border-color: var(--dark-action);
   background-color: var(--dark-panel-raised);
   --tw-ring-color: var(--dark-action);
