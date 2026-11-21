@@ -1,0 +1,528 @@
+.exam-trends {
+  --et-blue: #255789;
+  --et-ochre: #976429;
+  --et-rule: color-mix(in srgb, var(--ink-main) 17%, transparent);
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 58px) clamp(16px, 4vw, 52px) 90px;
+  color: var(--ink-main);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.65;
+}
+html[data-theme="dark"] .exam-trends {
+  --et-blue: #97bcdf;
+  --et-ochre: #d6ad78;
+}
+.exam-trends h1,
+.exam-trends h2,
+.exam-trends h3,
+.exam-trends p {
+  margin: 0;
+}
+.exam-trends button,
+.exam-trends select,
+.exam-trends summary {
+  cursor: pointer;
+}
+.exam-trends button:focus-visible,
+.exam-trends select:focus-visible,
+.exam-trends summary:focus-visible {
+  outline: 3px solid var(--et-blue);
+  outline-offset: 3px;
+}
+.et-heading,
+.et-date,
+.et-kicker,
+.et-eyebrow,
+.et-nav,
+.et-mode,
+.et-readout,
+.et-chart-foot,
+.et-subtitle,
+.et-key,
+.et-picker {
+  display: flex;
+  align-items: center;
+}
+.et-heading,
+.et-subtitle,
+.et-chart-foot {
+  justify-content: space-between;
+}
+.et-heading {
+  gap: 18px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+.et-kicker,
+.et-eyebrow {
+  gap: 7px;
+  font-size: 0.79rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--et-blue);
+}
+.et-kicker span {
+  height: 2px;
+  width: 26px;
+  background: currentColor;
+}
+.et-heading h1 {
+  font-size: clamp(2.35rem, 4.6vw, 3.65rem);
+  font-weight: 790;
+  line-height: 1.2;
+  letter-spacing: 0.025em;
+}
+.et-date {
+  gap: 7px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+.et-hero {
+  display: grid;
+  grid-template-columns: 0.92fr 1.16fr;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-float);
+  border: 1px solid var(--et-rule);
+}
+.et-count,
+.et-finding {
+  padding: clamp(20px, 3vw, 37px);
+}
+.et-count {
+  background: #1a3d58;
+  color: #fff;
+}
+.et-count .et-eyebrow {
+  color: #c3dcf3;
+}
+.et-big {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(3.5rem, 6.4vw, 5.3rem);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.065em;
+}
+.et-big small {
+  font: 600 1rem system-ui;
+  letter-spacing: 0;
+  color: #d4e5f3;
+}
+.et-count p {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.et-coverage {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.79rem;
+  color: #d1dfeb;
+}
+.et-finding {
+  align-self: center;
+}
+.et-finding h2,
+.et-section-head h2,
+.et-paperhead h2 {
+  font-weight: 740;
+  line-height: 1.45;
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+}
+.et-finding h2 {
+  margin: 6px 0 9px;
+}
+.et-finding p,
+.et-section-head p,
+.et-panel p,
+.et-paperhead p,
+.et-source p {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+.et-deltas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 17px;
+  margin-bottom: 8px;
+}
+.et-deltas span {
+  font-size: 0.8rem;
+}
+.et-deltas b {
+  color: var(--et-blue);
+  font-size: 1.12rem;
+}
+.et-deltas small {
+  color: var(--ink-soft);
+}
+.et-nav {
+  gap: 8px;
+  border-bottom: 1px solid var(--et-rule);
+  margin: 22px 0 24px;
+}
+.et-nav button {
+  padding: 8px 17px 10px;
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  font-weight: 650;
+  color: var(--ink-soft);
+}
+.et-nav button[aria-pressed="true"] {
+  border-color: var(--et-blue);
+  color: var(--et-blue);
+}
+.et-section-head p {
+  margin-top: 4px;
+}
+.et-medcards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 15px;
+}
+.et-medcards button {
+  text-align: left;
+  border: 1px solid var(--et-rule);
+  border-radius: 9px;
+  padding: 15px 20px;
+  background: var(--surface-float);
+  color: var(--ink-main);
+}
+.et-medcards button:hover {
+  border-color: var(--et-blue);
+}
+.et-medcards button > span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 690;
+}
+.et-medcards strong {
+  font-size: 2.05rem;
+  letter-spacing: -0.04em;
+  display: block;
+  line-height: 1.35;
+}
+.et-medcards small,
+.et-medcards em {
+  color: var(--ink-soft);
+  font-weight: 450;
+  font-size: 0.8rem;
+  letter-spacing: normal;
+  font-style: normal;
+}
+.et-medcards i {
+  display: block;
+  background: var(--et-blue);
+  height: 4px;
+  border-radius: 3px;
+  margin: 9px 0 6px;
+}
+.et-medcards button:nth-child(2) i {
+  background: var(--et-ochre);
+}
+.et-panel,
+.et-paperhead {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid var(--et-rule);
+}
+.et-over + .et-panel {
+  margin-top: 32px;
+}
+.et-paperhead {
+  border: 0;
+  padding: 0;
+}
+.et-panel h3 {
+  font-size: 1.03rem;
+  font-weight: 700;
+}
+.et-mode {
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 15px 0 13px;
+}
+.et-mode button {
+  background: var(--surface-float);
+  border: 1px solid var(--et-rule);
+  border-radius: 6px;
+  color: var(--ink-main);
+  padding: 5px 11px;
+  font-size: 0.86rem;
+}
+.et-mode button[aria-pressed="true"] {
+  background: var(--et-blue);
+  border-color: var(--et-blue);
+  color: var(--surface-float);
+}
+.et-chart-wrap {
+  background: var(--surface-float);
+  border: 1px solid var(--et-rule);
+  padding: 14px 16px 10px;
+  border-radius: 9px;
+}
+.et-panel svg {
+  width: 100%;
+  display: block;
+  height: auto;
+  max-height: 260px;
+}
+.et-panel svg text {
+  font-size: 10px;
+  fill: var(--ink-soft);
+}
+.et-plot-title,
+.et-chart-foot,
+.et-periods small {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+.et-line {
+  fill: none;
+  stroke: var(--et-blue);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.et-area {
+  fill: color-mix(in srgb, var(--et-blue) 9%, transparent);
+}
+.et-grid {
+  stroke: var(--et-rule);
+  stroke-width: 0.75;
+  stroke-dasharray: 3 3;
+}
+.et-node {
+  fill: var(--surface-float);
+  stroke: var(--et-blue);
+  stroke-width: 1.8;
+}
+.et-readout {
+  gap: 18px;
+  margin: 8px 0;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+.et-readout b {
+  color: var(--ink-main);
+}
+.exam-trends details {
+  margin-top: 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--et-rule);
+}
+.exam-trends summary {
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: var(--et-blue);
+}
+.exam-trends details p {
+  margin: 9px 0;
+}
+.exam-trends table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.exam-trends th,
+.exam-trends td {
+  text-align: right;
+  padding: 7px 4px;
+  border-bottom: 1px solid var(--et-rule);
+}
+.exam-trends th:first-child,
+.exam-trends td:first-child {
+  text-align: left;
+}
+.et-picker {
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.88rem;
+  margin: 15px 0;
+  color: var(--ink-soft);
+}
+.et-picker select {
+  padding: 8px 35px 8px 12px;
+  border: 1px solid var(--et-rule);
+  border-radius: 6px;
+  background: var(--surface-float);
+  color: var(--ink-main);
+  max-width: 100%;
+  font: inherit;
+}
+.et-matrix,
+.et-periods {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+  padding: 16px 0;
+  margin: 8px 0 16px;
+  border-block: 1px solid var(--et-rule);
+}
+.et-matrix strong {
+  display: block;
+  font-size: clamp(1.3rem, 2.4vw, 2rem);
+  line-height: 1.5;
+}
+.et-matrix span,
+.et-periods span {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+.et-matrix small,
+.et-subtitle span {
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}
+.et-periods {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.et-periods b {
+  display: block;
+  font-size: 0.94rem;
+}
+.et-key {
+  gap: 15px;
+  margin-top: 16px;
+  font-size: 0.85rem;
+}
+.et-key span:before {
+  content: "";
+  display: inline-block;
+  width: 13px;
+  height: 6px;
+  border-radius: 3px;
+  margin-right: 6px;
+  background: var(--et-blue);
+}
+.et-key span + span:before {
+  background: var(--et-ochre);
+}
+.et-subject {
+  padding: 17px 0;
+  border-bottom: 1px solid var(--et-rule);
+}
+.et-subtitle {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.et-bars {
+  max-width: 780px;
+  margin: 7px 0;
+}
+.et-bars > div {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 48px minmax(25px, 1fr) 75px 45px;
+  gap: 8px;
+  font-size: 0.84rem;
+  padding: 2px 0;
+}
+.et-track {
+  background: var(--surface-muted);
+  height: 9px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.et-track i {
+  height: 100%;
+  display: block;
+  background: var(--et-blue);
+}
+.et-track i.low {
+  background: var(--et-ochre);
+}
+.et-bars b,
+.et-bars small {
+  text-align: right;
+}
+.et-source {
+  margin-top: 30px !important;
+}
+@media (max-width: 640px) {
+  .exam-trends {
+    padding: 23px 14px 90px;
+  }
+  .et-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+  .et-hero {
+    grid-template-columns: 1fr;
+  }
+  .et-count,
+  .et-finding {
+    padding: 17px 19px;
+  }
+  .et-big {
+    font-size: 3.35rem;
+  }
+  .et-deltas {
+    gap: 3px 12px;
+  }
+  .et-finding p,
+  .et-section-head p,
+  .et-panel p {
+    font-size: 0.84rem;
+  }
+  .et-nav {
+    margin: 14px 0 18px;
+  }
+  .et-medcards {
+    gap: 8px;
+  }
+  .et-medcards button {
+    padding: 10px 12px;
+  }
+  .et-medcards strong {
+    font-size: 1.7rem;
+  }
+  .et-medcards small,
+  .et-medcards em {
+    font-size: 0.73rem;
+  }
+  .et-panel,
+  .et-over + .et-panel {
+    margin-top: 23px;
+    padding-top: 18px;
+  }
+  .et-chart-wrap {
+    padding: 10px 5px;
+  }
+  .et-plot-title,
+  .et-chart-foot {
+    padding-inline: 6px;
+  }
+  .et-matrix {
+    gap: 9px;
+  }
+  .et-matrix strong {
+    font-size: 1.21rem;
+  }
+  .et-periods {
+    grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+    gap: 10px;
+  }
+  .et-subtitle span {
+    font-size: 0.77rem;
+  }
+  .et-bars > div {
+    grid-template-columns: 42px minmax(25px, 1fr) 58px 34px;
+    gap: 5px;
+  }
+}
+.et-bars > div > span,
+.et-bars small {
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .et-bars > div {
+    grid-template-columns: 50px minmax(25px, 1fr) 62px 37px;
+  }
+}

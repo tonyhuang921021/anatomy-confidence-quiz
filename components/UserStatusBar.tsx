@@ -19,6 +19,7 @@ import {
   Pill,
   Settings,
   Trophy,
+  TrendingUp,
   UserRound,
   X
 } from "lucide-react";
@@ -66,7 +67,8 @@ const PRIMARY_NAV: NavItem[] = [
     label: "儲存題目",
     icon: Bookmark,
     matches: (pathname) => pathname.startsWith("/saved-questions")
-  }
+  },
+  { href: "/exam-trends", label: "國考趨勢", icon: TrendingUp, matches: (path) => path === "/exam-trends" }
 ];
 
 const STUDY_TOOL_LINKS: NavItem[] = [

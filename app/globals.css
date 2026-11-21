@@ -3647,7 +3647,7 @@ html[data-theme="dark"] .border-slate-100 {
   inset: auto 0 0;
   z-index: 70;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   border-top: 1px solid var(--line-soft);
   background: var(--topbar-bg);
   padding: 0.38rem max(0.35rem, env(safe-area-inset-right)) calc(0.38rem + env(safe-area-inset-bottom)) max(0.35rem, env(safe-area-inset-left));

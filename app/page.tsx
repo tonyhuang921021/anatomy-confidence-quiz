@@ -50,6 +50,11 @@ const REVIEW_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "11/21",
+    title: "國考趨勢可以逐卷看了",
+    body: "從主導覽打開國考趨勢，查看考前首作、各科高低分組與歷屆兩卷達標情形。"
+  },
+  {
     time: "10/29",
     title: "搜尋結果換頁更順手",
     body: "按上一頁或下一頁後，畫面會回到搜尋結果開頭，方便繼續閱讀。"
