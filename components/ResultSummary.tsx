@@ -31,7 +31,7 @@ export function ResultSummary({ summary, masteryAnalysis, scoreRevision }: Resul
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-x-8 gap-y-5 rounded-2xl border border-brand-100 bg-brand-50/60 px-5 py-5 sm:px-6">
+      <div className="result-score-overview flex flex-wrap items-center gap-x-8 gap-y-5 rounded-2xl border border-brand-100 bg-brand-50/60 px-5 py-5 sm:px-6">
         <div>
           <p className="text-sm font-medium text-brand-800">本次答對率</p>
           <p className="mt-1 text-4xl font-bold tabular-nums text-ink">{summary.correctRate}<span className="ml-1 text-xl">%</span></p>

@@ -2028,7 +2028,7 @@ function ResultsPageContent() {
 
   if (!mounted) {
     return (
-      <main id="main-content" className="shell workspace-page">
+      <main id="main-content" className="study-results shell workspace-page">
         <div className="workspace-empty-state">載入中...</div>
       </main>
     );
@@ -2036,7 +2036,7 @@ function ResultsPageContent() {
 
   if (!requestedSessionId) {
     return (
-      <main id="main-content" className="shell workspace-page">
+      <main id="main-content" className="study-results shell workspace-page">
         <CloudHistoryReadStatus historyMode={forceSimulationHistoryHydration ? "simulation" : undefined} />
         <section className="workspace-section results-history-shell">
           <div className="workspace-section-header">
@@ -2146,7 +2146,7 @@ function ResultsPageContent() {
 
   if (!state.session || !state.summary) {
     return (
-      <main id="main-content" className="shell workspace-page">
+      <main id="main-content" className="study-results shell workspace-page">
         <CloudHistoryReadStatus historyMode={forceSimulationHistoryHydration ? "simulation" : undefined} />
         <section className="workspace-section results-history-shell text-center">
           <h1 className="text-2xl font-semibold text-ink">找不到這次作答紀錄</h1>
@@ -2286,7 +2286,7 @@ function ResultsPageContent() {
       ? "text-emerald-600 group-open:text-emerald-700"
       : "text-rose-500 group-open:text-rose-600";
     return (
-      <span className="flex max-w-full min-w-0 items-center gap-2 align-top">
+      <span className="result-review-header flex max-w-full min-w-0 items-center gap-2 align-top">
         <span
           aria-hidden="true"
           className={`inline-flex h-5 w-5 shrink-0 items-center justify-center transition duration-150 group-open:rotate-90 ${triangleClass}`}
@@ -2318,7 +2318,7 @@ function ResultsPageContent() {
             {suffix ? <span className="shrink-0 text-xs font-semibold text-slate-500">{suffix}</span> : null}
           </span>
         </span>
-        <span className="flex shrink-0 flex-col items-end gap-1.5">
+        <span className="result-review-badges flex shrink-0 flex-col items-end gap-1.5">
           <span className="flex items-center gap-1.5">
             {sourceBadge ? (
               <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-bold text-slate-600 ring-1 ring-slate-200">
@@ -2983,7 +2983,7 @@ function ResultsPageContent() {
   }
 
   return (
-    <main id="main-content" className="shell workspace-page">
+    <main id="main-content" className="study-results shell workspace-page">
         <CloudHistoryReadStatus historyMode={forceSimulationHistoryHydration ? "simulation" : undefined} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -3395,7 +3395,7 @@ export default function ResultsPage() {
   return (
     <Suspense
       fallback={
-        <main id="main-content" className="shell workspace-page">
+        <main id="main-content" className="study-results shell workspace-page">
           <div className="workspace-empty-state">
             載入中...
           </div>

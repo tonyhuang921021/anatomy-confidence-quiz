@@ -80,7 +80,7 @@ export function QuestionExplanationTabs({question, compact = false, className = 
         {sources.map(({source,label,Icon})=><button key={source} type="button" onClick={()=>select(source)}
           aria-pressed={activeTab===source} aria-controls={panelId}
           title={activeTab===source?"再點一次回到原詳解":`顯示${label}`}
-          className={`inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${activeTab===source?"bg-brand-800 text-white ring-brand-800":"bg-white text-slate-700 ring-slate-200 hover:bg-brand-50"}`}>
+          className={`dark-reading-tab inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${activeTab===source?"bg-brand-800 text-white ring-brand-800":"bg-white text-slate-700 ring-slate-200 hover:bg-brand-50"}`}>
           <Icon aria-hidden="true" className="size-3.5" strokeWidth={1.8}/>{label}
           {source==="supplement" && (supplementCount??0)>0?<span className="text-[10px]">{supplementCount}</span>:null}
         </button>)}

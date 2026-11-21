@@ -149,6 +149,16 @@ html[data-theme="dark"] {
   --topbar-border: rgba(207, 214, 224, 0.045);
   --selection-bg: rgba(138, 154, 184, 0.14);
   --grid-line: rgba(207, 214, 224, 0.012);
+  --dark-panel: #202a36;
+  --dark-panel-raised: #293646;
+  --dark-outline: #4a5d73;
+  --dark-action: #abcdeb;
+  --dark-on-action: #13243a;
+  --dark-positive-surface: #192e2b;
+  --dark-positive-ink: #a7e4c7;
+  --dark-negative-surface: #36252f;
+  --dark-negative-ink: #ffbfd1;
+  --dark-warning-ink: #f6c88e;
 }
 
 * {
@@ -3059,9 +3069,9 @@ html[data-theme="dark"] .dark-success-chip {
 }
 
 html[data-theme="dark"] .primary-pill {
-  color: #e7ecf3;
+  color: var(--dark-on-action);
+  background: var(--dark-action);
   box-shadow: 0 10px 22px rgba(8, 12, 20, 0.12);
-  filter: saturate(0.9);
 }
 
 html[data-theme="dark"] .text-slate-900,
@@ -8175,3 +8185,140 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
 }
 
 .reviewed-reader img[data-reviewed-zoom="true"][aria-expanded="false"] { width: auto; height: auto; max-width: 100%; max-height: 10rem; object-fit: contain; margin-left: auto; margin-right: auto; }
+
+/* Ordinary study screens only. The exam-presentation renderer has its own palette. */
+html[data-theme="dark"] :is(.app-mobile-nav, .app-mobile-drawer, .app-modal-panel) {
+  border-color: var(--dark-outline);
+}
+
+html[data-theme="dark"] .app-mobile-nav :is(.is-active, button[aria-expanded="true"]) {
+  background: var(--dark-panel-raised);
+  color: var(--dark-action);
+}
+
+html[data-theme="dark"] .account-preference-choice.is-selected {
+  border-color: var(--dark-action);
+  background: var(--dark-action);
+  color: var(--dark-on-action);
+}
+
+html[data-theme="dark"] :is(.account-preference-choice, .app-mobile-nav a, .app-mobile-nav button):focus-visible {
+  outline: 2px solid var(--dark-action);
+  outline-offset: -2px;
+}
+
+html[data-theme="dark"] .study-quiz .study-option {
+  border-color: var(--dark-outline);
+  background-color: var(--dark-panel);
+}
+
+html[data-theme="dark"] .study-quiz .study-option:has(.study-choice[aria-pressed="true"]) {
+  border-color: var(--dark-action);
+  background-color: var(--dark-panel-raised);
+  --tw-ring-color: var(--dark-action);
+}
+
+html[data-theme="dark"] .study-quiz :is(.study-option.bg-emerald-50, .quiz-answer-summary.is-correct) {
+  border-color: #50816e;
+  background: var(--dark-positive-surface);
+  color: var(--dark-positive-ink);
+  --tw-ring-color: #50816e;
+}
+
+html[data-theme="dark"] .study-quiz :is(.study-option.bg-rose-50, .quiz-answer-summary.is-incorrect) {
+  border-color: #936477;
+  background: var(--dark-negative-surface);
+  color: var(--dark-negative-ink);
+  --tw-ring-color: #936477;
+}
+
+html[data-theme="dark"] .study-quiz .quiz-answer-status-icon {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+html[data-theme="dark"] .study-quiz .quiz-answer-status-detail {
+  color: var(--ink-main);
+}
+
+html[data-theme="dark"] .study-quiz .quiz-answer-community-stat {
+  border-color: var(--dark-outline);
+  background: var(--dark-panel-raised);
+  color: var(--dark-action);
+}
+
+html[data-theme="dark"] .result-score-overview {
+  border-color: var(--dark-outline);
+  background: var(--dark-panel);
+}
+
+html[data-theme="dark"] :is(.study-quiz, .study-results, .search-page) .text-sky-700 {
+  color: var(--dark-action);
+}
+
+html[data-theme="dark"] :is(.study-quiz, .study-results, .search-page) .text-amber-700 {
+  color: var(--dark-warning-ink);
+}
+
+html[data-theme="dark"] :is(.study-quiz, .study-results, .search-page) .dark-reading-tab:not([aria-pressed="true"]):hover {
+  background: var(--dark-panel-raised);
+}
+
+html[data-theme="dark"] .dark-reading-tab[aria-pressed="true"] {
+  background: var(--dark-action);
+  color: var(--dark-on-action);
+  --tw-ring-color: var(--dark-action);
+}
+
+html[data-theme="dark"] .reviewed-explanation {
+  border-color: var(--dark-outline);
+  background: var(--dark-panel);
+  color: var(--ink-main);
+}
+
+html[data-theme="dark"] .reviewed-reader :is(figure, details, th, .reviewed-official-answer),
+html[data-theme="dark"] .reviewed-explanation-controls button {
+  border-color: var(--dark-outline);
+  background: var(--dark-panel-raised);
+  color: var(--ink-main);
+}
+
+html[data-theme="dark"] .reviewed-explanation-controls button[aria-pressed="true"] {
+  border-color: var(--dark-action);
+  background: var(--dark-action);
+  color: var(--dark-on-action);
+}
+
+html[data-theme="dark"] .reviewed-reader :is(td, .reviewed-image-link) {
+  border-color: var(--dark-outline);
+}
+
+html[data-theme="dark"] .reviewed-reader :is(a, figcaption) {
+  color: var(--dark-action);
+}
+
+/* Preserve the original image pixels and their light backing, including transparent diagrams. */
+html[data-theme="dark"] .reviewed-image-frame[data-image-state="loading"],
+html[data-theme="dark"] .reviewed-image-frame[data-image-state="error"] {
+  background: var(--dark-panel-raised);
+}
+
+html[data-theme="dark"] .reviewed-image-frame[data-image-state]::after {
+  color: var(--ink-soft);
+}
+
+html[data-theme="dark"] .reviewed-reader .reviewed-image-frame[data-reviewed-expanded="true"]::before {
+  background: var(--dark-panel);
+  color: var(--dark-action);
+}
+
+@media (max-width: 479px) {
+  html[data-theme="dark"] .result-review-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  html[data-theme="dark"] .result-review-header .result-review-badges {
+    grid-column: 2;
+    align-items: flex-start;
+  }
+}
