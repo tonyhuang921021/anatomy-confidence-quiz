@@ -591,9 +591,30 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
     setSigningOut(false);
   }
 
+  const themePreference = (
+    <PreferenceRow label="畫面模式" description="依閱讀環境切換明亮或暗色畫面。">
+      <div className="account-preference-options" role="group" aria-label="畫面模式">
+        <PreferenceChoice selected={themeMode === "light"} onClick={() => handleChangeThemeMode("light")}>
+          明亮
+        </PreferenceChoice>
+        <PreferenceChoice selected={themeMode === "dark"} onClick={() => handleChangeThemeMode("dark")}>
+          暗夜
+        </PreferenceChoice>
+      </div>
+    </PreferenceRow>
+  );
+  const localThemePreference = (
+    <div className="account-settings-preferences mb-4">
+      <PreferenceGroup title="顯示" description="免登入，儲存在這台裝置。">
+        {themePreference}
+      </PreferenceGroup>
+    </div>
+  );
+
   if (!configured) {
     return (
       <section className="surface-card p-6">
+        {localThemePreference}
         <p className="eyebrow">Account</p>
         <h2 className="display-title mt-2 text-3xl">登入功能暫時無法使用</h2>
         <p className="mt-3 text-sm leading-6 text-slate-600">你仍可繼續刷題，作答紀錄會保存在這台裝置。</p>
@@ -604,6 +625,7 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
   if (recoveryMode) {
     return (
       <section className="surface-card p-6">
+        {localThemePreference}
         <p className="eyebrow">Account</p>
         <h2 className="display-title mt-2 text-3xl">雲端同步維護中</h2>
         <p className="body-soft mt-3 text-sm leading-7">
@@ -750,22 +772,7 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
                       </PreferenceChoice>
                     </div>
                   </PreferenceRow>
-                  <PreferenceRow label="畫面模式" description="依閱讀環境切換明亮或暗色畫面。">
-                    <div className="account-preference-options" role="group" aria-label="畫面模式">
-                      <PreferenceChoice
-                        selected={themeMode === "light"}
-                        onClick={() => handleChangeThemeMode("light")}
-                      >
-                        明亮
-                      </PreferenceChoice>
-                      <PreferenceChoice
-                        selected={themeMode === "dark"}
-                        onClick={() => handleChangeThemeMode("dark")}
-                      >
-                        暗夜
-                      </PreferenceChoice>
-                    </div>
-                  </PreferenceRow>
+                  {themePreference}
                 </PreferenceGroup>
 
                 <PreferenceGroup title="複習" description="錯題與低信心題的完成條件">
@@ -892,6 +899,7 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
 
   return (
     <section className="min-w-0">
+      {localThemePreference}
       <h2 className="text-xl font-semibold text-ink">
         {authMode === "login" ? "登入帳號" : authMode === "register" ? "註冊新帳號" : "重設密碼"}
       </h2>
