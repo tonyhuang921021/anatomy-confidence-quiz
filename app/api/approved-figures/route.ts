@@ -26,7 +26,7 @@ export async function GET(request:NextRequest){
   if(userProvided)return NextResponse.json({figures:[],sectionFigures:[],explanationHash:hash,replacementRevision:saved.data.replacement_revision,userProvidedFigureId:userProvided.id,imageStatus:'user_provided',sections:[{sectionTitle:userProvided.sectionTitle}]},{headers});
   const published=publishedTrialFigure(id,hash);
   if(published)return NextResponse.json({figures:[],sectionFigures:[published],explanationHash:hash,imageStatus:'approved',sections:[{sectionTitle:published.section_heading}]},{headers});
-  const jobs=await db.from('figure_queue_jobs').select('figure_needs,image_status,state,lease_until,updated_at').eq('question_id',id).eq('explanation_sha256',hash).maybeSingle();
+  const jobs=await db.from('figure_queue_jobs').select('request_id,figure_needs,image_status,state,lease_until,updated_at').eq('question_id',id).eq('explanation_sha256',hash).maybeSingle();
   const bound=await db.from('explanation_figure_candidates').select('id,section_anchor,section_heading,section_sha256,status,explanation_sha256').eq('question_id',id).limit(100);
   if(jobs.error||bound.error)throw Error('unavailable');
   const sectionFigures=figures.flatMap((x:any)=>{const m=bound.data?.find(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved'&&y.section_anchor);return m?[{...x,...m}]:[]});
@@ -34,7 +34,7 @@ export async function GET(request:NextRequest){
   // becomes a fabricated 'quota exceeded' cause and never hides saved images.
   let capacity:any=null;
   if(jobs.data?.state==='done'&&jobs.data.image_status==='awaiting_budget'){
-   try{const quota=await db.rpc('figure_search_capacity');
+   try{const quota=await db.rpc('figure_search_capacity_for_job',{p_request:jobs.data.request_id});
     if(!quota.error&&quota.data?.mode==='taipei_daily_v1')capacity=quota.data;
    }catch{/* Keep saved images and neutral status if the optional read fails. */}
   }
