@@ -10,7 +10,7 @@ const xml=xmlFor();
 const manifest={pmcid,version:1,is_pmc_openaccess:true,is_manuscript:false,is_retracted:false,license_code:'CC BY',xml_url:`s3://pmc-oa-opendata/${version}/${version}.xml?md5=${hash(xml,'md5')}`,media_urls:[`s3://pmc-oa-opendata/${version}/${filename}?md5=${hash(image,'md5')}`]};
 const listing='<ListBucketResult><IsTruncated>false</IsTruncated><CommonPrefixes><Prefix>PMC123456.1/</Prefix></CommonPrefixes></ListBucketResult>';
 const facts=()=>manifestFacts(JSON.stringify(manifest),pmcid,version);
-function harness(){const cache=new Map(),requests=[];const fetcher=async url=>{requests.push(url);const u=new URL(url);let raw;if(u.hostname==='www.ebi.ac.uk')raw=JSON.stringify({resultList:{result:[{pmcid,isOpenAccess:'Y',license:'cc by',title:'Inulin clearance diagram',abstractText:'Inulin clearance and renal filtration.'}]}});else if(u.searchParams.has('list-type'))raw=listing;else if(u.pathname.endsWith('.json'))raw=JSON.stringify(manifest);else if(u.pathname.endsWith('.xml'))raw=xml;else throw Error('unexpected HTTP');return new Response(raw,{status:200,headers:{'content-type':'binary/octet-stream'}})};const read=async(key,load)=>{if(!cache.has(key))cache.set(key,await load());return structuredClone(cache.get(key))};return {cache,requests,run:()=>discoverPmcFigures('inulin clearance diagram',read,fetcher)}}
+function harness(beforeFetch=async()=>{}){const cache=new Map(),requests=[];const fetcher=async (url,opts)=>{requests.push(url);const u=new URL(url);await beforeFetch(u,opts);let raw;if(u.hostname==='www.ebi.ac.uk')raw=JSON.stringify({resultList:{result:[{pmcid,isOpenAccess:'Y',license:'cc by',title:'Inulin clearance diagram',abstractText:'Inulin clearance and renal filtration.'}]}});else if(u.searchParams.has('list-type'))raw=listing;else if(u.pathname.endsWith('.json'))raw=JSON.stringify(manifest);else if(u.pathname.endsWith('.xml'))raw=xml;else throw Error('unexpected HTTP');return new Response(raw,{status:200,headers:{'content-type':'binary/octet-stream'}})};const read=async(key,load)=>{if(!cache.has(key))cache.set(key,await load());return structuredClone(cache.get(key))};return {cache,requests,run:()=>discoverPmcFigures('inulin clearance diagram',read,fetcher)}}
 test('official version, manifest and floats-group JATS yield an attributed candidate',()=>{assert.deepEqual(versions(listing,pmcid),[version]);const [c]=jatsFigures(xml,facts());assert.equal(classifySource(c),'pending_visual_review');assert.match(c.attribution,/Fixture Author/);assert.doesNotMatch(c.attribution,/Not Author/);assert.match(c.attribution,new RegExp(hash(xml)));assert.match(c.attribution,new RegExp(facts().manifestHash));assert.ok(c.attribution.length<=500);assert.match(c.sourceUrl,/#fig-1$/)});
 test('four individually reserved metadata reads replay from cache with zero HTTP',async()=>{const h=harness();const first=await h.run();assert.equal(first.length,1);assert.equal(h.requests.length,4);assert.equal(h.cache.size,4);assert.deepEqual(await h.run(),first);assert.equal(h.requests.length,4)});
 test('manifest identity, version and tri-state flags fail closed',()=>{for(const changes of [{pmcid:'PMC999'},{version:2},{is_pmc_openaccess:'true'},{is_retracted:null},{is_manuscript:undefined},{license_code:'CC BY-NC'}])assert.equal(manifestFacts(JSON.stringify({...manifest,...changes}),pmcid,version),null)});
@@ -118,4 +118,34 @@ test('topic ranking shares core query normalization and retains distinguishing m
  assert.equal(relevantArticleScore({title:'B cell receptor signaling'},'t cell receptor signaling'),0);
  assert.ok(relevantArticleScore({title:'Hepatitis B virus carcinogenesis'},'hepatitis b virus carcinogenesis')>0);
  assert.ok(relevantArticleScore({title:'T-cell receptor signaling'},'t cell receptor signaling')>0);
+});
+
+// Real timers, isolated transport. A normal but slow 200 used to fail at six seconds.
+const delayWithinSignal=(ms,signal)=>new Promise((resolve,reject)=>{
+ if(signal.aborted){reject(signal.reason);return;}
+ const done=setTimeout(()=>{signal.removeEventListener('abort',stop);resolve()},ms);
+ function stop(){clearTimeout(done);reject(signal.reason);}
+ signal.addEventListener('abort',stop,{once:true});
+});
+test('slow initial Europe PMC reply reaches version, manifest, JATS and licensed figure',async()=>{
+ const h=harness(async(u,{signal,redirect})=>{
+  assert.equal(redirect,'error');
+  if(u.hostname==='www.ebi.ac.uk')await delayWithinSignal(6700,signal);
+ });
+ const candidates=await h.run();
+ assert.equal(h.requests.length,4);
+ assert.equal(candidates.length,1);
+ assert.match(candidates[0].sourceUrl,/#fig-1$/);
+ assert.equal(classifySource(candidates[0]),'pending_visual_review');
+ assert.equal(candidates[0].license,'CC BY 4.0');
+ const downloaded=await readBoundedImage(candidates[0].previewUrl, async()=>new Response(image,{headers:{'content-type':'binary/octet-stream'}}));
+ assert.deepEqual(downloaded.bytes,image);
+ assert.deepEqual(await h.run(),candidates);
+ assert.equal(h.requests.length,4,'confirmed metadata cache must not re-dispatch');
+});
+test('PMC bucket still times out at six seconds and does not advance or retry',async()=>{
+ const h=harness(async(u,{signal})=>{if(u.hostname!=='www.ebi.ac.uk')await delayWithinSignal(6700,signal);});
+ await assert.rejects(h.run,/metadata_timeout/);
+ assert.equal(h.requests.length,2,'search succeeded, only one failed bucket read');
+ assert.equal(h.cache.size,1);
 });
