@@ -26,6 +26,8 @@
 .reviewed-reader .reviewed-equation { font-size:1.12rem; margin:1.25rem 0; padding:.65rem 0; white-space:nowrap; overflow-x:auto; text-align:center; }
 .reviewed-reader .reviewed-equation strong { font-weight:500; }
 .reviewed-table-scroll:focus-visible, .structured-explanation-table-shell:focus-visible { outline:2px solid #39765a; outline-offset:3px; }
+.reading-prose[data-reading-tone="dark"] .reading-section h4 { color:#f0fdfa; }
+.reading-prose[data-reading-tone="dark"] .reading-section strong { color:inherit; }
 .reading-prose[data-reading-tone="dark"] th { background:rgba(255,255,255,.08); }
 @media(max-width:600px) {
  .reviewed-explanation { padding:18px 14px; }
@@ -37,6 +39,8 @@
 }
 
 /* Full explanation body only, never the question or answer controls. */
+.reading-prose > .explanation-body-columns,
+.reading-prose > .explanation-reader-header-wide { max-width:none; }
 .explanation-body-columns {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px;align-items:start}
 .explanation-body-column {min-width:0;display:grid;gap:1.1rem;align-content:start}
 .explanation-body-column + .explanation-body-column {border-inline-start:1px solid rgb(148 163 184 / .32);padding-inline-start:26px}
@@ -47,3 +51,6 @@
 .explanation-source-panel {position:absolute;z-index:20;inset-inline-end:0;top:100%;width:min(19rem,78vw);max-height:18rem;overflow:auto;border-radius:12px;padding:.4rem;font-size:.875rem}
 
 .explanation-source-only:empty {display:none}
+
+/* The figure status is a sibling of the reader in the shared delivery provider. */
+p[role="status"]:has(+ .reading-prose[data-reading-tone="dark"]) { color:#cbd5e1; }

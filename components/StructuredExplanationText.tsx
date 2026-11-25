@@ -429,7 +429,7 @@ function StructuredExplanationBody({
   const published = questionId ? <VerifiedExplanationFigures key={text} questionId={questionId} allowStatic={!replacementRevision} /> : null;
   return (
     <SectionFiguresProvider key={text} questionId={questionId} text={text || ""}><div ref={bodyRef} data-reading-tone={tone} className={`structured-explanation-text reading-prose w-full max-w-full min-w-0 ${className}`}>
-      {label || sources?.links.size ? <div className="mb-3 flex min-w-0 items-start justify-between gap-1">
+      {label || sources?.links.size ? <div className={`mb-3 flex min-w-0 items-start justify-between gap-1${useColumns ? " explanation-reader-header-wide" : ""}`}>
         {label ? <p className={`text-[15px] font-black leading-6 ${labelClassName}`}>{label}</p> : <span/>}
         {sources?.links.size ? <SplitExplanationSources sources={[...sources.links.values()]}/> : null}
       </div> : null}
