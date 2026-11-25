@@ -35,3 +35,15 @@
  .reviewed-reader .reviewed-equation { font-size:1.02rem; }
  .reviewed-reader .reviewed-image-frame { --reviewed-image-max-height:10rem; }
 }
+
+/* Full explanation body only, never the question or answer controls. */
+.explanation-body-columns {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px;align-items:start}
+.explanation-body-column {min-width:0;display:grid;gap:1.1rem;align-content:start}
+.explanation-body-column + .explanation-body-column {border-inline-start:1px solid rgb(148 163 184 / .32);padding-inline-start:26px}
+.explanation-source-details {position:relative;flex:none;line-height:1.4}
+.explanation-source-trigger {display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;list-style:none;color:inherit}
+.explanation-source-trigger::-webkit-details-marker {display:none}
+.explanation-source-trigger:hover,.explanation-source-trigger:focus-visible {outline:1px solid currentColor;outline-offset:-2px}
+.explanation-source-panel {position:absolute;z-index:20;inset-inline-end:0;top:100%;width:min(19rem,78vw);max-height:18rem;overflow:auto;border-radius:12px;padding:.4rem;font-size:.875rem}
+
+.explanation-source-only:empty {display:none}

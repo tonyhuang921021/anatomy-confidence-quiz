@@ -1,5 +1,4 @@
 "use client";
-import { ExplanationMathText } from "@/components/ExplanationMathText";
 import {requestExplanation} from "@/lib/explanationRequestClient";
 
 import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
@@ -1266,31 +1265,9 @@ function SearchPageContent() {
                 <div className="search-result-action-dock">
                   <QuestionExplanationTabs mainExplanationContent={<>
 {shouldShowAnswer ? (
-                  <StructuredExplanationText text={renderedQuestion.explanation} label={!override&&!hasReviewedExplanation(renderedQuestion.id)?"題庫既有說明":"詳解"} compact questionId={renderedQuestion.id} />
+                  <StructuredExplanationText text={renderedQuestion.explanation} label={!override&&!hasReviewedExplanation(renderedQuestion.id)?"題庫既有說明":"詳解"} compact questionId={renderedQuestion.id} optionAnalysis={!hasReviewedExplanation(renderedQuestion.id) ? renderedQuestion.optionAnalysis : undefined} />
                 ) : null}
-                {shouldShowAnswer && !hasReviewedExplanation(renderedQuestion.id) && renderedQuestion.optionAnalysis ? (
-                  <div className="space-y-2.5">
-                    {OPTION_KEYS.map((key) => {
-                      const text = renderedQuestion.optionAnalysis?.[key];
-                      if (!text) return null;
-                      return (
-                        <div
-                          key={`${renderedQuestion.id}-analysis-${key}`}
-                          className="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-3 sm:px-4"
-                        >
-                          <div className="flex items-start gap-3">
-                            <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                              {key}
-                            </span>
-                            <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
-                              <ExplanationMathText text={text} />
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : null}
+
 </>}
                     question={renderedQuestion}
                     relatedQuestionsContent={() => <RelatedQuestionsPanel question={renderedQuestion} relatedQuestions={allQuestions} savedQuestionSource="search" />}

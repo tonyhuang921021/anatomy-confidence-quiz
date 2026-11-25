@@ -2,7 +2,6 @@
 import {setExamConfidenceFlag,confidenceForExamFlag,confidenceForNewExamAnswer} from "@/lib/examQuestionFlags";
 import {getActiveStorageUser} from "@/lib/storage";
 import {editCanonicalAnswer,syncAnswerEditMetadata,isAcceptedCompletion,canonicalCompletionResponse} from "@/lib/quizAnswerEdits";
-import { ExplanationMathText } from "@/components/ExplanationMathText";
 import {requestExplanation} from "@/lib/explanationRequestClient";
 
 import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
@@ -2873,7 +2872,7 @@ function OwnerQuizPage() {
                       {!hasReviewedExplanation(currentQuestion.id)&&!currentExplanationOverride&&<button type="button" disabled={currentExplanationLoading} onClick={()=>void handleGenerateQuestionExplanation(currentQuestion,submittedAttempt)} className="mb-3 min-h-11 rounded-xl bg-brand-700 px-4 py-2 font-semibold text-white disabled:opacity-60">{currentExplanationLoading?'詳解生成中…':'產生圖文詳解'}</button>}
                       <QuestionExplanationTabs onReplacementVisibilityChange={handleReplacementVisibilityChange} mainExplanationContent={<>
 {shouldShowAiExplanationDetails ? (
-                        <StructuredExplanationText text={currentQuestion.explanation} label={!currentExplanationOverride&&!hasReviewedExplanation(currentQuestion.id)?"題庫既有說明":"整題詳解"} compact questionId={currentQuestion.id} />
+                        <StructuredExplanationText text={currentQuestion.explanation} label={!currentExplanationOverride&&!hasReviewedExplanation(currentQuestion.id)?"題庫既有說明":"整題詳解"} compact questionId={currentQuestion.id} optionAnalysis={!hasReviewedExplanation(currentQuestion.id) ? currentQuestion.optionAnalysis : undefined} />
                       ) : null}
 </>}
                         question={currentQuestion}
@@ -2929,28 +2928,7 @@ function OwnerQuizPage() {
                       儲存題目進度：答對 {currentSavedQuestionRecord?.correctCount ?? 0} / 2
                     </p>
                   ) : null}
-                  {shouldShowExplanation && shouldShowAiExplanationDetails && !hasReviewedExplanation(currentQuestion.id) && currentQuestion.optionAnalysis ? (
-                    <div hidden={Boolean(replacingExplanationIds[currentQuestion.id])} className="border-t border-slate-200 pt-4 text-sm text-slate-800">
-                      <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
-                      <div className="mt-2">
-                        {Object.entries(currentQuestion.optionAnalysis).map(([key, value]) => (
-                          <div
-                            key={key}
-                            className="border-b border-slate-100 py-3 last:border-b-0"
-                          >
-                            <div className="flex items-start gap-3">
-                              <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                                {key}
-                              </span>
-                              <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
-                                <ExplanationMathText text={value} />
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
+
 
                   {shouldShowExplanation && currentExplanationError ? (
                     <p className="text-sm font-medium text-rose-700">{currentExplanationError}</p>

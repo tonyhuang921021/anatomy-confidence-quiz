@@ -1,6 +1,6 @@
 "use client";
 import {usesFullGeneratedReading} from "@/lib/generatedExplanationReading";
-import {useEffect,useState} from "react";
+import {useEffect,useRef,useState} from "react";
 import {loadQuestionExplanationOverride} from "@/lib/storage";
 import type {QuestionExplanationOverride} from "@/types/quiz";
 import "@/app/explanation-reading.css";
@@ -12,6 +12,7 @@ import { ReviewedExplanation } from "@/components/ReviewedExplanation";
 import { VerifiedExplanationFigures } from "@/components/VerifiedExplanationFigures";
 import { ReviewedExplanationSupplement } from "@/components/ReviewedExplanationSupplement";
 import { splitInlineExplanationEmphasis } from "@/lib/inlineExplanationEmphasis";
+import { explanationSources, SplitExplanationSources, stripCollectedCitations } from "./SplitExplanationSources";
 
 function InlineEmphasis({ text }: { text: string }) {
   return <>{splitInlineExplanationEmphasis(text).map((part, index) =>
@@ -28,6 +29,7 @@ type StructuredExplanationTextProps = {
   className?: string;
   sectionFilter?: (section: ExplanationSection, index: number) => boolean;
   fallbackToFullText?: boolean;
+  optionAnalysis?: Partial<Record<string, string>>;
 };
 
 type ExplanationBlock =
@@ -259,9 +261,8 @@ export function StructuredExplanationText(props:StructuredExplanationTextProps){
  const replacement=version.id===questionId&&version.value?.replacementRevision?version.value:null;
  if(questionId&&hasReviewedExplanation(questionId)){
   if(!replacement)return <ReviewedExplanation questionId={questionId}/>;
-  return <><StructuredExplanationBody {...props} sectionFilter={undefined} text={replacement.explanation} replacementRevision={replacement.replacementRevision}/>
-   {replacement.optionAnalysis?<div className="mt-3 space-y-2" aria-label="新詳解選項解析">{Object.entries(replacement.optionAnalysis).map(([key,text])=><p key={key} className="min-w-0 text-sm leading-7"><strong>{key}　</strong><ExplanationMathText text={text||""}/></p>)}</div>:null}
-  </>;
+  return <StructuredExplanationBody {...props} sectionFilter={undefined} text={replacement.explanation} replacementRevision={replacement.replacementRevision} optionAnalysis={replacement.optionAnalysis}/>;
+
  }
  return <StructuredExplanationBody {...props} sectionFilter={usesFullGeneratedReading(version.id===questionId?version.value:undefined,false)?undefined:props.sectionFilter} text={replacement?.explanation??props.text} replacementRevision={replacement?.replacementRevision}/>;
 }
@@ -275,11 +276,28 @@ function StructuredExplanationBody({
   tone = "light",
   className = "",
   sectionFilter,
-  fallbackToFullText = true
+  fallbackToFullText = true,
+  optionAnalysis
 }: StructuredExplanationTextProps & {replacementRevision?:string|null}) {
 
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const body = bodyRef.current;
+    if (!body || !questionId) return;
+    const screen = window.matchMedia("(min-width: 1050px)");
+    const refresh = () => setWide(screen.matches && body.clientWidth >= 680);
+    refresh();
+    const observer = new ResizeObserver(refresh);
+    observer.observe(body);
+    screen.addEventListener("change", refresh);
+    return () => { observer.disconnect(); screen.removeEventListener("change", refresh); };
+  }, [text, questionId]);
   const trimmedText = text?.trim();
-  if (!trimmedText) return null;
+  if (!trimmedText) {
+    const rows = Object.entries(optionAnalysis ?? {}).filter(([key,value])=>/^[A-E]$/.test(key) && value?.trim());
+    return rows.length ? <div className="space-y-2" aria-label="各選項解析">{rows.map(([key,value])=><p key={key} className="text-sm leading-7"><strong>{key}　</strong><InlineEmphasis text={value || ""}/></p>)}</div> : null;
+  }
 
   const blocks = parseExplanationBlocks(trimmedText).filter(block =>
     questionId !== "MOEX-C217-091030-S4004-STAGE1-Q001" || !isOriginalHipDirectionTable(block)
@@ -313,16 +331,30 @@ function StructuredExplanationBody({
   const tableTextWrapClassName =
     "structured-explanation-table-cell min-w-[7.5rem] max-w-[16rem] whitespace-normal break-words [overflow-wrap:anywhere] [word-break:normal] sm:min-w-[8.5rem] sm:max-w-[18rem]";
 
-  return (
-    <SectionFiguresProvider key={text} questionId={questionId} text={text || ""}><div data-reading-tone={tone} className={`structured-explanation-text reading-prose w-full max-w-full min-w-0 ${className}`}>
-      {label ? (
-        <p className={`mb-3 text-[15px] font-black leading-6 ${labelClassName}`}>
-          {label}
-        </p>
-      ) : null}
-      {questionId ? <VerifiedExplanationFigures key={text} questionId={questionId} allowStatic={!replacementRevision} /> : null}
-      <div className="w-full max-w-[52rem] min-w-0 space-y-4 sm:space-y-5">
-        {sections.map((section, index) => (
+  const full = Boolean(questionId && !sectionFilter);
+  const sources = full ? explanationSources(trimmedText) : null;
+  const sourceOnly = new Set<ExplanationSection>();
+  if (sources) for (const section of sections) {
+    if (/^(來源|資料來源|參考資料|參考文獻)$/.test(section.title || "") &&
+      section.blocks.every(b => b.type !== "table") &&
+      sources.addRows(section.blocks.flatMap(b => b.type === "paragraph" ? b.text.split("\n").filter(Boolean) : b.type === "list" ? b.items.map((i,index) => b.ordered ? `${i.value ?? index+1}. ${i.text}` : i.text) : []))) sourceOnly.add(section);
+  }
+  const displaySections = sections;
+  const matchOptions = (section:ExplanationSection) => /^(逐項|各)?選項(解析|分析|判讀)|^逐項(解析|判讀)/.test(section.title || "");
+  const inlineOptionText = displaySections.filter(matchOptions).flatMap(section=>section.blocks.flatMap(block=>block.type==="paragraph"?[block.text]:block.type==="list"?block.items.map(item=>item.text):block.rows.flat())).join("\n");
+  const optionRows = Object.entries(optionAnalysis ?? {}).filter(([key, value]) => /^[A-E]$/.test(key) && value?.trim() && !inlineOptionText.includes(value.trim()));
+  const display = (value:string, title?:string) => sources && !/^(來源|資料來源|參考資料|參考文獻)$/.test(title || "") ? stripCollectedCitations(value, sources.links) : value;
+  const isRight = (section:ExplanationSection) => /^(逐項|各)?選項(解析|分析|判讀)|^逐項(解析|判讀)|^觸類旁通|^延伸概念|^常見混淆/.test(section.title || "");
+  const pairs = displaySections.map((section,index)=>({section,index}));
+  const left = pairs.filter(({section})=>!isRight(section)), right = pairs.filter(({section})=>isRight(section));
+  const useColumns = wide && full && left.some(({section})=>!sourceOnly.has(section)) && (right.length > 0 || optionRows.length > 0);
+  const renderOptions = () => optionRows.length ? <section className="reading-section min-w-0">
+    <h4 className={`mb-2 text-[16px] font-black leading-7 sm:text-[17px] ${headingClassName}`}>各選項解析</h4>
+    <div className="space-y-2">{optionRows.map(([key,value])=><p key={key} className={`min-w-0 text-sm leading-7 ${paragraphClassName}`}><strong>{key}　</strong><InlineEmphasis text={value || ""}/></p>)}</div>
+  </section> : null;
+  const renderSection = ({section,index}: {section:ExplanationSection;index:number}) => sourceOnly.has(section) ? (
+    <section key={`source-figure-${index}`} className="reading-section explanation-source-only"><SectionFigures title={section.title}/></section>
+  ) : (
           <section
             key={`${section.title ?? "section"}-${index}`}
             className="reading-section w-full max-w-full min-w-0"
@@ -351,7 +383,7 @@ function StructuredExplanationBody({
                                     scope="col" key={`${header}-${headerIndex}`}
                                     className={`border-b px-3 py-2.5 font-black ${tableCellClassName} ${tableTextWrapClassName}`}
                                   >
-                                    <InlineEmphasis text={header} />
+                                    <InlineEmphasis text={display(header, section.title)} />
                                   </th>
                                 ))}
                               </tr>
@@ -364,7 +396,7 @@ function StructuredExplanationBody({
                                       key={`cell-${rowIndex}-${cellIndex}`}
                                       className={`border-t px-3 py-2.5 align-top font-medium ${tableCellClassName} ${tableTextWrapClassName}`}
                                     >
-                                      <InlineEmphasis text={row[cellIndex] ?? ""} />
+                                      <InlineEmphasis text={display(row[cellIndex] ?? "", section.title)} />
                                     </td>
                                   ))}
                                 </tr>
@@ -377,14 +409,14 @@ function StructuredExplanationBody({
 
                     if (block.type === "list") {
                       const List=block.ordered ? "ol" : "ul";
-                      return <List className="reading-list" key={`list-${blockIndex}`}>{block.items.map((item,i)=><li key={i} value={item.value}><InlineEmphasis text={item.text}/></li>)}</List>;
+                      return <List className="reading-list" key={`list-${blockIndex}`}>{block.items.map((item,i)=><li key={i} value={item.value}><InlineEmphasis text={display(item.text, section.title)}/></li>)}</List>;
                     }
                     return (
                       <p
                         key={`${section.title ?? "paragraph"}-${blockIndex}`}
                         className={`${compact ? "text-[16px] leading-8" : "text-[17px] leading-9"} whitespace-pre-line font-medium ${paragraphClassName} [overflow-wrap:anywhere]`}
                       >
-                        <InlineEmphasis text={block.text} />
+                        <InlineEmphasis text={display(block.text, section.title)} />
                       </p>
                     );
                   })}
@@ -393,8 +425,21 @@ function StructuredExplanationBody({
             ) : null}
             <SectionFigures title={section.title} />
           </section>
-        ))}
-      </div>
+        );
+  const published = questionId ? <VerifiedExplanationFigures key={text} questionId={questionId} allowStatic={!replacementRevision} /> : null;
+  return (
+    <SectionFiguresProvider key={text} questionId={questionId} text={text || ""}><div ref={bodyRef} data-reading-tone={tone} className={`structured-explanation-text reading-prose w-full max-w-full min-w-0 ${className}`}>
+      {label || sources?.links.size ? <div className="mb-3 flex min-w-0 items-start justify-between gap-1">
+        {label ? <p className={`text-[15px] font-black leading-6 ${labelClassName}`}>{label}</p> : <span/>}
+        {sources?.links.size ? <SplitExplanationSources sources={[...sources.links.values()]}/> : null}
+      </div> : null}
+      {useColumns ? <div className="explanation-body-columns">
+        <div className="explanation-body-column">{left.map(renderSection)}{published}</div>
+        <div className="explanation-body-column">{renderOptions()}{right.map(renderSection)}</div>
+      </div> : <>
+        {published}
+        <div className="w-full max-w-[52rem] min-w-0 space-y-4 sm:space-y-5">{pairs.map(renderSection)}{renderOptions()}</div>
+      </>}
       <SectionFigures />
       {questionId ? <ReviewedExplanationSupplement questionId={questionId} /> : null}
     </div></SectionFiguresProvider>

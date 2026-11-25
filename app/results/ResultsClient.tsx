@@ -2218,34 +2218,6 @@ function ResultsPageContent() {
     );
   }
 
-  function renderOptionAnalysis(question: Question) {
-    if (!question.optionAnalysis || Object.keys(question.optionAnalysis).length === 0) return null;
-
-    return (
-      <div className="space-y-2.5">
-        {getAvailableOptionKeys(question).map((key) => {
-          const text = question.optionAnalysis?.[key];
-          if (!text) return null;
-
-          return (
-            <div
-              key={`${question.id}-option-analysis-${key}`}
-              className="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-3 sm:px-4"
-            >
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                  {key}
-                </span>
-                <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
-                  {text}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
 
   function renderExplanationFooter(question: Question, attempt: Attempt) {
     return (
@@ -2470,13 +2442,13 @@ function ResultsPageContent() {
           label="詳解"
           compact
           questionId={question.id}
+          optionAnalysis={!hasReviewedExplanation(question.id) ? question.optionAnalysis : undefined}
           sectionFilter={
             shouldCollapseAiExplanation
               ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
               : undefined
           }
         />
-        {!hasReviewedExplanation(question.id) ? renderOptionAnalysis(question) : null}
 </>}
           question={question}
           compact

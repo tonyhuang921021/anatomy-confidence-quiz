@@ -504,11 +504,6 @@ function getOptionKeys(item: ReviewQuestionItem) {
   );
 }
 
-function getOptionKeysFromQuestion(question: Question) {
-  return (["A", "B", "C", "D", "E"] as OptionKey[]).filter(
-    (key) => typeof question.options[key] === "string"
-  );
-}
 
 function renderQuestionReview(
   item: ReviewQuestionItem,
@@ -536,35 +531,14 @@ function renderQuestionReview(
         label="重點解析"
         compact
         questionId={renderedQuestion.id}
+        optionAnalysis={!hasReviewedExplanation(renderedQuestion.id) ? renderedQuestion.optionAnalysis : undefined}
         sectionFilter={
           shouldCollapseAiExplanation
             ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
             : undefined
         }
       />
-      {!hasReviewedExplanation(renderedQuestion.id) && renderedQuestion.optionAnalysis ? (
-        <div className="space-y-2">
-          {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
-            const text = renderedQuestion.optionAnalysis?.[key];
-            if (!text) return null;
-            return (
-              <div
-                key={`${renderedQuestion.id}-analysis-${key}`}
-                className="rounded-xl border border-slate-200 bg-slate-50/90 px-3 py-2.5 sm:px-4"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                    {key}
-                  </span>
-                  <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
-                    {text}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
+
 </>}
       question={renderedQuestion}
       compact
