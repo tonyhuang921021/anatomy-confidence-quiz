@@ -1721,13 +1721,12 @@ export default function SubjectNotesPage() {
                           <summary className="secondary-pill cursor-pointer list-none px-4 py-2 text-sm">
                             看答案與詳解
                           </summary>
-                          <div hidden={Boolean(replacementHiddenMap[question.id])} className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
+                          <div hidden={Boolean(replacementHiddenMap[question.id])} className="note-explanation-card mt-3 min-w-0 overflow-hidden break-words rounded-2xl px-4 py-3 text-sm leading-7">
                             <p className="font-bold">答案：{getQuestionAnswerLabel(question)}</p>
                             <StructuredExplanationText
                               text={explanation}
                               label="詳解"
                               compact
-                              tone="dark"
                               className="mt-3"
                               questionId={question.id}
                             />
@@ -1735,15 +1734,15 @@ export default function SubjectNotesPage() {
                               questionId={question.id}
                               compact
                               className="mt-3"
-                              buttonClassName="min-h-10 rounded-2xl bg-amber-100/15 px-4 py-2 text-sm font-semibold text-amber-50 ring-1 ring-amber-100/20 transition hover:bg-amber-100/25 disabled:cursor-wait disabled:opacity-60"
+                              buttonClassName="note-explanation-yangming min-h-10 rounded-2xl px-4 py-2 text-sm font-semibold transition disabled:cursor-wait disabled:opacity-60"
                             />
                             {!hasReviewedExplanation(question.id) && optionAnalysis && Object.keys(optionAnalysis).length > 0 ? (
                               <div className="mt-3 grid gap-2">
                                 {Object.entries(optionAnalysis).map(([key, value]) =>
                                   value ? (
-                                    <p key={key} className="rounded-2xl bg-white/10 px-3 py-2">
-                                      <span className="font-bold text-white">{key}. </span>
-                                      <span className="text-slate-100">{value}</span>
+                                    <p key={key} className="note-explanation-option rounded-2xl px-3 py-2">
+                                      <span className="font-bold">{key}. </span>
+                                      <span>{value}</span>
                                     </p>
                                   ) : null
                                 )}

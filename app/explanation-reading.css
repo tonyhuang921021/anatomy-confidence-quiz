@@ -26,8 +26,6 @@
 .reviewed-reader .reviewed-equation { font-size:1.12rem; margin:1.25rem 0; padding:.65rem 0; white-space:nowrap; overflow-x:auto; text-align:center; }
 .reviewed-reader .reviewed-equation strong { font-weight:500; }
 .reviewed-table-scroll:focus-visible, .structured-explanation-table-shell:focus-visible { outline:2px solid #39765a; outline-offset:3px; }
-.reading-prose[data-reading-tone="dark"] .reading-section h4 { color:#f0fdfa; }
-.reading-prose[data-reading-tone="dark"] .reading-section strong { color:inherit; }
 .reading-prose[data-reading-tone="dark"] th { background:rgba(255,255,255,.08); }
 @media(max-width:600px) {
  .reviewed-explanation { padding:18px 14px; }
@@ -50,12 +48,31 @@
 .explanation-source-trigger:hover,.explanation-source-trigger:focus-visible {outline:1px solid currentColor;outline-offset:-2px}
 .explanation-source-panel {position:absolute;z-index:20;inset-inline-end:0;top:100%;width:min(19rem,78vw);max-height:18rem;overflow:auto;border-radius:12px;padding:.4rem;font-size:.875rem}
 
-/* Narrow dark note cards clip larger popovers; anchor to the available header width. */
-.reading-prose[data-reading-tone="dark"] > .explanation-reader-header { position:relative; }
-.reading-prose[data-reading-tone="dark"] .explanation-reader-header > .explanation-source-details { position:static; }
-.reading-prose[data-reading-tone="dark"] .explanation-source-panel { width:min(19rem,100%); }
-
 .explanation-source-only:empty {display:none}
 
-/* The figure status is a sibling of the reader in the shared delivery provider. */
-p[role="status"]:has(+ .reading-prose[data-reading-tone="dark"]) { color:#cbd5e1; }
+/* Notes use the site theme, while keeping their question and drawer unchanged. */
+.note-explanation-card {
+  background:#fff;
+  color:var(--ink-main);
+  box-shadow:inset 0 0 0 1px var(--line-soft);
+}
+html[data-theme="dark"] .note-explanation-card { background:var(--surface-float); }
+.note-explanation-card .reading-section h4 { color:var(--ink-main); }
+.note-explanation-card .reading-section strong { color:inherit; }
+.note-explanation-card > [role="status"],
+.note-explanation-card .reviewed-reader figcaption,
+.note-explanation-card .reviewed-official-answer { color:var(--ink-soft); }
+.note-explanation-option { background:var(--surface-muted); }
+.note-explanation-yangming {
+  color:var(--ink-main);
+  background:var(--surface-muted);
+  box-shadow:inset 0 0 0 1px var(--line-soft);
+}
+.note-explanation-yangming:hover { background:color-mix(in srgb,var(--ink-soft) 12%,var(--surface-muted)); }
+html[data-theme="dark"] .note-explanation-card :is(.reading-prose,.reviewed-reader) th { background:var(--surface-muted); }
+
+/* Give narrow note popovers the actual available width instead of the viewport width. */
+.note-explanation-card .explanation-reader-header { position:relative; }
+.note-explanation-card .explanation-reader-header > .explanation-source-details { position:static; }
+.note-explanation-card .explanation-source-panel { width:min(19rem,100%); }
+html[data-theme="dark"] .note-explanation-card .explanation-source-panel { background:var(--surface-float); }
