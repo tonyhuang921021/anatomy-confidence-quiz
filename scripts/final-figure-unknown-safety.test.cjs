@@ -48,3 +48,21 @@ test('provider failures and incomplete or malformed responses never display or r
  }
 });
 test('lost acknowledgement after completed uncertain is read back without new review',async()=>{const f=fixture('after','uncertain');assert.equal((await f.run()).status,'unknown');assert.equal(f.state(),'committed');assert.equal((await f.run()).status,'already_reviewed');assert.equal(f.paid(),1)});
+
+test('v5 binds stricter normal anatomy and caption-accurate partial matching to the same visual contract',()=>{
+ const {bindInput,providerInput}=require('../lib/finalFigureSuitability.cjs');
+ const question={id:'Q1',stem:'Which standard anatomical relation is required?',options:{A:'Typical relationship',B:'A congenital variation'},answer:'A'};
+ const bound=bindInput({...base,question});
+ const p=providerInput(bound,policy.model),rubric=p.input[0].content[0].text;
+ assert.equal(bound.binding.promptRevision,'human-medical-language-purpose-v5');
+ const prior={...bound.binding,promptRevision:'human-medical-language-purpose-v4'};
+ assert.equal(bound.key,sha(JSON.stringify(bound.binding)));
+ assert.notEqual(bound.key,sha(JSON.stringify(prior)));
+ assert.match(rubric,/nonrepresentative fetal, pathologic, or congenital variant is mismatch when shown as the standard relation/);
+ assert.match(rubric,/missing the required normal relationships or whose caption would claim relationships the image does not show is mismatch/);
+ assert.match(rubric,/medically useful, caption-accurate subset/);
+ assert.match(rubric,/Do not reject an expressly identified variant when teaching that variant or comparing it with normal anatomy/);
+ assert.equal(p.input[1].content[1].detail,'low');
+ assert.equal(JSON.parse(p.input[1].content[0].text).teachingGoal.caption,item.caption);
+ assert.equal(parseDecision('{"verdict":"mismatch","labelLanguage":"en"}'),'mismatch');
+});
