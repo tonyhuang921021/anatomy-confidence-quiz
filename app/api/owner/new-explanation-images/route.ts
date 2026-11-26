@@ -1,7 +1,7 @@
 import {discoverPmcFigures} from '@/lib/pmcFigureSource.cjs';
 import {runNewImageContinuation} from '@/lib/newExplanationImageContinuation.cjs';
 import {enqueueSavedPlan} from '@/lib/savedExplanationImagePlan.cjs';
-import {continueFigure,createContinuationRepository} from '@/lib/figureContinuation.cjs';
+import {continueFigure,createContinuationRepository,exactEyeAssetFor} from '@/lib/figureContinuation.cjs';
 import {resolveTrustedExplanationQuestion} from "@/lib/trustedQuestionLoader";
 import {createFinalFigureReviewer,recoverStoredFigureReview} from "@/lib/finalFigureRuntime.cjs";
 import {reviewStagedFigure} from "@/lib/stagedFigureReview.cjs";
@@ -50,6 +50,9 @@ export async function POST(request:NextRequest){
     const item=parentRow.figure_needs?.items?.find((x:any)=>x.sectionAnchor===body.sectionAnchor);
     if(!item||typeof body.query!=='string'||! /^[A-Za-z][A-Za-z0-9 -]{2,99}$/.test(body.query))return reply({ok:false,code:'invalid_query'},400);
     if(sitewide&&!automaticQuery({...item,proposedQuery:body.query}))return reply({ok:false,code:'invalid_query'},400);
+    const requiredAsset=exactEyeAssetFor({parent_request:body.parentId,query:body.query,question_id:parentRow.question_id,text_sha:parentRow.explanation_sha256,item});
+    if(requiredAsset===null)return reply({ok:false,code:'stale_exact_image'},409);
+    if(requiredAsset&&(process.env.Q100_EXACT_FIGURE_CONTINUATION_DISABLED==='1'||process.env.FIGURE_LUNA_REVIEW_ENABLED!=='1'))return reply({ok:false,code:'worker_disabled'},503);
     const r=await db.rpc('figure_continuation_open',{p_id:body.id,p_actor:u.id,p_parent:body.parentId,p_text_sha:parentRow.explanation_sha256,p_item:{...item,query:body.query,proposedQuery:body.query,catalogRevision:'reviewed-query-v1'}});
     return r.error?reply({ok:false,code:'continuation_unavailable'},503):reply({ok:true,...r.data});
    }
@@ -57,7 +60,23 @@ export async function POST(request:NextRequest){
    const snapshot=await repository.read(body.id);
    if(!snapshot?.operation||(!sitewide&&!pilotTargets.some(t=>t.questionId===snapshot.operation.question_id&&t.textHash===snapshot.operation.text_sha)))return reply({ok:false,code:'outside_batch'},403);
    if(sitewide){const allowed=await db.rpc('explanation_sitewide_request_allowed',{p_id:snapshot.operation.parent_request,p_actor:u.id});if(allowed.error||allowed.data!==true)return reply({ok:false,code:'outside_batch'},403);}
-   return reply({ok:true,...await continueFigure({id:body.id,repository,discover:discoverPmcFigures,trafficAllowed:async()=>imageWindowOpen(process.env)&&await figureCaptureAllowed(db),readText:async(id:string)=>{const r=await db.from('question_explanation_overrides').select('explanation').eq('question_id',id).maybeSingle();if(r.error)throw Error('read unavailable');return r.data?.explanation},search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),review:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const r=resolveTrustedExplanationQuestion(id);return r.ok?r.question:null}})})});
+   const requiredAsset=exactEyeAssetFor(snapshot.operation);
+   if(requiredAsset===null)return reply({ok:false,code:'stale_exact_image'},409);
+   if(requiredAsset){
+    if(process.env.Q100_EXACT_FIGURE_CONTINUATION_DISABLED==='1'||process.env.FIGURE_LUNA_REVIEW_ENABLED!=='1')return reply({ok:false,code:'worker_disabled'},503);
+    const [saved,candidate]=await Promise.all([
+     db.from('question_explanation_overrides').select('replacement_revision').eq('question_id',requiredAsset.question).maybeSingle(),
+     db.from('explanation_figure_candidates').select('id,question_id,explanation_sha256,image_sha256,section_sha256,section_heading,section_anchor,section_title,source_url,license,license_url,attribution,status').eq('id',requiredAsset.candidateId).maybeSingle()
+    ]);
+    const c=candidate.data;
+    if(saved.error||candidate.error||saved.data?.replacement_revision!==requiredAsset.parent||
+       !c||c.question_id!==requiredAsset.question||c.explanation_sha256!==requiredAsset.textSha||c.image_sha256!==requiredAsset.imageSha||
+       c.section_sha256!==requiredAsset.sectionSha||c.section_heading!==requiredAsset.heading||c.section_anchor!=='section-0'||c.section_title!==requiredAsset.caption||
+       c.source_url!==requiredAsset.sourceUrl||c.license!==requiredAsset.license||c.license_url!==requiredAsset.licenseUrl||c.attribution!==requiredAsset.attribution||
+       !['pending','approved'].includes(c.status))return reply({ok:false,code:'stale_exact_image'},409);
+    if(c.status==='approved')return reply({ok:true,status:'display'});
+   }
+   return reply({ok:true,...await continueFigure({id:body.id,repository,requiredAsset,discover:discoverPmcFigures,trafficAllowed:async()=>imageWindowOpen(process.env)&&await figureCaptureAllowed(db),readText:async(id:string)=>{const r=await db.from('question_explanation_overrides').select('explanation').eq('question_id',id).maybeSingle();if(r.error)throw Error('read unavailable');return r.data?.explanation},search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),review:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const r=resolveTrustedExplanationQuestion(id);return r.ok?r.question:null}})})});
   }
   if(body.action==='list'){
    const {data,error}=await db.from('figure_queue_jobs').select('request_id,question_id,explanation_sha256,figure_needs,needs_state,image_status,state,attempts').in('state',['pending','leased','done','failed']).order('created_at',{ascending:false}).limit(20);
