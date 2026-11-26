@@ -1,7 +1,7 @@
 import {discoverPmcFigures} from '@/lib/pmcFigureSource.cjs';
 import {runNewImageContinuation} from '@/lib/newExplanationImageContinuation.cjs';
 import {enqueueSavedPlan} from '@/lib/savedExplanationImagePlan.cjs';
-import {continueFigure,createContinuationRepository,exactEyeAssetFor} from '@/lib/figureContinuation.cjs';
+import {continueFigure,createContinuationRepository,exactEyeAssetFor,continueFrozenEye,EXACT_RECOVERY_ID} from '@/lib/figureContinuation.cjs';
 import {resolveTrustedExplanationQuestion} from "@/lib/trustedQuestionLoader";
 import {createFinalFigureReviewer,recoverStoredFigureReview} from "@/lib/finalFigureRuntime.cjs";
 import {reviewStagedFigure} from "@/lib/stagedFigureReview.cjs";
@@ -63,10 +63,11 @@ export async function POST(request:NextRequest){
    const requiredAsset=exactEyeAssetFor(snapshot.operation);
    if(requiredAsset===null)return reply({ok:false,code:'stale_exact_image'},409);
    if(requiredAsset){
+    const frozenRecovery=body.id===EXACT_RECOVERY_ID;
     if(process.env.Q100_EXACT_FIGURE_CONTINUATION_DISABLED==='1'||process.env.FIGURE_LUNA_REVIEW_ENABLED!=='1')return reply({ok:false,code:'worker_disabled'},503);
     const [saved,candidate]=await Promise.all([
-     db.from('question_explanation_overrides').select('replacement_revision').eq('question_id',requiredAsset.question).maybeSingle(),
-     db.from('explanation_figure_candidates').select('id,question_id,explanation_sha256,image_sha256,section_sha256,section_heading,section_anchor,section_title,source_url,license,license_url,attribution,status').eq('id',requiredAsset.candidateId).maybeSingle()
+     db.from('question_explanation_overrides').select(frozenRecovery?'replacement_revision,explanation':'replacement_revision').eq('question_id',requiredAsset.question).maybeSingle(),
+     db.from('explanation_figure_candidates').select(frozenRecovery?'id,question_id,explanation_sha256,image_sha256,section_sha256,section_heading,section_anchor,section_title,source_url,license,license_url,attribution,status,image_mime,image_bytes':'id,question_id,explanation_sha256,image_sha256,section_sha256,section_heading,section_anchor,section_title,source_url,license,license_url,attribution,status').eq('id',requiredAsset.candidateId).maybeSingle()
     ]);
     const c=candidate.data;
     if(saved.error||candidate.error||saved.data?.replacement_revision!==requiredAsset.parent||
@@ -75,6 +76,10 @@ export async function POST(request:NextRequest){
        c.source_url!==requiredAsset.sourceUrl||c.license!==requiredAsset.license||c.license_url!==requiredAsset.licenseUrl||c.attribution!==requiredAsset.attribution||
        !['pending','approved'].includes(c.status))return reply({ok:false,code:'stale_exact_image'},409);
     if(c.status==='approved')return reply({ok:true,status:'display'});
+    if(frozenRecovery){
+     const review=createFinalFigureReviewer({db,readQuestion:(id:string)=>{const r=resolveTrustedExplanationQuestion(id);return r.ok?r.question:null}});
+     return reply({ok:true,...await continueFrozenEye({id:body.id,snapshot,candidate:c,text:saved.data?.explanation,review})});
+    }
    }
    return reply({ok:true,...await continueFigure({id:body.id,repository,requiredAsset,discover:discoverPmcFigures,trafficAllowed:async()=>imageWindowOpen(process.env)&&await figureCaptureAllowed(db),readText:async(id:string)=>{const r=await db.from('question_explanation_overrides').select('explanation').eq('question_id',id).maybeSingle();if(r.error)throw Error('read unavailable');return r.data?.explanation},search:guardFigureTraffic(db,commonsSearch,()=>imageWindowOpen(process.env)),loadImage:guardFigureTraffic(db,readBoundedImage,()=>imageWindowOpen(process.env)),review:createFinalFigureReviewer({db,readQuestion:(id:string)=>{const r=resolveTrustedExplanationQuestion(id);return r.ok?r.question:null}})})});
   }
