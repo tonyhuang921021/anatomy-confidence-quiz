@@ -8,9 +8,14 @@ import {reviewStagedFigure} from "@/lib/stagedFigureReview.cjs";
 import {figureCaptureAllowed,guardFigureTraffic} from "@/lib/figureCaptureGate.cjs";
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {boundedImageTargets,boundedImageTarget,imageWindowOpen,buildNeeds,approveConcepts,automaticQuery,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
+import {boundedImageTargets,boundedImageTarget,imageWindowOpen,buildNeeds,menstrualCycleComparatorPlan,approveConcepts,automaticQuery,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 const reply=(x:any,status=200)=>NextResponse.json(x,{status,headers:{'Cache-Control':'no-store'}});
+const CYCLE_BACKFILL={
+ question:'MOEX-115090-2301-Q096',
+ revision:'c708e2fb-05ac-4e1c-8124-058b7ea8c9d2',
+ textHash:'f167dba11544c1bd1f3f97aaf81f1afca8330ce94ab90f946ec369beb898ff2d',
+};
 export async function POST(request:NextRequest){
  if(process.env.NEW_EXPLANATION_FIGURES_ADMIN!=='1')return reply({ok:false,code:'disabled'},503);
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -98,6 +103,16 @@ export async function POST(request:NextRequest){
    // A bounded saved-text pilot may add a fresh plan without regenerating text
    // or reopening any previous attempted job. No general catalog expansion.
    const available=[...(unplanned.data||[])].filter(x=>!pilotTargets.length||pilotTargets.some(t=>t.questionId===x.question_id));
+   if(sitewide){
+    const remaining=available.filter(x=>x.question_id!==CYCLE_BACKFILL.question);
+    const [saved,queued,admitted]=await Promise.all([
+     db.from('question_explanation_overrides').select('replacement_revision,figure_status').eq('question_id',CYCLE_BACKFILL.question).maybeSingle(),
+     db.from('figure_queue_jobs').select('request_id').eq('request_id',CYCLE_BACKFILL.revision).maybeSingle(),
+     db.rpc('explanation_sitewide_request_allowed',{p_id:CYCLE_BACKFILL.revision,p_actor:u.id})
+    ]);
+    if(!saved.error&&!queued.error&&!admitted.error&&admitted.data===true&&!queued.data&&saved.data?.replacement_revision===CYCLE_BACKFILL.revision&&saved.data.figure_status==='awaiting_image_plan')remaining.unshift({question_id:CYCLE_BACKFILL.question});
+    available.splice(0,available.length,...remaining);
+   }
    for(const target of pilotTargets){
     const old=await db.from('figure_queue_jobs').select('request_id').eq('question_id',target.questionId).limit(1);
     const saved=await db.from('question_explanation_overrides').select('question_id,explanation,figure_status').eq('question_id',target.questionId).maybeSingle();
@@ -126,7 +141,14 @@ export async function POST(request:NextRequest){
    if(typeof body.questionId!=='string'||! /^[A-Za-z0-9_-]{1,200}$/.test(body.questionId))return reply({ok:false},400);
    const saved=await db.from('question_explanation_overrides').select('explanation,figure_status,replacement_revision').eq('question_id',body.questionId).maybeSingle();
    if(saved.error||!saved.data?.explanation)return reply({ok:false},404);
-   const needs=buildNeeds(saved.data.explanation,body.hints);
+   const exactCycle=sitewide&&body.questionId===CYCLE_BACKFILL.question&&saved.data.replacement_revision===CYCLE_BACKFILL.revision;
+   const question=exactCycle?resolveTrustedExplanationQuestion(CYCLE_BACKFILL.question):null;
+   const needs=exactCycle?(question?.ok?menstrualCycleComparatorPlan(saved.data.explanation,question.question):null):buildNeeds(saved.data.explanation,body.hints);
+   if(exactCycle&&(body.requestId!==CYCLE_BACKFILL.revision||needs?.explanationHash!==CYCLE_BACKFILL.textHash))return reply({ok:false,code:'exact_plan_not_created'},409);
+   if(exactCycle){
+    const admitted=await db.rpc('explanation_sitewide_request_allowed',{p_id:CYCLE_BACKFILL.revision,p_actor:u.id});
+    if(admitted.error||admitted.data!==true)return reply({ok:false,code:'outside_batch'},403);
+   }
    if(target&&needs?.explanationHash!==target.textHash)return reply({ok:false,code:'stale_single_batch'},409);
    if(!needs?.items?.length)return reply({ok:false,code:'heading_not_found'},400);
    const eligible=await db.rpc('ai_guard_image_eligible',{p_question:body.questionId,p_text_sha:needs.explanationHash});
