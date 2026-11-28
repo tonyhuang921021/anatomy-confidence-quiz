@@ -9,6 +9,7 @@ import { explanationPrefix } from "@/lib/explanationStream";
 import {waitUntil} from '@vercel/functions';
 import { dispatchReplacementImages } from "@/lib/replacementFigures.cjs";
 import { createGenerationJournal } from "@/lib/generationResultJournal.cjs";
+import { hasUnresolvedPrimaryImage } from '@/lib/primaryImageDependency.cjs';
 import { uncertainPrimaryTeachingSource } from '@/lib/primaryTeachingSource';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 import { imageWindowOpen, buildNeedsWithFallback, IMAGE_PROMPT, processSavedImages } from "@/lib/newExplanationFigures.cjs";
@@ -871,7 +872,7 @@ export async function POST(request: NextRequest) {
         // Mark restrictions without blocking access to an existing shared row.
         return {...q,trustedContext:found.sharedContext,requiresContext:found.requiresContext,
           hasUncertainSource:uncertainPrimaryTeachingSource(q),
-          hasUnresolvedImage:Boolean(q.stemImage || (q.optionImages && Object.values(q.optionImages).some(Boolean)))};
+          hasUnresolvedImage:hasUnresolvedPrimaryImage(q)};
       },
       prepare: async (q:any) => {
         const prepareStart=Date.now();const trustedContext = q.trustedContext;
