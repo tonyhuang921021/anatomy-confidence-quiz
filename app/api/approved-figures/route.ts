@@ -3,7 +3,7 @@ import {createClient} from '@supabase/supabase-js';
 import {createHash} from 'node:crypto';
 import {imageActivityForJob} from '@/lib/explanationImageActivity';
 import {publishedTrialFigure} from '@/lib/publishedTrialFigures';
-import {safeApprovedMeta} from '@/lib/approvedFigureSecurity';
+import {safeApprovedMeta,isWithdrawnApprovedFigure} from '@/lib/approvedFigureSecurity';
 import {userProvidedExplanationFigure} from '@/lib/userProvidedExplanationFigure.cjs';
 export async function GET(request:NextRequest){
  const headers={'Cache-Control':'no-store'};if(process.env.FIGURE_REVIEW_ENABLED!=='1')return NextResponse.json({figures:[]},{headers});
@@ -13,7 +13,7 @@ export async function GET(request:NextRequest){
   const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data,error}=await db.rpc('list_approved_explanation_figures',{p_question:id});
   if(error||!Array.isArray(data))throw Error('unavailable');
-  let figures=data.filter(safeApprovedMeta).slice(0,3);
+  let figures=data.filter(x=>!isWithdrawnApprovedFigure(x?.id)&&safeApprovedMeta(x)).slice(0,3);
   const saved=await db.from('question_explanation_overrides').select('explanation,figure_status,replacement_revision').eq('question_id',id).maybeSingle();
   if(saved.error)throw Error('unavailable');
   if(!saved.data)return NextResponse.json({figures},{headers});
@@ -38,8 +38,11 @@ export async function GET(request:NextRequest){
     if(!quota.error&&quota.data?.mode==='taipei_daily_v1')capacity=quota.data;
    }catch{/* Keep saved images and neutral status if the optional read fails. */}
   }
-  let imageStatus=jobs.data?.image_status||saved.data.figure_status;
+  const hasFigure=figures.some((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved'));
+  // Do not advertise processing/approval of an intentionally withdrawn figure.
+  const onlyWithdrawn=!hasFigure&&jobs.data?.state==='done'&&jobs.data.image_status==='approved'&&bound.data?.some(x=>x.explanation_sha256===hash&&x.status==='approved'&&isWithdrawnApprovedFigure(x.id));
+  let imageStatus=onlyWithdrawn?null:(jobs.data?.image_status||saved.data.figure_status);
   if(imageStatus==='pending_visual_review'&&!sectionFigures.length&&!bound.data?.some(x=>x.explanation_sha256===hash&&x.status==='pending'))imageStatus='awaiting_image';
-  return NextResponse.json({figures:versioned?[]:figures.filter((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved')&&!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus,imageActivity:imageActivityForJob(jobs.data,figures.some((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved')),Date.now(),capacity),sections:(jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
+  return NextResponse.json({figures:versioned?[]:figures.filter((x:any)=>bound.data?.some(y=>y.id===x.id&&y.explanation_sha256===hash&&y.status==='approved')&&!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus,imageActivity:onlyWithdrawn?null:imageActivityForJob(jobs.data,hasFigure,Date.now(),capacity),sections:(onlyWithdrawn?[]:jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
  }catch{return NextResponse.json({figures:[]},{status:503,headers})}
 }
